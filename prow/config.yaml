@@ -1,0 +1,63 @@
+prowjob_namespace: default
+pod_namespace: test-pods
+
+presubmits:
+  maistra-prow-testing/istio:
+  - name: unittesting
+    decorate: true
+    always_run: true
+    path_alias: istio.io/istio
+    skip_report: false
+    spec:
+      containers:
+      - image: "docker.io/dgrimm/maistra-builder:latest"
+        command:
+        - make
+        - init
+        - test
+        env:
+        - name: ISTIO_BUILD_BUCKET
+          value: "maistra-prow-testing"
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+
+tide:
+  merge_method:
+    maistra-prow-testing: squash
+  target_url: https://prow.apps.maistra-ci.devcluster.openshift.com/tide
+  queries:
+  - orgs:
+    - maistra-prow-testing
+    labels:
+    - lgtm
+    - approved
+    missingLabels:
+    - do-not-merge
+    - do-not-merge/hold
+    - do-not-merge/work-in-progress
+    - do-not-merge/invalid-owners-file
+    - needs-rebase
+  context_options:
+    from-branch-protection: true
+    skip-unknown-contexts: true
+    orgs:
+      maistra-prow-testing:
+        repos:
+          istio:
+            required-contexts:
+            - "unittesting"
+
+plank:
+  default_decoration_configs:
+    '*':
+      utility_images:
+        clonerefs: "gcr.io/k8s-prow/clonerefs:v20190619-25afbb545"
+        initupload: "gcr.io/k8s-prow/initupload:v20190619-25afbb545"
+        entrypoint: "gcr.io/k8s-prow/entrypoint:v20190619-25afbb545"
+        sidecar: "gcr.io/k8s-prow/sidecar:v20190619-25afbb545"
+      gcs_configuration:
+        path_strategy: explicit
+        bucket: "maistra-prow-testing"
+      gcs_credentials_secret: "gcs-credentials"

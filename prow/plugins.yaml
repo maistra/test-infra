@@ -1,0 +1,9 @@
+plugins:
+  maistra-prow-testing:
+  - size
+  - trigger
+  - lgtm
+  - hold
+  - approve
+  - wip
+  - verify-owners
