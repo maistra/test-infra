@@ -83,7 +83,7 @@ presubmits:
 # tide:
 #   merge_method:
 #     maistra-prow-testing: squash
-#   target_url: https://78.47.176.69/tide
+#   target_url: https://prow.maistra.io/tide
 #   queries:
 #   - orgs:
 #     - maistra-prow-testing
@@ -107,7 +107,7 @@ presubmits:
 #             - "integrationtests"
 
 plank:
-  job_url_template: 'https://78.47.176.69/log?job={{ .Spec.Job}}&id={{ .Status.BuildID }}'
+  job_url_template: 'https://prow.maistra.io/log?job={{ .Spec.Job}}&id={{ .Status.BuildID }}'
   default_decoration_configs:
     '*':
       timeout: 2h
