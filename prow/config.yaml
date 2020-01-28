@@ -2,15 +2,51 @@ prowjob_namespace: default
 pod_namespace: test-pods
 
 presubmits:
+  Maistra/istio-operator:
+  - name: unittests
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/istio-operator
+    skip_report: false
+    spec:
+      containers:
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1.0"
+        command:
+        - make
+        - test
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+  maistra-prow-testing/istio-operator:
+  - name: unittests
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/istio-operator
+    skip_report: false
+    spec:
+      containers:
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1.0"
+        command:
+        - make
+        - test
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
   maistra-prow-testing/istio:
-  - name: unittesting
+  - name: unittests
     decorate: true
     always_run: true
     path_alias: istio.io/istio
     skip_report: false
+    branches:
+      - maistra-1.0
     spec:
       containers:
-      - image: "docker.io/dgrimm/maistra-builder:latest"
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:latest"
         command:
         - make
         - init
@@ -22,42 +58,84 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+  - name: integrationtests
+    decorate: true
+    always_run: true
+    path_alias: istio.io/istio
+    skip_report: false
+    branches:
+      - maistra-1.0
+    spec:
+      containers:
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:latest"
+        command:
+        - make
+        - init
+        - test.integration.local
+        env:
+        - name: ISTIO_BUILD_BUCKET
+          value: "maistra-prow-testing"
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
 
-tide:
-  merge_method:
-    maistra-prow-testing: squash
-  target_url: https://prow.apps.maistra-ci.devcluster.openshift.com/tide
-  queries:
-  - orgs:
-    - maistra-prow-testing
-    labels:
-    - lgtm
-    - approved
-    missingLabels:
-    - do-not-merge
-    - do-not-merge/hold
-    - do-not-merge/work-in-progress
-    - do-not-merge/invalid-owners-file
-    - needs-rebase
-  context_options:
-    from-branch-protection: true
-    skip-unknown-contexts: true
-    orgs:
-      maistra-prow-testing:
-        repos:
-          istio:
-            required-contexts:
-            - "unittesting"
+# tide:
+#   merge_method:
+#     maistra-prow-testing: squash
+#   target_url: https://78.47.176.69/tide
+#   queries:
+#   - orgs:
+#     - maistra-prow-testing
+#     labels:
+#     - okay to merge
+#     missingLabels:
+#     - do-not-merge
+#     - do-not-merge/hold
+#     - do-not-merge/work-in-progress
+#     - do-not-merge/invalid-owners-file
+#     - needs-rebase
+#   context_options:
+#     from-branch-protection: true
+#     skip-unknown-contexts: true
+#     orgs:
+#       maistra-prow-testing:
+#         repos:
+#           istio:
+#             required-contexts:
+#             - "unittests"
+#             - "integrationtests"
 
 plank:
+  job_url_template: 'https://78.47.176.69/log?job={{ .Spec.Job}}&id={{ .Status.BuildID }}'
   default_decoration_configs:
     '*':
+      timeout: 2h
+      grace_period: 15s
       utility_images:
-        clonerefs: "gcr.io/k8s-prow/clonerefs:v20190619-25afbb545"
-        initupload: "gcr.io/k8s-prow/initupload:v20190619-25afbb545"
-        entrypoint: "gcr.io/k8s-prow/entrypoint:v20190619-25afbb545"
-        sidecar: "gcr.io/k8s-prow/sidecar:v20190619-25afbb545"
+        clonerefs: "gcr.io/k8s-prow/clonerefs:v20200117-c08038c1c"
+        initupload: "gcr.io/k8s-prow/initupload:v20200117-c08038c1c"
+        entrypoint: "gcr.io/k8s-prow/entrypoint:v20200117-c08038c1c"
+        sidecar: "gcr.io/k8s-prow/sidecar:v20200117-c08038c1c"
       gcs_configuration:
         path_strategy: explicit
         bucket: "maistra-prow-testing"
       gcs_credentials_secret: "gcs-credentials"
+
+sinker:
+  resync_period: 1h
+  max_prowjob_age: 168h
+  max_pod_age: 6h
+
+branch-protection:
+  allow_disabled_policies: true
+  protect: false
+  orgs:
+    maistra-prow-testing:
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        require_code_owner_reviews: false
+    Maistra:
+      required_pull_request_reviews:
+        required_approving_review_count: 2
+        require_code_owner_reviews: false
