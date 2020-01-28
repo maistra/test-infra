@@ -3,25 +3,27 @@
 set -ex
 
 # create test-pods namespace
-oc new-project test-pods
+kubectl create namespace test-pods || echo Skipping
 
 # create configmaps
-oc project default
-oc create cm config
-oc create cm plugins
+kubectl create cm config || echo Skipping
+kubectl create cm plugins || echo Skipping
 
 # create secrets
-oc create secret generic hmac-token --from-file=hmac=secrets/github-hmac-secret
-oc create secret generic cookie --from-file=secret=secrets/cookie-secret
-oc create secret generic oauth-token --from-file=oauth=secrets/github-token
-oc create secret generic gcs-credentials -n test-pods --from-file=service-account.json=secrets/gcs-credentials.json
+kubectl create secret generic hmac-token --from-file=hmac=secrets/github-hmac-secret
+kubectl create secret generic cookie --from-file=secret=secrets/cookie-secret
+kubectl create secret generic oauth-token --from-file=oauth=secrets/github-token
+kubectl create secret generic gcs-credentials -n test-pods --from-file=service-account.json=secrets/gcs-credentials.json
 
-# install openshift-acme controller
-oc new-project letsencrypt
-oc create -fhttps://raw.githubusercontent.com/tnozicka/openshift-acme/master/deploy/letsencrypt-live/cluster-wide/{clusterrole,serviceaccount,imagestream,deployment}.yaml
-oc adm policy add-cluster-role-to-user openshift-acme -z openshift-acme
+# install nginx-ingress
+kubectl create namespace ingress || echo Skipping
+helm template --name ingress --namespace ingress \
+  --set rbac.create=true,controller.kind=DaemonSet,controller.service.type=ClusterIP,controller.hostNetwork=true \
+  nginx-ingress | kubectl apply -n ingress -f -
 
-oc project default
+# install cert-manager
+kubectl create namespace cert-manager || echo Skipping
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.13.0/cert-manager.yaml
 
 # deploy prow
 ./update.sh

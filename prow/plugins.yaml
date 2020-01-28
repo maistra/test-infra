@@ -4,6 +4,10 @@ plugins:
   - trigger
   - lgtm
   - hold
-  - approve
   - wip
-  - verify-owners
+  Maistra:
+  - size
+  - trigger
+  - lgtm
+  - hold
+  - wip
