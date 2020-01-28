@@ -5,7 +5,7 @@ plugins:
   - lgtm
   - hold
   - wip
-  Maistra:
+  Maistra/istio-operator:
   - size
   - trigger
   - lgtm
