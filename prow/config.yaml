@@ -8,6 +8,8 @@ presubmits:
     always_run: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
+    branches:
+      - maistra-1.1
     spec:
       containers:
       - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1.0"
