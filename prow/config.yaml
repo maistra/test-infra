@@ -109,7 +109,8 @@ presubmits:
 #             - "integrationtests"
 
 plank:
-  job_url_template: 'https://prow.maistra.io/log?job={{ .Spec.Job}}&id={{ .Status.BuildID }}'
+  job_url_prefix_config:
+    '*': "https://prow.maistra.io/view/gcs/"
   default_decoration_configs:
     '*':
       timeout: 2h
@@ -141,3 +142,23 @@ branch-protection:
       required_pull_request_reviews:
         required_approving_review_count: 2
         require_code_owner_reviews: false
+
+deck:
+  spyglass:
+    size_limit: 500000000  # 500 MB
+    lenses:
+    - lens:
+        name: buildlog
+        config:
+          highlight_regexes:
+          - timed out
+          - 'ERROR:'
+          - (FAIL|Failure \[)\b
+          - panic\b
+          - ^E\d{4} \d\d:\d\d:\d\d\.\d\d\d]
+      required_files:
+      - build-log.txt
+    - lens:
+        name: junit
+      required_files:
+      - artifacts/junit.*\.xml
