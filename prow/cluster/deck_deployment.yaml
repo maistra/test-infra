@@ -48,6 +48,7 @@ spec:
         - --github-endpoint=https://api.github.com
         - --cookie-secret=/etc/cookie/secret
         - --plugin-config=/etc/plugins/plugins.yaml
+        - --spyglass=true
         volumeMounts:
         - name: cookie-secret
           mountPath: /etc/cookie
