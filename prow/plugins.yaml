@@ -11,3 +11,9 @@ plugins:
   - lgtm
   - hold
   - wip
+  Maistra/test-infra:
+  - size
+  - trigger
+  - lgtm
+  - hold
+  - wip

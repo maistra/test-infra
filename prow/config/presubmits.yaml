@@ -36,6 +36,20 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+  Maistra/test-infra:
+  - name: gen-check
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    branches:
+      - master
+    spec:
+      containers:
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+        command:
+        - make
+        - gen-check
 
 ## The presubmits below are for the maistra-prow-testing org, which is our test bed
   maistra-prow-testing/istio-operator:
