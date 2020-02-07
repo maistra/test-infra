@@ -6,7 +6,7 @@ set -ex
 sh gen-config.sh
 
 # update config and plugins
-kubectl create configmap config --from-file=config.yaml=config.yaml --dry-run -o yaml | kubectl replace configmap -n default config -f -
+kubectl create configmap config --from-file=config.yaml=config.gen.yaml --dry-run -o yaml | kubectl replace configmap -n default config -f -
 kubectl create configmap plugins --from-file=plugins.yaml=plugins.yaml --dry-run -o yaml | kubectl replace configmap -n default plugins -f -
 
 # update deployments etc.
