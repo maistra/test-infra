@@ -1,6 +1,50 @@
-prowjob_namespace: default
-pod_namespace: test-pods
-
+branch-protection:
+  allow_disabled_policies: true
+  protect: false
+  orgs:
+    maistra-prow-testing:
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        require_code_owner_reviews: false
+    Maistra:
+      required_pull_request_reviews:
+        required_approving_review_count: 2
+        require_code_owner_reviews: false
+deck:
+  spyglass:
+    size_limit: 500000000  # 500 MB
+    lenses:
+    - lens:
+        name: buildlog
+        config:
+          highlight_regexes:
+          - timed out
+          - 'ERROR:'
+          - (FAIL|Failure \[)\b
+          - panic\b
+          - ^E\d{4} \d\d:\d\d:\d\d\.\d\d\d]
+      required_files:
+      - build-log.txt
+    - lens:
+        name: junit
+      required_files:
+      - artifacts/junit.*\.xml
+plank:
+  job_url_prefix_config:
+    '*': "https://prow.maistra.io/view/gcs/"
+  default_decoration_configs:
+    '*':
+      timeout: 2h
+      grace_period: 15s
+      utility_images:
+        clonerefs: "gcr.io/k8s-prow/clonerefs:v20200117-c08038c1c"
+        initupload: "gcr.io/k8s-prow/initupload:v20200117-c08038c1c"
+        entrypoint: "gcr.io/k8s-prow/entrypoint:v20200117-c08038c1c"
+        sidecar: "gcr.io/k8s-prow/sidecar:v20200117-c08038c1c"
+      gcs_configuration:
+        path_strategy: explicit
+        bucket: "maistra-prow-testing"
+      gcs_credentials_secret: "gcs-credentials"
 presubmits:
   Maistra/istio-operator:
   - name: unittests
@@ -12,7 +56,7 @@ presubmits:
       - maistra-1.1
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1.0"
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
         command:
         - make
         - test
@@ -21,18 +65,40 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+  
+## The presubmits below are for the maistra-prow-testing org, which is our test bed
   maistra-prow-testing/istio-operator:
   - name: unittests
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
+    branches:
+      - maistra-1.1
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1.0"
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
         command:
         - make
         - test
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+  - name: gen-check
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/istio-operator
+    skip_report: false
+    branches:
+      - maistra-1.1
+    spec:
+      containers:
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+        command:
+        - make
+        - gen-check
         env:
         - name: XDG_CACHE_HOME
           value: /tmp/cache
@@ -48,7 +114,7 @@ presubmits:
       - maistra-1.0
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:latest"
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.0"
         command:
         - make
         - init
@@ -69,7 +135,7 @@ presubmits:
       - maistra-1.0
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:latest"
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.0"
         command:
         - make
         - init
@@ -81,7 +147,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
-
+prowjob_namespace: default
+pod_namespace: test-pods
+sinker:
+  resync_period: 1h
+  max_prowjob_age: 168h
+  max_pod_age: 6h
 # tide:
 #   merge_method:
 #     maistra-prow-testing: squash
@@ -107,58 +178,3 @@ presubmits:
 #             required-contexts:
 #             - "unittests"
 #             - "integrationtests"
-
-plank:
-  job_url_prefix_config:
-    '*': "https://prow.maistra.io/view/gcs/"
-  default_decoration_configs:
-    '*':
-      timeout: 2h
-      grace_period: 15s
-      utility_images:
-        clonerefs: "gcr.io/k8s-prow/clonerefs:v20200117-c08038c1c"
-        initupload: "gcr.io/k8s-prow/initupload:v20200117-c08038c1c"
-        entrypoint: "gcr.io/k8s-prow/entrypoint:v20200117-c08038c1c"
-        sidecar: "gcr.io/k8s-prow/sidecar:v20200117-c08038c1c"
-      gcs_configuration:
-        path_strategy: explicit
-        bucket: "maistra-prow-testing"
-      gcs_credentials_secret: "gcs-credentials"
-
-sinker:
-  resync_period: 1h
-  max_prowjob_age: 168h
-  max_pod_age: 6h
-
-branch-protection:
-  allow_disabled_policies: true
-  protect: false
-  orgs:
-    maistra-prow-testing:
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-        require_code_owner_reviews: false
-    Maistra:
-      required_pull_request_reviews:
-        required_approving_review_count: 2
-        require_code_owner_reviews: false
-
-deck:
-  spyglass:
-    size_limit: 500000000  # 500 MB
-    lenses:
-    - lens:
-        name: buildlog
-        config:
-          highlight_regexes:
-          - timed out
-          - 'ERROR:'
-          - (FAIL|Failure \[)\b
-          - panic\b
-          - ^E\d{4} \d\d:\d\d:\d\d\.\d\d\d]
-      required_files:
-      - build-log.txt
-    - lens:
-        name: junit
-      required_files:
-      - artifacts/junit.*\.xml

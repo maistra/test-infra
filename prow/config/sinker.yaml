@@ -1,0 +1,4 @@
+sinker:
+  resync_period: 1h
+  max_prowjob_age: 168h
+  max_pod_age: 6h
