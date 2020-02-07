@@ -1,0 +1,19 @@
+deck:
+  spyglass:
+    size_limit: 500000000  # 500 MB
+    lenses:
+    - lens:
+        name: buildlog
+        config:
+          highlight_regexes:
+          - timed out
+          - 'ERROR:'
+          - (FAIL|Failure \[)\b
+          - panic\b
+          - ^E\d{4} \d\d:\d\d:\d\d\.\d\d\d]
+      required_files:
+      - build-log.txt
+    - lens:
+        name: junit
+      required_files:
+      - artifacts/junit.*\.xml

@@ -1,0 +1,25 @@
+# tide:
+#   merge_method:
+#     maistra-prow-testing: squash
+#   target_url: https://prow.maistra.io/tide
+#   queries:
+#   - orgs:
+#     - maistra-prow-testing
+#     labels:
+#     - okay to merge
+#     missingLabels:
+#     - do-not-merge
+#     - do-not-merge/hold
+#     - do-not-merge/work-in-progress
+#     - do-not-merge/invalid-owners-file
+#     - needs-rebase
+#   context_options:
+#     from-branch-protection: true
+#     skip-unknown-contexts: true
+#     orgs:
+#       maistra-prow-testing:
+#         repos:
+#           istio:
+#             required-contexts:
+#             - "unittests"
+#             - "integrationtests"
