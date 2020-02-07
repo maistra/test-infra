@@ -5,7 +5,13 @@ ENV PATH /usr/local/go/bin:/go/bin:${PATH}
 # Install dependencies
 COPY scripts /tmp/scripts
 WORKDIR /tmp/scripts
-RUN chmod -R +x /tmp/scripts/ && /tmp/scripts/install_all.sh && rm -rf /tmp/scripts
+RUN chmod -R +x /tmp/scripts/ 
+RUN /tmp/scripts/install_base.sh
+RUN /tmp/scripts/install_go_12.sh
+RUN /tmp/scripts/install_helm.sh
+RUN /tmp/scripts/install_shellcheck.sh
+
+RUN rm -rf /tmp/scripts
 
 # Set CI variable which can be checked by test scripts to verify
 # if running in the continuous integration environment.
