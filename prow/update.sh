@@ -2,11 +2,8 @@
 
 set -ex
 
-# re-generate config
-rm config.gen.yaml
-for file in `ls config`; do
-  cat config/$file >> config.gen.yaml
-done
+# make sure we use the latest configuration
+sh gen-config.sh
 
 # update config and plugins
 kubectl create configmap config --from-file=config.yaml=config.yaml --dry-run -o yaml | kubectl replace configmap -n default config -f -
