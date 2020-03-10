@@ -97,6 +97,28 @@ presubmits:
         command:
         - make
         - gen-check
+  Maistra/istio:
+  - name: unittests
+    decorate: true
+    always_run: true
+    path_alias: istio.io/istio
+    skip_report: false
+    branches:
+      - maistra-1.1
+    spec:
+      containers:
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+        command:
+        - make
+        - init
+        - test
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
 
 ## The presubmits below are for the maistra-prow-testing org, which is our test bed
   maistra-prow-testing/istio-operator:
