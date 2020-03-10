@@ -17,3 +17,9 @@ plugins:
   - lgtm
   - hold
   - wip
+  Maistra/istio:
+  - size
+  - trigger
+  - lgtm
+  - hold
+  - wip
