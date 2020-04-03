@@ -91,7 +91,7 @@ You should have existing secrets for an already running cluster. You'll only nee
 1. Create a Service Account, store API credentials in `prow/secrets/gcs-credentials.json`
 1. Give the Service Account write permissions to the bucket you created
 
-### Deploying Prow
+### Deploying Prow from Scratch
 
 1. Run `cd prow && ./create.sh`
 1. Add the webhook URL to the GitHub Org: https://github.com/organizations/<org>/settings/hooks - the URL is https://<prow-url>/hook

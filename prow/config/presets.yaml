@@ -1,0 +1,14 @@
+presets:
+- labels:
+    preset-prow-deployer: "true"
+  env:
+  - name: KUBECONFIG
+    value: /creds/kubeconfig.yaml
+  volumeMounts:
+  - name: creds
+    mountPath: /creds
+    readOnly: true
+  volumes:
+  - name: creds
+    secret:
+      secretName: prow-deployer-kubeconfig

@@ -45,6 +45,39 @@ plank:
         path_strategy: explicit
         bucket: "maistra-prow-testing"
       gcs_credentials_secret: "gcs-credentials"
+postsubmits:
+  Maistra/test-infra:
+  - name: deploy-prow
+    decorate: true
+    always_run: true
+    skip_report: false
+    labels:
+      preset-prow-deployer: "true"
+    max_concurrency: 1
+    branches:
+    - ^master$
+    spec:
+      containers:
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+        imagePullPolicy: Always
+        command:
+        - make
+        - gen-check
+        - update-prow
+presets:
+- labels:
+    preset-prow-deployer: "true"
+  env:
+  - name: KUBECONFIG
+    value: /creds/kubeconfig.yaml
+  volumeMounts:
+  - name: creds
+    mountPath: /creds
+    readOnly: true
+  volumes:
+  - name: creds
+    secret:
+      secretName: prow-deployer-kubeconfig
 presubmits:
   Maistra/istio-operator:
   - name: unittests
