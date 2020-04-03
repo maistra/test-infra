@@ -6,11 +6,66 @@ This repository is meant to hold all information required to deploy and run Mais
 
 The build container (`maistra-builder`) is used by Prow to run unit tests and the linters against [`maistra/istio`](https://github.com/maistra/istio). 
 
-To build the `maistra-builder` container image, run `make builder-image` in this repository.
+To build the `maistra-builder` container image locally, run `make maistra-builder` in this repository. It will build all available versions of the container; generally, one per Maistra minor version: 1.0, 1.1, etc.
 
-## Prow
+## Using Prow
 
-This describes the steps needed to get our prow instance up and running on an existing cluster. It only covers aspects that are relevant to our configuration. See the [upstream docs](https://github.com/kubernetes/test-infra/blob/master/prow/getting_started_deploy.md) for more details.
+The official Maistra Prow instance is available at https://prow.maistra.io. All commits to this repository's `master` branch will be auto-applied to that cluster.
+
+### Prow Configuration
+
+You can find all configuration files (including jobs, see next chapter) in the `prow/config` directory. Before applying the config, the files in that directory will be concatenated and written to `prow/config.gen.yaml`, so that file represents what will be applied to the cluster. When changing a file in the `prow/config` directory, make sure to run `make gen` afterwards to generate the concatenated file. 
+
+### Adding Jobs
+
+All jobs are located in the files `prow/config/presubmits.yaml` and `prow/config/postsubmits.yaml`. Prow also supports running periodical jobs, but we don't currently use that. A job looks like this:
+
+```yaml
+presubmits:
+  # the <github org>/<repository> this job is run against
+  Maistra/istio:
+    # the job's name
+  - name: unittests
+    # `decorate` determines whether to wrap the container image using prow's init containers.
+    # This makes sure that workdir is set correctly and you can expect to run your commands
+    # in the root of the checked-out repo. It also makes sure logs are uploaded to GCS.
+    # You'll generally want to enable this.
+    decorate: true
+    # you want to set this to true if you don't speficy special change patterns (you can
+    # instruct prow to run jobs only if certain files have changed). See upstream docs
+    always_run: true
+    # for GOPATH aliasing
+    path_alias: istio.io/istio
+    # if you set `skip_report` to true, Prow won't comment on your PRs or add status fields.
+    # the job still shows up on the dashboard though. useful when testing
+    skip_report: false
+    # which branches to run against
+    branches:
+      - maistra-1.1
+    # these fields will be injected in the spec of the pod that will run your test.
+    spec:
+      containers:
+      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+        command:
+        - make
+        - init
+        - test
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+```
+
+#### New Repositories
+
+Repos that previously were not managed by Prow will require some additional steps for jobs to run against them:
+
+* the `maistra-bot` will need Admin access to a repo. This is due to the status-reconciler creating Status fields if they don't yet exist.
+* make sure to add at least the `trigger` plugin for your repo in the `prow/plugins.yaml`
+
+
+## Operating Prow
+
+This section describes the steps needed to get your own Prow instance up and running on an existing cluster. It only covers aspects that are relevant to our configuration. See the [upstream docs](https://github.com/kubernetes/test-infra/blob/master/prow/getting_started_deploy.md) for more details.
 
 ### Obtaining Secrets
 
