@@ -1,4 +1,31 @@
 presubmits:
+  Maistra/maistra.github.io:
+  - name: lint
+    decorate: true
+    always_run: true
+    skip_report: false
+    branches:
+      - maistra-1.2
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.1"
+        command:
+        - /tests/runLinter.sh
+    trigger: "(?m)^/test lint"
+    rerun_command: "/test lint"
+  - name: check-links
+    decorate: true
+    always_run: true
+    skip_report: false
+    branches:
+      - maistra-1.2
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.1"
+        command:
+        - /tests/checkLinks.sh
+    trigger: "(?m)^/test check-links"
+    rerun_command: "/test check-links"
   Maistra/istio-operator:
   - name: unittests
     decorate: true
