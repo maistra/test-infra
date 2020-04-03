@@ -15,6 +15,9 @@ kubectl create secret generic cookie --from-file=secret=secrets/cookie-secret
 kubectl create secret generic oauth-token --from-file=oauth=secrets/github-token
 kubectl create secret generic gcs-credentials -n test-pods --from-file=service-account.json=secrets/gcs-credentials.json
 
+# create service account including secret holding kubeconfig (for auto-updating prow config on merged PRs)
+./setup-prow-deployer.sh
+
 # install nginx-ingress
 kubectl create namespace ingress || echo Skipping
 helm template --name ingress --namespace ingress \

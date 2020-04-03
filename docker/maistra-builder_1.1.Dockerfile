@@ -10,6 +10,7 @@ RUN /tmp/scripts/install_base.sh
 RUN /tmp/scripts/install_go_13.sh
 RUN /tmp/scripts/install_helm.sh
 RUN /tmp/scripts/install_shellcheck.sh
+RUN /tmp/scripts/install_kubectl.sh
 
 RUN rm -rf /tmp/scripts
 
