@@ -12,3 +12,16 @@ presets:
   - name: creds
     secret:
       secretName: prow-deployer-kubeconfig
+- labels:
+    preset-quay-pusher: "true"
+  env:
+  - name: DOCKER_CONFIG
+    value: /creds/
+  volumeMounts:
+  - name: creds
+    mountPath: /creds
+    readOnly: true
+  volumes:
+  - name: creds
+    secret:
+      secretName: quay-pusher-dockercfg

@@ -1,4 +1,4 @@
-HUB ?= registry.gitlab.com/dgrimm/istio
+HUB ?= quay.io/maistra
 
 BUILD_IMAGE = maistra-builder
 BUILD_IMAGE_VERSIONS = $(BUILD_IMAGE)_1.1 ${BUILD_IMAGE}_1.0

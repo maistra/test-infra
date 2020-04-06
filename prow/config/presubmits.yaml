@@ -9,7 +9,7 @@ presubmits:
       - maistra-1.1
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.1"
         command:
         - make
         - test
@@ -27,7 +27,7 @@ presubmits:
       - maistra-1.1
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.1"
         command:
         - make
         - gen-check
@@ -46,10 +46,28 @@ presubmits:
       - master
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.1"
         command:
         - make
         - gen-check
+  - name: build-containers
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    branches:
+      - master
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.1"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - maistra-builder
+        securityContext:
+          privileged: true
   Maistra/istio:
   - name: unittests
     decorate: true
@@ -60,7 +78,7 @@ presubmits:
       - maistra-1.1
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.1"
         command:
         - make
         - init
@@ -74,6 +92,25 @@ presubmits:
           value: /tmp/cache
 
 ## The presubmits below are for the maistra-prow-testing org, which is our test bed
+  maistra-prow-testing/test-infra:
+  - name: build-containers
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    branches:
+      - master
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.1"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - maistra-builder
+        securityContext:
+          privileged: true
   maistra-prow-testing/istio-operator:
   - name: unittests
     decorate: true
@@ -84,7 +121,7 @@ presubmits:
       - maistra-1.1
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.1"
         command:
         - make
         - test
@@ -102,7 +139,7 @@ presubmits:
       - maistra-1.1
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.1"
         command:
         - make
         - gen-check
@@ -121,7 +158,7 @@ presubmits:
       - maistra-1.0
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.0"
+      - image: "quay.io/maistra/maistra-builder:1.0"
         command:
         - make
         - init
@@ -142,7 +179,7 @@ presubmits:
       - maistra-1.0
     spec:
       containers:
-      - image: "registry.gitlab.com/dgrimm/istio/maistra-builder:1.0"
+      - image: "quay.io/maistra/maistra-builder:1.0"
         command:
         - make
         - init
