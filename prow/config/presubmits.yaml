@@ -149,6 +149,7 @@ presubmits:
         - build-containers
         securityContext:
           privileged: true
+
   Maistra/istio:
   - name: istio_1.2-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
@@ -158,7 +159,6 @@ presubmits:
     skip_report: false
     branches:
       - maistra-1.2-future
-    context: ci/prow/unit
     rerun_command: /test unit
     spec:
       containers:
@@ -181,7 +181,47 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
 
-  - name: istio_1.1-unit
+  - name: maistra-istio-1.2-integration
+    skip_report: false
+    max_concurrency: 1
+    always_run: true
+    branches:
+    - maistra-1.2
+    decorate: true
+    path_alias: istio.io/istio
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - prow/integ-suite-kind.sh
+        - test.integration.kube.presubmit
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        image: "quay.io/maistra-dev/maistra-builder:1.2"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
+
+  - name: maistra-istio-1.1-unit
     decorate: true
     always_run: true
     path_alias: istio.io/istio
@@ -203,6 +243,46 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+
+  - name: maistra-istio-1.1-integration
+    skip_report: true
+    max_concurrency: 1
+    always_run: true
+    branches:
+    - maistra-1.1
+    decorate: true
+    path_alias: istio.io/istio
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - prow/integ-suite-kind.sh
+        - test.integration.kube.presubmit
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        image: "quay.io/maistra-dev/maistra-builder:1.2"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
 
   Maistra/rpm-common:
   - name: rpm-common_tests

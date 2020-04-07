@@ -1,5 +1,10 @@
 #!/bin/bash
 
+DOCKER_DAEMON_ARGS=${DOCKER_DAEMON_ARGS:-"-l warn"}
+
+# Inject CloudFlare DNS to make sure we don't have DNS loops
+echo "nameserver 1.1.1.1" > /etc/resolv.conf
+
 ### This is mostly taken from https://github.com/moby/moby/blob/master/hack/dind
 ### It includes minor changes to make sure dockerd is killed at the end.
 
