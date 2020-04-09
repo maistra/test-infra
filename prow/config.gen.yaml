@@ -163,6 +163,7 @@ presubmits:
       - image: "quay.io/maistra/maistra-builder:1.1"
         command:
         - make
+        - compile
         - test
         env:
         - name: XDG_CACHE_HOME
