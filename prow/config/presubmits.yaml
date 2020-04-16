@@ -16,8 +16,8 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
-    trigger: "(?m)^/test check-spelling"
-    rerun_command: "/test check-spelling"
+    trigger: "(?m)^/test lint"
+    rerun_command: "/test lint"
   - name: check-links
     decorate: true
     always_run: true

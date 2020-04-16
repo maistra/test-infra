@@ -129,14 +129,14 @@ presubmits:
       containers:
       - image: "quay.io/bravery/maistra-builder:1.1"
         command:
-        - vale .
+        - /tests/runLinter.sh
         env:
         - name: XDG_CACHE_HOME
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
-    trigger: "(?m)^/test unittests"
-    rerun_command: "/test unittests"
+    trigger: "(?m)^/test lint"
+    rerun_command: "/test lint"
   - name: check-links
     decorate: true
     always_run: true
