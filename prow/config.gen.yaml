@@ -1,3 +1,9 @@
+#======================================
+# This configuration is auto-generated. 
+# To update:
+#    Modify files in the config directory
+#    Run gen-config.sh to regenerate.
+#======================================
 branch-protection:
   allow_disabled_policies: true
   protect: false
@@ -112,6 +118,43 @@ presets:
     secret:
       secretName: quay-pusher-dockercfg
 presubmits:
+  brian-avery/maistra.github.io:
+  - name: check-spelling
+    decorate: true
+    always_run: true
+    skip_report: false
+    branches:
+      - maistra-1.1
+    spec:
+      containers:
+      - image: "quay.io/bravery/maistra-builder:1.1"
+        command:
+        - vale .
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+    trigger: "(?m)^/test unittests"
+    rerun_command: "/test unittests"
+  - name: check-links
+    decorate: true
+    always_run: true
+    skip_report: false
+    branches:
+      - maistra-1.1
+    spec:
+      containers:
+      - image: "quay.io/bravery/maistra-builder:1.1"
+        command:
+        - /tests/checkLinks.sh
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+    trigger: "(?m)^/test check-links"
+    rerun_command: "/test check-links"
   Maistra/istio-operator:
   - name: unittests
     decorate: true

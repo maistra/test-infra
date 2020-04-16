@@ -1,4 +1,41 @@
 presubmits:
+  brian-avery/maistra.github.io:
+  - name: check-spelling
+    decorate: true
+    always_run: true
+    skip_report: false
+    branches:
+      - maistra-1.1
+    spec:
+      containers:
+      - image: "quay.io/bravery/maistra-builder:1.1"
+        command:
+        - /tests/runLinter.sh
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+    trigger: "(?m)^/test check-spelling"
+    rerun_command: "/test check-spelling"
+  - name: check-links
+    decorate: true
+    always_run: true
+    skip_report: false
+    branches:
+      - maistra-1.1
+    spec:
+      containers:
+      - image: "quay.io/bravery/maistra-builder:1.1"
+        command:
+        - /tests/checkLinks.sh
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+    trigger: "(?m)^/test check-links"
+    rerun_command: "/test check-links"
   Maistra/istio-operator:
   - name: unittests
     decorate: true
