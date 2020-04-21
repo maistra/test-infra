@@ -1,4 +1,9 @@
 plugins:
+  Maistra/maistra.github.io:
+  - size
+  - trigger
+  - lgtm
+  - hold
   maistra-prow-testing:
   - size
   - trigger
