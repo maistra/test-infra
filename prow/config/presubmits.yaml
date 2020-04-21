@@ -36,6 +36,7 @@ presubmits:
     skip_report: false
     branches:
       - maistra-1.1
+      - maistra-1.2
     spec:
       containers:
       - image: "quay.io/maistra/maistra-builder:1.1"
@@ -54,6 +55,7 @@ presubmits:
     skip_report: false
     branches:
       - maistra-1.1
+      - maistra-1.2
     spec:
       containers:
       - image: "quay.io/maistra/maistra-builder:1.1"
@@ -148,6 +150,7 @@ presubmits:
     skip_report: false
     branches:
       - maistra-1.1
+      - maistra-1.2
     spec:
       containers:
       - image: "quay.io/maistra/maistra-builder:1.1"
@@ -166,6 +169,7 @@ presubmits:
     skip_report: false
     branches:
       - maistra-1.1
+      - maistra-1.2
     spec:
       containers:
       - image: "quay.io/maistra/maistra-builder:1.1"
