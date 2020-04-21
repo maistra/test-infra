@@ -12,7 +12,7 @@ RUN chmod -R +x /tmp/scripts/ && \
     /tmp/scripts/install_shellcheck.sh && \
     /tmp/scripts/install_kubectl.sh && \
     /tmp/scripts/install_docker.sh && \
-    /tmp/scripts/install_docs_tools.sh \
+    /tmp/scripts/install_docs_tools.sh && \
     rm -rf /tmp/scripts
 
 # Set CI variable which can be checked by test scripts to verify
