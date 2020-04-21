@@ -10,7 +10,8 @@ presubmits:
       containers:
       - image: "quay.io/maistra/maistra-builder:1.1"
         command:
-        - /tests/runLinter.sh
+        - make
+        - lint
     trigger: "(?m)^/test lint"
     rerun_command: "/test lint"
   - name: check-links
@@ -23,7 +24,8 @@ presubmits:
       containers:
       - image: "quay.io/maistra/maistra-builder:1.1"
         command:
-        - /tests/checkLinks.sh
+        - make
+        - check-links
     trigger: "(?m)^/test check-links"
     rerun_command: "/test check-links"
   Maistra/istio-operator:

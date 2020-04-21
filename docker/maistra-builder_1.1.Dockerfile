@@ -15,8 +15,6 @@ RUN chmod -R +x /tmp/scripts/ && \
     /tmp/scripts/install_docs_tools.sh \
     rm -rf /tmp/scripts
 
-COPY tests /tests/
-
 # Set CI variable which can be checked by test scripts to verify
 # if running in the continuous integration environment.
 ENV CI prow
