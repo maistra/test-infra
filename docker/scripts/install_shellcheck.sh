@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#FIXME: Remove this file once support for 1.0 is removed
+
 set -ex
 
 ## Install shellcheck

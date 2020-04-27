@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#FIXME: Remove this file once we drop 1.0 Dockerfile
+
 set -ex
 
 ## Install base dependencies
