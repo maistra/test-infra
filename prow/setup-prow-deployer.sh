@@ -9,12 +9,12 @@ TARGET_FOLDER="/tmp"
 
 create_service_account() {
     echo -e "\\nCreating a service account in ${NAMESPACE} namespace: ${SERVICE_ACCOUNT_NAME}"
-    kubectl create sa "${SERVICE_ACCOUNT_NAME}" --namespace "${NAMESPACE}"
+    kubectl create sa "${SERVICE_ACCOUNT_NAME}" --namespace "${NAMESPACE}" || echo Skipping
 }
 
 get_secret_name_from_service_account() {
     echo -e "\\nGetting secret of service account ${SERVICE_ACCOUNT_NAME} on ${NAMESPACE}"
-    SECRET_NAME=$(kubectl get sa "${SERVICE_ACCOUNT_NAME}" --namespace="${NAMESPACE}" -o json | jq -r .secrets[].name)
+    SECRET_NAME=$(kubectl get sa "${SERVICE_ACCOUNT_NAME}" --namespace="${NAMESPACE}" -o json | jq -r .secrets[].name | grep token)
     echo "Secret name: ${SECRET_NAME}"
 }
 
