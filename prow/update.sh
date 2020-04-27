@@ -9,8 +9,8 @@ set -ex
 sh gen-config.sh
 
 # update config and plugins
-kubectl create configmap config --from-file=config.yaml=config.gen.yaml --dry-run -o yaml | kubectl replace configmap -n default config -f -
-kubectl create configmap plugins --from-file=plugins.yaml=plugins.yaml --dry-run -o yaml | kubectl replace configmap -n default plugins -f -
+kubectl -n default create configmap config --from-file=config.yaml=config.gen.yaml --dry-run -o yaml | kubectl -n default replace configmap config -f -
+kubectl -n default create configmap plugins --from-file=plugins.yaml=plugins.yaml --dry-run -o yaml | kubectl -n default replace configmap plugins -f -
 
 # update deployments etc.
 for file in `ls cluster`; do
@@ -19,5 +19,5 @@ done
 
 # restart deployments
 for deployment in `kubectl get deployments -n default -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'`; do
-  kubectl rollout restart deployment $deployment
+  kubectl -n default rollout restart deployment $deployment
 done
