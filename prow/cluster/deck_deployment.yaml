@@ -35,7 +35,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: deck
-        image: gcr.io/k8s-prow/deck:v20200117-c08038c1c
+        image: gcr.io/k8s-prow/deck:v20200417-a6017ee5b
         imagePullPolicy: Always
         ports:
           - name: http
@@ -49,6 +49,7 @@ spec:
         - --cookie-secret=/etc/cookie/secret
         - --plugin-config=/etc/plugins/plugins.yaml
         - --spyglass=true
+        - --gcs-no-auth=true
         volumeMounts:
         - name: cookie-secret
           mountPath: /etc/cookie
