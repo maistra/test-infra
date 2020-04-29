@@ -34,7 +34,7 @@ spec:
       serviceAccountName: "plank"
       containers:
       - name: plank
-        image: gcr.io/k8s-prow/plank:v20200417-a6017ee5b
+        image: gcr.io/k8s-prow/plank:v20200427-baaf248ed
         args:
         - --dry-run=false
         - --github-endpoint=https://api.github.com
