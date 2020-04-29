@@ -22,3 +22,6 @@ check-clean-repo:
 
 update-prow:
 	(cd prow; sh update.sh)
+
+lint:
+	find . -name '*.sh' -print0 | xargs -0 -r shellcheck
