@@ -93,14 +93,17 @@ rm -rf /var/run/docker.pid
 # If we were given a PORT environment variable, start as a simple daemon
 if [ "$PORT" ]
 then
+	# shellcheck disable=SC2086
 	exec dockerd -H "0.0.0.0:$PORT" -H unix:///var/run/docker.sock \
-		"$DOCKER_DAEMON_ARGS"
+		${DOCKER_DAEMON_ARGS}
 else
 	if [ "$LOG" == "file" ]
 	then
-		dockerd "$DOCKER_DAEMON_ARGS" &>/var/log/docker.log &
+		# shellcheck disable=SC2086
+		dockerd ${DOCKER_DAEMON_ARGS} &>/var/log/docker.log &
 	else
-		dockerd "$DOCKER_DAEMON_ARGS" &
+		# shellcheck disable=SC2086
+		dockerd ${DOCKER_DAEMON_ARGS} &
 	fi
 	(( timeout = 60 + SECONDS ))
 	until docker info >/dev/null 2>&1
