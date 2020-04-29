@@ -1,0 +1,1 @@
+Starting with 1.2, files `install_*.sh` are not used, their functionalities were moved to within `Dockerfiles` directly. So, once support for 1.0 and 1.1 ends, we can safely remove these files.
