@@ -4,6 +4,7 @@ postsubmits:
     decorate: true
     always_run: true
     skip_report: false
+    run_if_changed: '^prow/'
     labels:
       preset-prow-deployer: "true"
     max_concurrency: 1
@@ -22,6 +23,7 @@ postsubmits:
     always_run: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
+    run_if_changed: '^docker/'
     branches:
       - master
     labels:
