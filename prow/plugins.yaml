@@ -28,3 +28,17 @@ plugins:
   - lgtm
   - hold
   - wip
+
+
+external_plugins:
+  Maistra:
+  - name: cherrypicker
+    events:
+      - issue_comment
+      - pull_request
+      
+  maistra-prow-testing:
+  - name: cherrypicker
+    events:
+      - issue_comment
+      - pull_request

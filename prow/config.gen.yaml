@@ -190,6 +190,19 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
   Maistra/test-infra:
+  - name: lint
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    branches:
+      - master
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.1"
+        command:
+        - make
+        - lint
   - name: gen-check
     decorate: true
     always_run: true

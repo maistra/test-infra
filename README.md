@@ -94,7 +94,10 @@ You should have existing secrets for an already running cluster. You'll only nee
 ### Deploying Prow from Scratch
 
 1. Run `cd prow && ./create.sh`
-1. Add the webhook URL to the GitHub Org: https://github.com/organizations/<org>/settings/hooks - the URL is https://<prow-url>/hook
+1. Add the webhook URL to the GitHub Org: `https://github.com/organizations/<org>/settings/hooks`
+   - Payload URL: `https://<prow-url>/hook`
+   - Content type: `application/json`
+   - Secret: the contents of `prow/secrets/github-hmac-secret`
 
 ### Known Issues
 
