@@ -112,7 +112,7 @@ presubmits:
         command:
         - entrypoint
         - make
-        - maistra-builder
+        - build-containers
         securityContext:
           privileged: true
   Maistra/istio:
