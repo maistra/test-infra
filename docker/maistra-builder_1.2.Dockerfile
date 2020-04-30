@@ -40,6 +40,7 @@ RUN curl -sfL https://install.goreleaser.com/github.com/ValeLint/vale.sh -o ./va
     rm -f ./vale.sh
 
 ADD scripts/entrypoint.sh /usr/local/bin/entrypoint
+RUN chmod +x /usr/local/bin/entrypoint
 
 RUN mkdir -p /work && chmod 777 /work
 WORKDIR /work
