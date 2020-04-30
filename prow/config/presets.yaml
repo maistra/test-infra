@@ -38,3 +38,19 @@ presets:
   - name: creds-github
     secret:
       secretName: github-token
+
+- labels:
+    preset-copr: "true"
+  env:
+  - name: DEV_MODE
+    value: "1"
+  - name: COPR_CONFIG
+    value: /creds-copr/copr
+  volumeMounts:
+  - name: creds-copr
+    mountPath: /creds-copr
+    readOnly: true
+  volumes:
+  - name: creds-copr
+    secret:
+      secretName: copr
