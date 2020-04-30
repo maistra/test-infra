@@ -12,6 +12,7 @@ presets:
   - name: creds
     secret:
       secretName: prow-deployer-kubeconfig
+
 - labels:
     preset-quay-pusher: "true"
   env:
@@ -25,3 +26,15 @@ presets:
   - name: creds
     secret:
       secretName: quay-pusher-dockercfg
+
+- labels:
+    preset-github: "true"
+  env:
+  volumeMounts:
+  - name: creds-github
+    mountPath: /creds-github
+    readOnly: true
+  volumes:
+  - name: creds-github
+    secret:
+      secretName: github-token
