@@ -2,7 +2,6 @@ postsubmits:
   Maistra/test-infra:
   - name: deploy-prow
     decorate: true
-    always_run: true
     skip_report: false
     run_if_changed: '^prow/'
     labels:
@@ -20,7 +19,6 @@ postsubmits:
         - update-prow
   - name: push-containers
     decorate: true
-    always_run: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
     run_if_changed: '^docker/'

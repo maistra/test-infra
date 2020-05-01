@@ -99,7 +99,6 @@ presubmits:
         - gen-check
   - name: build-containers
     decorate: true
-    always_run: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
     run_if_changed: '^docker/'
