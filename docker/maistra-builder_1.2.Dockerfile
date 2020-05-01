@@ -25,6 +25,7 @@ ENV GOBIN=/usr/local/bin
 RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/jstemmer/go-junit-report && \
     gobin k8s.io/test-infra/robots/pr-creator && \
+    gobin k8s.io/test-infra/prow/cmd/checkconfig && \
     rm -rf /root/* /root/.cache /tmp/*
 
 # Helm
@@ -40,6 +41,7 @@ RUN curl -sfL https://install.goreleaser.com/github.com/ValeLint/vale.sh -o ./va
     rm -f ./vale.sh
 
 ADD scripts/entrypoint.sh /usr/local/bin/entrypoint
+RUN chmod +x /usr/local/bin/entrypoint
 
 RUN mkdir -p /work && chmod 777 /work
 WORKDIR /work

@@ -25,3 +25,9 @@ update-prow:
 
 lint:
 	find . -name '*.sh' -print0 | xargs -0 -r shellcheck
+	checkconfig -strict -config-path prow/config.gen.yaml -plugin-config prow/plugins.yaml
+
+# this will build the containers and then try to use them to build themselves again, making sure we didn't break docker support
+build-containers: maistra-builder
+	docker run --privileged -v ${PWD}:/work --workdir /work ${HUB}/maistra-builder:1.1 make maistra-builder
+	docker run --privileged -v ${PWD}:/work --workdir /work ${HUB}/maistra-builder:1.2 make maistra-builder

@@ -55,8 +55,8 @@ postsubmits:
   Maistra/test-infra:
   - name: deploy-prow
     decorate: true
-    always_run: true
     skip_report: false
+    run_if_changed: '^prow/'
     labels:
       preset-prow-deployer: "true"
     max_concurrency: 1
@@ -64,7 +64,7 @@ postsubmits:
     - master
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - make
@@ -72,9 +72,9 @@ postsubmits:
         - update-prow
   - name: push-containers
     decorate: true
-    always_run: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
+    run_if_changed: '^docker/'
     branches:
       - master
     labels:
@@ -82,7 +82,7 @@ postsubmits:
     max_concurrency: 1
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - entrypoint
@@ -199,7 +199,7 @@ presubmits:
       - master
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         command:
         - make
         - lint
@@ -212,26 +212,26 @@ presubmits:
       - master
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         command:
         - make
         - gen-check
   - name: build-containers
     decorate: true
-    always_run: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
+    run_if_changed: '^docker/'
     branches:
       - master
     max_concurrency: 1
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - entrypoint
         - make
-        - maistra-builder
+        - build-containers
         securityContext:
           privileged: true
   Maistra/istio:
@@ -269,7 +269,7 @@ presubmits:
     max_concurrency: 1
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - entrypoint
