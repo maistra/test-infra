@@ -11,7 +11,7 @@ postsubmits:
     - master
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - make
@@ -29,7 +29,7 @@ postsubmits:
     max_concurrency: 1
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - entrypoint
