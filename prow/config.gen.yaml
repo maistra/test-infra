@@ -64,7 +64,7 @@ postsubmits:
     - master
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - make
@@ -82,7 +82,7 @@ postsubmits:
     max_concurrency: 1
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - entrypoint
@@ -199,7 +199,7 @@ presubmits:
       - master
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         command:
         - make
         - lint
@@ -212,7 +212,7 @@ presubmits:
       - master
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         command:
         - make
         - gen-check
@@ -226,7 +226,7 @@ presubmits:
     max_concurrency: 1
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - entrypoint
@@ -269,7 +269,7 @@ presubmits:
     max_concurrency: 1
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.1"
+      - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - entrypoint
