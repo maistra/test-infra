@@ -19,7 +19,6 @@ plugins:
   Maistra/test-infra:
   - size
   - trigger
-  - lgtm
   - hold
   - wip
   Maistra/istio:
