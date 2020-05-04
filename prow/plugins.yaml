@@ -37,6 +37,11 @@ plugins:
   - trigger
   - hold
   - wip
+  Maistra/rpm-istio-operator:
+  - size
+  - trigger
+  - hold
+  - wip
 
 
 external_plugins:

@@ -12,6 +12,7 @@ tide:
 
   - repos:
     - Maistra/rpm-ior
+    - Maistra/rpm-istio-operator
     - Maistra/test-infra
     labels:
     - "okay to merge"
@@ -23,6 +24,7 @@ tide:
 
   - repos:
     - Maistra/rpm-ior
+    - Maistra/rpm-istio-operator
     author: maistra-bot
     missingLabels:
     - do-not-merge

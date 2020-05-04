@@ -158,6 +158,26 @@ presubmits:
         - make
         - test
 
+  Maistra/rpm-istio-operator:
+  - name: tests
+    decorate: true
+    always_run: true
+    path_alias: maistra.io/rpm-istio-operator
+    skip_report: false
+    branches:
+      - maistra-1.2
+      # Allow for testing
+      - playground
+    labels:
+      preset-copr: "true"
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.2"
+        imagePullPolicy: Always
+        command:
+        - make
+        - test
+
 ## The presubmits below are for the maistra-prow-testing org, which is our test bed
   maistra-prow-testing/test-infra:
   - name: build-containers

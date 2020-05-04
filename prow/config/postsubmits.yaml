@@ -66,3 +66,32 @@ postsubmits:
         - -c make update
         - '-t Automator: update ior'
         - -l auto-merge
+
+  Maistra/istio-operator:
+  - name: update-rpm
+    decorate: true
+    path_alias: maistra.io/istio-operator
+    skip_report: false
+    branches:
+      - maistra-1.2
+      # Allow for testing
+      - playground
+    labels:
+      preset-github: "true"
+    extra_refs:
+    - base_ref: master
+      org: maistra
+      path_alias: maistra.io/test-infra
+      repo: test-infra
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.2"
+        imagePullPolicy: Always
+        command:
+        - ../test-infra/tools/automator.sh
+        - -o maistra
+        - -f /creds-github/github-token
+        - -r rpm-istio-operator
+        - -c make update
+        - '-t Automator: update istio-operator'
+        - -l auto-merge

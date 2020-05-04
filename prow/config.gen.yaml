@@ -119,6 +119,35 @@ postsubmits:
         - -c make update
         - '-t Automator: update ior'
         - -l auto-merge
+
+  Maistra/istio-operator:
+  - name: update-rpm
+    decorate: true
+    path_alias: maistra.io/istio-operator
+    skip_report: false
+    branches:
+      - maistra-1.2
+      # Allow for testing
+      - playground
+    labels:
+      preset-github: "true"
+    extra_refs:
+    - base_ref: master
+      org: maistra
+      path_alias: maistra.io/test-infra
+      repo: test-infra
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.2"
+        imagePullPolicy: Always
+        command:
+        - ../test-infra/tools/automator.sh
+        - -o maistra
+        - -f /creds-github/github-token
+        - -r rpm-istio-operator
+        - -c make update
+        - '-t Automator: update istio-operator'
+        - -l auto-merge
 presets:
 - labels:
     preset-prow-deployer: "true"
@@ -335,6 +364,26 @@ presubmits:
         - make
         - test
 
+  Maistra/rpm-istio-operator:
+  - name: tests
+    decorate: true
+    always_run: true
+    path_alias: maistra.io/rpm-istio-operator
+    skip_report: false
+    branches:
+      - maistra-1.2
+      # Allow for testing
+      - playground
+    labels:
+      preset-copr: "true"
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.2"
+        imagePullPolicy: Always
+        command:
+        - make
+        - test
+
 ## The presubmits below are for the maistra-prow-testing org, which is our test bed
   maistra-prow-testing/test-infra:
   - name: build-containers
@@ -457,6 +506,7 @@ tide:
 
   - repos:
     - Maistra/rpm-ior
+    - Maistra/rpm-istio-operator
     - Maistra/test-infra
     labels:
     - "okay to merge"
@@ -468,6 +518,7 @@ tide:
 
   - repos:
     - Maistra/rpm-ior
+    - Maistra/rpm-istio-operator
     author: maistra-bot
     missingLabels:
     - do-not-merge
