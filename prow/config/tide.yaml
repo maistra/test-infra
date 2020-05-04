@@ -12,6 +12,9 @@ tide:
 
   - repos:
     - Maistra/rpm-ior
+    - Maistra/test-infra
+    labels:
+    - "okay to merge"
     missingLabels:
     - do-not-merge
     - do-not-merge/hold
