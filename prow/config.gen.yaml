@@ -90,6 +90,35 @@ postsubmits:
         - maistra-builder.push
         securityContext:
           privileged: true
+
+  Maistra/ior:
+  - name: update-rpm
+    decorate: true
+    path_alias: maistra.io/ior
+    skip_report: false
+    branches:
+      - maistra-1.2
+      # Allow for testing
+      - playground
+    labels:
+      preset-github: "true"
+    extra_refs:
+    - base_ref: master
+      org: maistra
+      path_alias: maistra.io/test-infra
+      repo: test-infra
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.2"
+        imagePullPolicy: Always
+        command:
+        - ../test-infra/automator.sh
+        - -o maistra
+        - -f /creds-github/github-token
+        - -r rpm-ior
+        - -c make update
+        - '-t Automator: update ior'
+        - -l auto-merge
 presets:
 - labels:
     preset-prow-deployer: "true"
@@ -104,6 +133,7 @@ presets:
   - name: creds
     secret:
       secretName: prow-deployer-kubeconfig
+
 - labels:
     preset-quay-pusher: "true"
   env:
@@ -117,6 +147,34 @@ presets:
   - name: creds
     secret:
       secretName: quay-pusher-dockercfg
+
+- labels:
+    preset-github: "true"
+  env:
+  volumeMounts:
+  - name: creds-github
+    mountPath: /creds-github
+    readOnly: true
+  volumes:
+  - name: creds-github
+    secret:
+      secretName: github-token
+
+- labels:
+    preset-copr: "true"
+  env:
+  - name: DEV_MODE
+    value: "1"
+  - name: COPR_CONFIG
+    value: /creds-copr/copr
+  volumeMounts:
+  - name: creds-copr
+    mountPath: /creds-copr
+    readOnly: true
+  volumes:
+  - name: creds-copr
+    secret:
+      secretName: copr
 presubmits:
   Maistra/maistra.github.io:
   - name: lint
@@ -257,6 +315,26 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
 
+  Maistra/rpm-ior:
+  - name: tests
+    decorate: true
+    always_run: true
+    path_alias: maistra.io/rpm-ior
+    skip_report: false
+    branches:
+      - maistra-1.2
+      # Allow for testing
+      - playground
+    labels:
+      preset-copr: "true"
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.2"
+        imagePullPolicy: Always
+        command:
+        - make
+        - test
+
 ## The presubmits below are for the maistra-prow-testing org, which is our test bed
   maistra-prow-testing/test-infra:
   - name: build-containers
@@ -365,28 +443,33 @@ sinker:
   resync_period: 1h
   max_prowjob_age: 168h
   max_pod_age: 6h
-# tide:
-#   merge_method:
-#     maistra-prow-testing: squash
-#   target_url: https://prow.maistra.io/tide
-#   queries:
-#   - orgs:
-#     - maistra-prow-testing
-#     labels:
-#     - okay to merge
-#     missingLabels:
-#     - do-not-merge
-#     - do-not-merge/hold
-#     - do-not-merge/work-in-progress
-#     - do-not-merge/invalid-owners-file
-#     - needs-rebase
-#   context_options:
-#     from-branch-protection: true
-#     skip-unknown-contexts: true
-#     orgs:
-#       maistra-prow-testing:
-#         repos:
-#           istio:
-#             required-contexts:
-#             - "unittests"
-#             - "integrationtests"
+github_reporter:
+  job_types_to_report:
+  - presubmit
+  - postsubmit
+
+tide:
+  merge_method:
+    Maistra: squash
+  target_url: https://prow.maistra.io/tide
+
+  queries:
+
+  - repos:
+    - Maistra/rpm-ior
+    missingLabels:
+    - do-not-merge
+    - do-not-merge/hold
+    - do-not-merge/work-in-progress
+    reviewApprovedRequired: true
+
+  - repos:
+    - Maistra/rpm-ior
+    author: maistra-bot
+    missingLabels:
+    - do-not-merge
+    - do-not-merge/hold
+    - do-not-merge/work-in-progress
+    labels:
+    - auto-merge
+    reviewApprovedRequired: false

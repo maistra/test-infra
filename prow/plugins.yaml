@@ -28,6 +28,16 @@ plugins:
   - lgtm
   - hold
   - wip
+  Maistra/ior:
+  - size
+  - trigger
+  - hold
+  - wip
+  Maistra/rpm-ior:
+  - size
+  - trigger
+  - hold
+  - wip
 
 
 external_plugins:
