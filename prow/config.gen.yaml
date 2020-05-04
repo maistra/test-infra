@@ -112,7 +112,7 @@ postsubmits:
       - image: "quay.io/maistra/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
-        - ../test-infra/automator.sh
+        - ../test-infra/tools/automator.sh
         - -o maistra
         - -f /creds-github/github-token
         - -r rpm-ior
