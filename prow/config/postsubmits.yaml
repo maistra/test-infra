@@ -95,3 +95,32 @@ postsubmits:
         - -c make update
         - '-t Automator: update istio-operator'
         - -l auto-merge
+
+  Maistra/rpm-common:
+  - name: update-rpm-common
+    decorate: true
+    path_alias: maistra.io/rpm-common
+    skip_report: false
+    branches:
+      - maistra-1.2
+      # Allow for testing
+      - playground
+    labels:
+      preset-github: "true"
+    extra_refs:
+    - base_ref: master
+      org: maistra
+      path_alias: maistra.io/test-infra
+      repo: test-infra
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.2"
+        imagePullPolicy: Always
+        command:
+        - ../test-infra/tools/automator.sh
+        - -o maistra
+        - -f /creds-github/github-token
+        - -r rpm-ior,rpm-istio-operator
+        - -c make update-common
+        - '-t Automator: update rpm-common files'
+        - -l auto-merge

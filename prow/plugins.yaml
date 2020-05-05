@@ -32,6 +32,11 @@ plugins:
   - trigger
   - hold
   - wip
+  Maistra/rpm-common:
+  - size
+  - trigger
+  - hold
+  - wip
   Maistra/rpm-ior:
   - size
   - trigger
