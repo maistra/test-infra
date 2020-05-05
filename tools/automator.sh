@@ -38,7 +38,7 @@ function usage() {
   echo
   echo "Options:"
   echo -e "  -o <org>\t\t GitHub organization. Mandatory."
-  echo -e "  -r <repo>\t\t GitHub repository. Mandatory."
+  echo -e "  -r <repo(s)>\t\t GitHub repository(ies), separated by comma. Mandatory."
   echo -e "  -f <oauth-token-file>\t File that contains the GitHub oauth token. Mandatory."
   echo -e "  -c <command>\t\t Command to execute to generate the diff to be committed. Mandatory."
   echo -e "  -b <branch>\t\t Branch. Defaults to the same as the original repo."
@@ -53,12 +53,18 @@ function usage() {
   exit 0
 }
 
+function split_on_commas() {
+  local array
+  IFS=, read -r -a array <<<"${1}"
+  echo "${array[@]}"
+}
+
 function parse_args() {
 
   while getopts ":o:r:f:c:b:l:t:h" opt; do
     case ${opt} in
       o) ORG=$(trim "${OPTARG}");;
-      r) REPO=$(trim "${OPTARG}");;
+      r) REPOS=$(trim "${OPTARG}");;
       f) TOKEN_FILE=$(trim "${OPTARG}");;
       c) CMD=$(trim "${OPTARG}");;
       b) BRANCH=$(trim "${OPTARG}");;
@@ -79,9 +85,11 @@ function parse_args() {
 
 function validate_args() {
   [ -z "${ORG:-}" ] && usage "Missing organization"
-  [ -z "${REPO:-}" ] && usage "Missing repository"
   [ -z "${CMD:-}" ] && usage "Missing command"
   [ -z "${TOKEN_FILE:-}" ] && usage "Missing token file"
+
+  REPOS="$(split_on_commas "${REPOS:-}")"
+  [ -z "${REPOS:-}" ] && usage "Missing repository"
 
   TOKEN="$(cat "${TOKEN_FILE}")"
   [ -z "${TOKEN}" ] && usage "Invalid token file"
@@ -100,18 +108,16 @@ function fetch_gh_data() {
   if [ -z "${GH_USER}" ] || [ -z "${GH_EMAIL}" ]; then
     error "Error fetching bot's data from GitHub"
   fi
-
-  # Create a fork
-  curl -XPOST -sSfLH "Authorization: token ${TOKEN}" "https://api.github.com/repos/${ORG}/${REPO}/forks" > /dev/null
 }
 
 function create_pr() {
-  local fork_name="${1}"
+  local repo="${1}"
+  local fork_name="${2}"
 
   pr-creator \
     --github-token-path="${TOKEN_FILE}" \
     --org="${ORG}" \
-    --repo="${REPO}" \
+    --repo="${repo}" \
     --branch="${BRANCH}" \
     --title="${TITLE}" \
     --match-title="\"${TITLE}\"" \
@@ -121,41 +127,52 @@ function create_pr() {
 }
 
 function add_labels() {
-  local pr="${1}"
+  local repo="${1}"
+  local pr="${2}"
   local json_labels
 
   if [ -n "${LABELS:-}" ]; then
     json_labels="$(echo "${LABELS}" | jq --raw-input --compact-output 'split(",")')"
-    curl -XPOST -sSfLH "Authorization: token ${TOKEN}" "https://api.github.com/repos/${ORG}/${REPO}/issues/${pr}/labels" --data "{\"labels\": ${json_labels}}" >/dev/null
+    curl -XPOST -sSfLH "Authorization: token ${TOKEN}" "https://api.github.com/repos/${ORG}/${repo}/issues/${pr}/labels" --data "{\"labels\": ${json_labels}}" >/dev/null
   fi
 }
 
 function commit_and_push() {
-  local fork_name="${1}"
+  local repo="${1}"
+  local fork_name="${2}"
 
   git -c "user.name=${GH_USER}" -c "user.email=${GH_EMAIL}" commit --message "${TITLE}" --author="${GH_USER} <${GH_EMAIL}>"
   git show --shortstat
-  git push --force "https://${GH_USER}:${TOKEN}@github.com/${GH_USER}/${REPO}.git" "HEAD:${fork_name}"
+  git push --force "https://${GH_USER}:${TOKEN}@github.com/${GH_USER}/${repo}.git" "HEAD:${fork_name}"
 }
 
 function do_work() {
   local pr
   local fork_name="automator-${BRANCH}"
+  local repo="${1}"
 
-  git clone --single-branch --branch "${BRANCH}" "https://github.com/${ORG}/${REPO}.git"
-  cd "${REPO}"
+  # Create a fork
+  curl -XPOST -sSfLH "Authorization: token ${TOKEN}" "https://api.github.com/repos/${ORG}/${repo}/forks" > /dev/null
+
+  git clone --single-branch --branch "${BRANCH}" "https://github.com/${ORG}/${repo}.git"
+  pushd "${repo}"
 
   echo "Executing ${CMD}"
   ${CMD}
   git add .
 
   if git diff --cached --quiet --exit-code; then
-    error "No diff was generated"
+    echo "***"
+    echo "No diff was generated for ${repo}"
+    echo "***"
+    return
   fi
 
-  commit_and_push "${fork_name}"
-  pr=$(create_pr "${fork_name}")
-  add_labels "${pr}"
+  commit_and_push "${repo}" "${fork_name}"
+  pr=$(create_pr "${repo}" "${fork_name}")
+  add_labels "${repo}" "${pr}"
+
+  popd
 }
 
 function cleanup() {
@@ -170,7 +187,9 @@ main() {
   cd "${TMP_DIR}"
   trap cleanup EXIT
 
-  do_work
+  for repo in ${REPOS}; do
+    do_work "${repo}"
+  done
 }
 
 main "$@"
