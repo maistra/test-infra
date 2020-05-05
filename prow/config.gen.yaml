@@ -373,6 +373,24 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
 
+  Maistra/rpm-common:
+  - name: tests
+    decorate: true
+    always_run: true
+    path_alias: maistra.io/rpm-common
+    skip_report: false
+    branches:
+      - maistra-1.2
+      # Allow for testing
+      - playground
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.2"
+        imagePullPolicy: Always
+        command:
+        - make
+        - test
+
   Maistra/rpm-ior:
   - name: tests
     decorate: true
