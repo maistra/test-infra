@@ -44,6 +44,7 @@ function usage() {
   echo -e "  -b <branch>\t\t Branch. Defaults to the same as the original repo."
   echo -e "  -l <label>\t\t Labels (comma-separated) to add to PR."
   echo -e "  -t <title>\t\t Title of PR. "
+  echo -e "  -m <modifier>\t\t Modifier (string) to append to the fork name, to differentiate it from other PR's"
 
   if [ -n "${1:-}" ]  ; then
     echo -e "\n${1}"
@@ -61,7 +62,7 @@ function split_on_commas() {
 
 function parse_args() {
 
-  while getopts ":o:r:f:c:b:l:t:h" opt; do
+  while getopts ":o:r:f:c:b:l:t:m:h" opt; do
     case ${opt} in
       o) ORG=$(trim "${OPTARG}");;
       r) REPOS=$(trim "${OPTARG}");;
@@ -70,6 +71,7 @@ function parse_args() {
       b) BRANCH=$(trim "${OPTARG}");;
       l) LABELS=$(trim "${OPTARG}");;
       t) TITLE=$(trim "${OPTARG}");;
+      m) MODIFIER=$(trim "${OPTARG}");;
       h) usage 0;;
       *) usage "Invalid command line argument. Aborting." ;;
     esac
@@ -96,6 +98,7 @@ function validate_args() {
 
   BRANCH="${BRANCH:-$(git describe --contains --all HEAD)}"
   TITLE="${TITLE:-Automator: Bump upstream}"
+  MODIFIER="${MODIFIER:-automator}"
 }
 
 function fetch_gh_data() {
@@ -148,8 +151,15 @@ function commit_and_push() {
 
 function do_work() {
   local pr
-  local fork_name="automator-${BRANCH}"
+  local hash
+  local fork_name
   local repo="${1}"
+  local src_branch="${PULL_BASE_REF:-${BRANCH}}"
+
+  # Use an unique fork name for the triple (origin repo, target repo, pr title)
+  # This avoids that two or more jobs that use automator for different purposes share the same fork
+  hash=$(echo -n "${TITLE}" | md5sum | cut -c1-8)
+  fork_name="${src_branch}-${BRANCH}-${MODIFIER}-${hash}"
 
   # Create a fork
   curl -XPOST -sSfLH "Authorization: token ${TOKEN}" "https://api.github.com/repos/${ORG}/${repo}/forks" > /dev/null
