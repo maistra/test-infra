@@ -119,6 +119,7 @@ postsubmits:
         - -c make update
         - '-t Automator: update ior'
         - -l auto-merge
+        - -m bump-rpm
 
   Maistra/istio-operator:
   - name: update-rpm
@@ -148,6 +149,7 @@ postsubmits:
         - -c make update
         - '-t Automator: update istio-operator'
         - -l auto-merge
+        - -m bump-rpm
 
   Maistra/rpm-common:
   - name: update-rpm-common
@@ -177,6 +179,7 @@ postsubmits:
         - -c make update-common
         - '-t Automator: update rpm-common files'
         - -l auto-merge
+        - -m rpm-common
 presets:
 - labels:
     preset-prow-deployer: "true"
