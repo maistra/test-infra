@@ -19,7 +19,7 @@ RUN curl -sfL https://download.docker.com/linux/fedora/docker-ce.repo -o /etc/yu
     dnf -y update && \
     dnf -y install fedpkg copr-cli jq xz unzip hostname golang \
                    make automake gcc gcc-c++ git ShellCheck which \
-                   hugo rubygem-asciidoctor rubygem-html-proofer docker-ce && \
+                   rubygem-asciidoctor rubygem-html-proofer docker-ce && \
     dnf -y clean all
 
 
@@ -35,7 +35,7 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
 RUN curl https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz | tar -xz linux-amd64/helm --strip=1 && mv helm /usr/local/bin
 
 # Hugo
-RUN curl https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz | tar -xz && mv hugo /usr/local/bin
+RUN curl -L https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz | tar -xz hugo && mv hugo /usr/local/bin
 
 
 # Kubectl
