@@ -11,7 +11,7 @@ postsubmits:
     - master
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.2"
+      - image: "quay.io/maistra-dev/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - make
@@ -29,7 +29,7 @@ postsubmits:
     max_concurrency: 1
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.2"
+      - image: "quay.io/maistra-dev/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - entrypoint
@@ -56,7 +56,7 @@ postsubmits:
       repo: test-infra
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.2"
+      - image: "quay.io/maistra-dev/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - ../test-infra/tools/automator.sh
@@ -86,7 +86,7 @@ postsubmits:
       repo: test-infra
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.2"
+      - image: "quay.io/maistra-dev/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - ../test-infra/tools/automator.sh
@@ -116,7 +116,7 @@ postsubmits:
       repo: test-infra
     spec:
       containers:
-      - image: "quay.io/maistra/maistra-builder:1.2"
+      - image: "quay.io/maistra-dev/maistra-builder:1.2"
         imagePullPolicy: Always
         command:
         - ../test-infra/tools/automator.sh

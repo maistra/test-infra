@@ -18,6 +18,8 @@ presets:
   env:
   - name: DOCKER_CONFIG
     value: /creds/
+  - name: HUB
+    value: quay.io/maistra-dev
   volumeMounts:
   - name: creds
     mountPath: /creds

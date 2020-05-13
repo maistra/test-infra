@@ -1,4 +1,4 @@
-HUB ?= quay.io/maistra
+HUB ?= quay.io/maistra-dev
 
 BUILD_IMAGE = maistra-builder
 BUILD_IMAGE_VERSIONS = $(BUILD_IMAGE)_1.2 $(BUILD_IMAGE)_1.1 ${BUILD_IMAGE}_1.0
