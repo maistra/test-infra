@@ -354,14 +354,16 @@ presubmits:
         securityContext:
           privileged: true
   Maistra/istio:
-  - name: unittests
+  - name: maistra-istio-1.2-unit
+    trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     always_run: true
     path_alias: istio.io/istio
     skip_report: false
     branches:
-      - maistra-1.2
       - maistra-1.2-future
+    context: ci/prow/unit
+    rerun_command: /test unit
     spec:
       containers:
       - image: "quay.io/maistra/maistra-builder:1.2"
