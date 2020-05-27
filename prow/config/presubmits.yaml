@@ -122,6 +122,29 @@ presubmits:
     path_alias: istio.io/istio
     skip_report: false
     branches:
+      - maistra-1.2
+      - maistra-1.2-future
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.2"
+        command:
+        - make
+        - init
+        - test
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+
+  - name: unittests
+    decorate: true
+    always_run: true
+    path_alias: istio.io/istio
+    skip_report: false
+    branches:
       - maistra-1.1
     spec:
       containers:
