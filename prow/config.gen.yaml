@@ -369,9 +369,14 @@ presubmits:
       - image: "quay.io/maistra/maistra-builder:1.2"
         command:
         - make
-        - init
-        - test
+        - -e
+        - T=-v
+        - build
+        - racetest
+        - binaries-test
         env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
         - name: GOFLAGS
           value: -mod=vendor
         - name: XDG_CACHE_HOME
