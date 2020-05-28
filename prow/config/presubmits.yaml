@@ -51,6 +51,8 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        - name: TEST_FLAGS
+          value: -v
   - name: gen-check
     decorate: true
     always_run: true
