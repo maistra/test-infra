@@ -289,6 +289,8 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        - name: TEST_FLAGS
+          value: -v
   - name: gen-check
     decorate: true
     always_run: true
@@ -354,6 +356,36 @@ presubmits:
         securityContext:
           privileged: true
   Maistra/istio:
+  - name: maistra-istio-1.2-unit
+    trigger: (?m)^/test( | .* )unit,?($|\s.*)
+    decorate: true
+    always_run: true
+    path_alias: istio.io/istio
+    skip_report: false
+    branches:
+      - maistra-1.2-future
+    context: ci/prow/unit
+    rerun_command: /test unit
+    spec:
+      containers:
+      - image: "quay.io/maistra/maistra-builder:1.2"
+        command:
+        - make
+        - -e
+        - T=-v
+        - build
+        - racetest
+        - binaries-test
+        env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+
   - name: unittests
     decorate: true
     always_run: true
