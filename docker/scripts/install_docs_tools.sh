@@ -18,4 +18,5 @@ curl -sfL https://install.goreleaser.com/github.com/ValeLint/vale.sh -o vale.sh
 chmod +x vale.sh
 ./vale.sh -b /usr/local/bin v2.1.0
 
-
+#install yq for use in yaml parsing
+GO111MODULE=on go get github.com/mikefarah/yq/v3

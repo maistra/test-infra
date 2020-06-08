@@ -29,6 +29,7 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/jstemmer/go-junit-report && \
     gobin k8s.io/test-infra/robots/pr-creator && \
     gobin k8s.io/test-infra/prow/cmd/checkconfig && \
+    gobin github.com/mikefarah/yq/v3 && \
     rm -rf /root/* /root/.cache /tmp/*
 
 # Helm
