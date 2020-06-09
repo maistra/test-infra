@@ -19,7 +19,8 @@ RUN curl -sfL https://download.docker.com/linux/fedora/docker-ce.repo -o /etc/yu
     dnf -y update && \
     dnf -y install fedpkg copr-cli jq xz unzip hostname golang \
                    make automake gcc gcc-c++ git ShellCheck which \
-                   rubygem-asciidoctor rubygem-html-proofer docker-ce && \
+                   rubygem-asciidoctor rubygem-html-proofer docker-ce \
+                   npm && \
     dnf -y clean all
 
 
@@ -27,8 +28,8 @@ RUN curl -sfL https://download.docker.com/linux/fedora/docker-ce.repo -o /etc/yu
 ENV GOBIN=/usr/local/bin
 RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/jstemmer/go-junit-report && \
-    gobin k8s.io/test-infra/robots/pr-creator && \
-    gobin k8s.io/test-infra/prow/cmd/checkconfig && \
+    gobin k8s.io/test-infra/robots/pr-creator@41512c7491a99c6bdf330e1a76d45c8a10d3679b && \
+    gobin k8s.io/test-infra/prow/cmd/checkconfig@41512c7491a99c6bdf330e1a76d45c8a10d3679b && \
     gobin github.com/mikefarah/yq/v3 && \
     rm -rf /root/* /root/.cache /tmp/*
 

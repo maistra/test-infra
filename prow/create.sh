@@ -16,7 +16,7 @@ kubectl -n default create secret generic oauth-token --from-file=oauth=secrets/g
 
 kubectl -n test-pods create secret generic github-token --from-file=github-token=secrets/github-token || echo Skipping
 kubectl -n test-pods create secret generic gcs-credentials --from-file=service-account.json=secrets/gcs-credentials.json || echo Skipping
-kubectl -n test-pods create secret generic quay-pusher-dockercfg --from-file=config.json=secrets/maistra-prow-auth.json || echo Skipping
+kubectl -n test-pods create secret generic quay-pusher-dockercfg --from-file=config.json=secrets/maistra-dev-prow-auth.json || echo Skipping
 kubectl -n test-pods create secret generic copr --from-file=copr=secrets/copr-token-bot || echo Skipping
 
 # create service account including secret holding kubeconfig (for auto-updating prow config on merged PRs)
