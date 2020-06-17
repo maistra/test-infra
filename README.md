@@ -10,7 +10,7 @@ To build the `maistra-builder` container image locally, run `make maistra-builde
 
 ## Using Prow
 
-The official Maistra Prow instance is available at https://prow.maistra.io. All commits to this repository's `master` branch will be auto-applied to that cluster.
+The official Maistra Prow instance is available at https://prow.maistra.io. All commits to this repository's `main` branch will be auto-applied to that cluster.
 
 ### Prow Configuration
 

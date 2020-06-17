@@ -109,7 +109,7 @@ presubmits:
     path_alias: github.com/maistra/test-infra
     skip_report: false
     branches:
-      - master
+      - main
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.2"
@@ -123,7 +123,7 @@ presubmits:
     path_alias: github.com/maistra/test-infra
     skip_report: false
     branches:
-      - master
+      - main
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.2"
@@ -137,7 +137,7 @@ presubmits:
     skip_report: false
     run_if_changed: '^docker/'
     branches:
-      - master
+      - main
     max_concurrency: 1
     spec:
       containers:
@@ -270,7 +270,7 @@ presubmits:
     path_alias: github.com/maistra/test-infra
     skip_report: false
     branches:
-      - master
+      - main
     max_concurrency: 1
     spec:
       containers:
