@@ -1,6 +1,6 @@
 postsubmits:
   Maistra/test-infra:
-  - name: deploy-prow
+  - name: test-infra_deploy-prow
     decorate: true
     skip_report: false
     run_if_changed: '^prow/'
@@ -17,7 +17,7 @@ postsubmits:
         - make
         - gen-check
         - update-prow
-  - name: push-containers
+  - name: test-infra_push-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
@@ -39,7 +39,7 @@ postsubmits:
           privileged: true
 
   Maistra/ior:
-  - name: update-rpm
+  - name: ior_update-rpm
     decorate: true
     path_alias: maistra.io/ior
     skip_report: false
@@ -69,7 +69,7 @@ postsubmits:
         - -m bump-rpm
 
   Maistra/istio-operator:
-  - name: update-rpm
+  - name: istio-operator_update-rpm
     decorate: true
     path_alias: maistra.io/istio-operator
     skip_report: false
@@ -99,7 +99,7 @@ postsubmits:
         - -m bump-rpm
 
   Maistra/rpm-common:
-  - name: update-rpm-common
+  - name: rpm-common_update
     decorate: true
     path_alias: maistra.io/rpm-common
     skip_report: false
