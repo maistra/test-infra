@@ -421,7 +421,7 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
 
-  - name: maistra-istio-1.2-integration
+  - name: istio_1.2-integration
     skip_report: false
     max_concurrency: 1
     always_run: true
@@ -461,7 +461,7 @@ presubmits:
           type: Directory
         name: cgroup
 
-  - name: maistra-istio-1.1-unit
+  - name: istio_1.1-unit
     decorate: true
     always_run: true
     path_alias: istio.io/istio
@@ -484,8 +484,8 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
 
-  - name: maistra-istio-1.1-integration
-    skip_report: true
+  - name: istio_1.1-integration
+    skip_report: false
     max_concurrency: 1
     always_run: true
     branches:
