@@ -61,7 +61,7 @@ postsubmits:
       preset-prow-deployer: "true"
     max_concurrency: 1
     branches:
-    - master
+    - main
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.2"
@@ -76,7 +76,7 @@ postsubmits:
     skip_report: false
     run_if_changed: '^docker/'
     branches:
-      - master
+      - main
     labels:
       preset-quay-pusher: "true"
     max_concurrency: 1
@@ -103,7 +103,7 @@ postsubmits:
     labels:
       preset-github: "true"
     extra_refs:
-    - base_ref: master
+    - base_ref: main
       org: maistra
       path_alias: maistra.io/test-infra
       repo: test-infra
@@ -133,7 +133,7 @@ postsubmits:
     labels:
       preset-github: "true"
     extra_refs:
-    - base_ref: master
+    - base_ref: main
       org: maistra
       path_alias: maistra.io/test-infra
       repo: test-infra
@@ -163,7 +163,7 @@ postsubmits:
     labels:
       preset-github: "true"
     extra_refs:
-    - base_ref: master
+    - base_ref: main
       org: maistra
       path_alias: maistra.io/test-infra
       repo: test-infra
@@ -349,7 +349,7 @@ presubmits:
     path_alias: github.com/maistra/test-infra
     skip_report: false
     branches:
-      - master
+      - main
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.2"
@@ -363,7 +363,7 @@ presubmits:
     path_alias: github.com/maistra/test-infra
     skip_report: false
     branches:
-      - master
+      - main
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.2"
@@ -377,7 +377,7 @@ presubmits:
     skip_report: false
     run_if_changed: '^docker/'
     branches:
-      - master
+      - main
     max_concurrency: 1
     spec:
       containers:
@@ -510,7 +510,7 @@ presubmits:
     path_alias: github.com/maistra/test-infra
     skip_report: false
     branches:
-      - master
+      - main
     max_concurrency: 1
     spec:
       containers:
