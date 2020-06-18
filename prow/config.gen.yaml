@@ -474,6 +474,8 @@ presubmits:
         imagePullPolicy: Always
         command:
         - make
+        - -e
+        - T=-v
         - init
         - test
         env:
