@@ -40,7 +40,7 @@ plank:
     '*': "https://prow.maistra.io/view/gcs/"
   default_decoration_configs:
     '*':
-      timeout: 2h
+      timeout: 4h
       grace_period: 15s
       utility_images:
         clonerefs: "gcr.io/k8s-prow/clonerefs:v20200427-baaf248ed"
@@ -53,7 +53,7 @@ plank:
       gcs_credentials_secret: "gcs-credentials"
 postsubmits:
   Maistra/test-infra:
-  - name: deploy-prow
+  - name: test-infra_deploy-prow
     decorate: true
     skip_report: false
     run_if_changed: '^prow/'
@@ -70,7 +70,7 @@ postsubmits:
         - make
         - gen-check
         - update-prow
-  - name: push-containers
+  - name: test-infra_push-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
@@ -92,7 +92,7 @@ postsubmits:
           privileged: true
 
   Maistra/ior:
-  - name: update-rpm
+  - name: ior_update-rpm
     decorate: true
     path_alias: maistra.io/ior
     skip_report: false
@@ -122,7 +122,7 @@ postsubmits:
         - -m bump-rpm
 
   Maistra/istio-operator:
-  - name: update-rpm
+  - name: istio-operator_update-rpm
     decorate: true
     path_alias: maistra.io/istio-operator
     skip_report: false
@@ -152,7 +152,7 @@ postsubmits:
         - -m bump-rpm
 
   Maistra/rpm-common:
-  - name: update-rpm-common
+  - name: rpm-common_update
     decorate: true
     path_alias: maistra.io/rpm-common
     skip_report: false
@@ -240,7 +240,7 @@ presets:
       secretName: copr
 presubmits:
   Maistra/maistra.github.io:
-  - name: lint
+  - name: maistra.github.io_lint
     decorate: true
     always_run: true
     skip_report: false
@@ -256,7 +256,7 @@ presubmits:
         - lint
     trigger: "(?m)^/test lint"
     rerun_command: "/test lint"
-  - name: check-links
+  - name: maistra.github.io_check-links
     decorate: true
     always_run: true
     skip_report: false
@@ -273,7 +273,7 @@ presubmits:
     trigger: "(?m)^/test check-links"
     rerun_command: "/test check-links"
   Maistra/istio-operator:
-  - name: unittests
+  - name: istio-operator_unittests
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
@@ -296,7 +296,7 @@ presubmits:
           value: /tmp/cache
         - name: TEST_FLAGS
           value: -v
-  - name: gen-check
+  - name: istio-operator_gen-check
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
@@ -316,7 +316,7 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
-  - name: release
+  - name: istio-operator_release
     decorate: true
     always_run: false
     path_alias: github.com/maistra/istio-operator
@@ -343,7 +343,7 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
   Maistra/test-infra:
-  - name: lint
+  - name: test-infra_lint
     decorate: true
     always_run: true
     path_alias: github.com/maistra/test-infra
@@ -357,7 +357,7 @@ presubmits:
         command:
         - make
         - lint
-  - name: gen-check
+  - name: test-infra_gen-check
     decorate: true
     always_run: true
     path_alias: github.com/maistra/test-infra
@@ -371,7 +371,7 @@ presubmits:
         command:
         - make
         - gen-check
-  - name: build-containers
+  - name: test-infra_build-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
@@ -389,8 +389,9 @@ presubmits:
         - build-containers
         securityContext:
           privileged: true
+
   Maistra/istio:
-  - name: maistra-istio-1.2-unit
+  - name: istio_1.2-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     always_run: true
@@ -398,7 +399,6 @@ presubmits:
     skip_report: false
     branches:
       - maistra-1.2-future
-    context: ci/prow/unit
     rerun_command: /test unit
     spec:
       containers:
@@ -421,7 +421,47 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
 
-  - name: unittests
+  - name: istio_1.2-integration
+    skip_report: false
+    max_concurrency: 1
+    always_run: true
+    branches:
+    - maistra-1.2
+    decorate: true
+    path_alias: istio.io/istio
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - prow/integ-suite-kind.sh
+        - test.integration.kube.presubmit
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        image: "quay.io/maistra-dev/maistra-builder:1.2"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
+
+  - name: istio_1.1-unit
     decorate: true
     always_run: true
     path_alias: istio.io/istio
@@ -446,8 +486,48 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
 
+  - name: istio_1.1-integration
+    skip_report: false
+    max_concurrency: 1
+    always_run: true
+    branches:
+    - maistra-1.1
+    decorate: true
+    path_alias: istio.io/istio
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - prow/integ-suite-kind.sh
+        - test.integration.kube.presubmit
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        image: "quay.io/maistra-dev/maistra-builder:1.2"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
+
   Maistra/rpm-common:
-  - name: tests
+  - name: rpm-common_tests
     decorate: true
     always_run: true
     path_alias: maistra.io/rpm-common
@@ -465,7 +545,7 @@ presubmits:
         - test
 
   Maistra/rpm-ior:
-  - name: tests
+  - name: rpm-ior_tests
     decorate: true
     always_run: true
     path_alias: maistra.io/rpm-ior
@@ -485,7 +565,7 @@ presubmits:
         - test
 
   Maistra/rpm-istio-operator:
-  - name: tests
+  - name: rpm-istio-operator_tests
     decorate: true
     always_run: true
     path_alias: maistra.io/rpm-istio-operator

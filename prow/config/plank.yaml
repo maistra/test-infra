@@ -3,7 +3,7 @@ plank:
     '*': "https://prow.maistra.io/view/gcs/"
   default_decoration_configs:
     '*':
-      timeout: 2h
+      timeout: 4h
       grace_period: 15s
       utility_images:
         clonerefs: "gcr.io/k8s-prow/clonerefs:v20200427-baaf248ed"
