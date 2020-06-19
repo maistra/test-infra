@@ -12,7 +12,7 @@ branch-protection:
       required_pull_request_reviews:
         required_approving_review_count: 1
         require_code_owner_reviews: false
-    Maistra:
+    maistra:
       required_pull_request_reviews:
         required_approving_review_count: 2
         require_code_owner_reviews: false
@@ -52,7 +52,7 @@ plank:
         bucket: "maistra-prow-testing"
       gcs_credentials_secret: "gcs-credentials"
 postsubmits:
-  Maistra/test-infra:
+  maistra/test-infra:
   - name: test-infra_deploy-prow
     decorate: true
     skip_report: false
@@ -91,7 +91,7 @@ postsubmits:
         securityContext:
           privileged: true
 
-  Maistra/ior:
+  maistra/ior:
   - name: ior_update-rpm
     decorate: true
     path_alias: maistra.io/ior
@@ -121,7 +121,7 @@ postsubmits:
         - -l auto-merge
         - -m bump-rpm
 
-  Maistra/istio-operator:
+  maistra/istio-operator:
   - name: istio-operator_update-rpm
     decorate: true
     path_alias: maistra.io/istio-operator
@@ -151,7 +151,7 @@ postsubmits:
         - -l auto-merge
         - -m bump-rpm
 
-  Maistra/rpm-common:
+  maistra/rpm-common:
   - name: rpm-common_update
     decorate: true
     path_alias: maistra.io/rpm-common
@@ -239,7 +239,7 @@ presets:
     secret:
       secretName: copr
 presubmits:
-  Maistra/maistra.github.io:
+  maistra/maistra.github.io:
   - name: maistra.github.io_lint
     decorate: true
     always_run: true
@@ -272,7 +272,7 @@ presubmits:
         - check-links
     trigger: "(?m)^/test check-links"
     rerun_command: "/test check-links"
-  Maistra/istio-operator:
+  maistra/istio-operator:
   - name: istio-operator_unittests
     decorate: true
     always_run: true
@@ -342,7 +342,7 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
-  Maistra/test-infra:
+  maistra/test-infra:
   - name: test-infra_lint
     decorate: true
     always_run: true
@@ -390,7 +390,7 @@ presubmits:
         securityContext:
           privileged: true
 
-  Maistra/istio:
+  maistra/istio:
   - name: istio_1.2-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -526,7 +526,7 @@ presubmits:
           type: Directory
         name: cgroup
 
-  Maistra/rpm-common:
+  maistra/rpm-common:
   - name: rpm-common_tests
     decorate: true
     always_run: true
@@ -544,7 +544,7 @@ presubmits:
         - make
         - test
 
-  Maistra/rpm-ior:
+  maistra/rpm-ior:
   - name: rpm-ior_tests
     decorate: true
     always_run: true
@@ -564,7 +564,7 @@ presubmits:
         - make
         - test
 
-  Maistra/rpm-istio-operator:
+  maistra/rpm-istio-operator:
   - name: rpm-istio-operator_tests
     decorate: true
     always_run: true
@@ -703,16 +703,16 @@ github_reporter:
 
 tide:
   merge_method:
-    Maistra: squash
+    maistra: squash
   target_url: https://prow.maistra.io/tide
 
   queries:
 
   - repos:
-    - Maistra/rpm-common
-    - Maistra/rpm-ior
-    - Maistra/rpm-istio-operator
-    - Maistra/test-infra
+    - maistra/rpm-common
+    - maistra/rpm-ior
+    - maistra/rpm-istio-operator
+    - maistra/test-infra
     labels:
     - "okay to merge"
     missingLabels:
@@ -722,8 +722,8 @@ tide:
     reviewApprovedRequired: true
 
   - repos:
-    - Maistra/rpm-ior
-    - Maistra/rpm-istio-operator
+    - maistra/rpm-ior
+    - maistra/rpm-istio-operator
     author: maistra-bot
     missingLabels:
     - do-not-merge

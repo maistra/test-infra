@@ -1,5 +1,5 @@
 postsubmits:
-  Maistra/test-infra:
+  maistra/test-infra:
   - name: test-infra_deploy-prow
     decorate: true
     skip_report: false
@@ -38,7 +38,7 @@ postsubmits:
         securityContext:
           privileged: true
 
-  Maistra/ior:
+  maistra/ior:
   - name: ior_update-rpm
     decorate: true
     path_alias: maistra.io/ior
@@ -68,7 +68,7 @@ postsubmits:
         - -l auto-merge
         - -m bump-rpm
 
-  Maistra/istio-operator:
+  maistra/istio-operator:
   - name: istio-operator_update-rpm
     decorate: true
     path_alias: maistra.io/istio-operator
@@ -98,7 +98,7 @@ postsubmits:
         - -l auto-merge
         - -m bump-rpm
 
-  Maistra/rpm-common:
+  maistra/rpm-common:
   - name: rpm-common_update
     decorate: true
     path_alias: maistra.io/rpm-common

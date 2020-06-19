@@ -1,5 +1,5 @@
 presubmits:
-  Maistra/maistra.github.io:
+  maistra/maistra.github.io:
   - name: maistra.github.io_lint
     decorate: true
     always_run: true
@@ -32,7 +32,7 @@ presubmits:
         - check-links
     trigger: "(?m)^/test check-links"
     rerun_command: "/test check-links"
-  Maistra/istio-operator:
+  maistra/istio-operator:
   - name: istio-operator_unittests
     decorate: true
     always_run: true
@@ -102,7 +102,7 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
-  Maistra/test-infra:
+  maistra/test-infra:
   - name: test-infra_lint
     decorate: true
     always_run: true
@@ -150,7 +150,7 @@ presubmits:
         securityContext:
           privileged: true
 
-  Maistra/istio:
+  maistra/istio:
   - name: istio_1.2-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -286,7 +286,7 @@ presubmits:
           type: Directory
         name: cgroup
 
-  Maistra/rpm-common:
+  maistra/rpm-common:
   - name: rpm-common_tests
     decorate: true
     always_run: true
@@ -304,7 +304,7 @@ presubmits:
         - make
         - test
 
-  Maistra/rpm-ior:
+  maistra/rpm-ior:
   - name: rpm-ior_tests
     decorate: true
     always_run: true
@@ -324,7 +324,7 @@ presubmits:
         - make
         - test
 
-  Maistra/rpm-istio-operator:
+  maistra/rpm-istio-operator:
   - name: rpm-istio-operator_tests
     decorate: true
     always_run: true

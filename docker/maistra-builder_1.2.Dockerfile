@@ -7,7 +7,7 @@ ENV HELM_VERSION="v2.16.6"
 ENV VALE_VERSION="v2.1.1"
 ENV KIND_VERSION="v0.7.0"
 
-#this needs to match the version of Hugo used in Maistra.io's netlify.toml file
+#this needs to match the version of Hugo used in maistra.io's netlify.toml file
 ENV HUGO_VERSION="0.69.2"
 
 # Set CI variable which can be checked by test scripts to verify
