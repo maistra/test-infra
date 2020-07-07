@@ -391,14 +391,14 @@ presubmits:
           privileged: true
 
   maistra/istio:
-  - name: istio_1.2-unit
+  - name: istio_2.0-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     always_run: true
     path_alias: istio.io/istio
     skip_report: false
     branches:
-      - maistra-1.2-future
+      - maistra-2.0
     rerun_command: /test unit
     spec:
       containers:
@@ -421,12 +421,14 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
 
-  - name: istio_1.2-integration
+  - name: istio_2.0-integration
+    trigger: (?m)^/test( | .* )integration,?($|\s.*)
+    rerun_command: /test integration
     skip_report: false
     max_concurrency: 1
     always_run: true
     branches:
-    - maistra-1.2
+    - maistra-2.0
     decorate: true
     path_alias: istio.io/istio
     spec:
