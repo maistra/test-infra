@@ -1,9 +1,10 @@
 FROM fedora:32
 
 # Versions
-ENV ISTIO_TOOLS_SHA=3a83f1998fbac342979d7fd0b6100c15e4931e9f
+ENV ISTIO_TOOLS_SHA=8ca60869f4b78e07d3f1daa839b07f0444947798
 ENV KUBECTL_VERSION="v1.17.0"
-ENV HELM_VERSION="v2.16.6"
+ENV HELM2_VERSION=v2.16.6
+ENV HELM3_VERSION=v3.1.2
 ENV VALE_VERSION="v2.1.1"
 ENV KIND_VERSION="v0.7.0"
 ENV AUTOPEP8_VERSION=1.4.4
@@ -12,9 +13,18 @@ ENV HADOLINT_VERSION=v1.17.2
 ENV MDL_VERSION=0.5.0
 ENV YAMLLINT_VERSION=1.17.0
 ENV HTML_PROOFER=3.15.3
+ENV GO_BINDATA_VERSION=v3.1.2
+ENV COUNTERFEITER_VERSION=v6.2.3
+ENV PROTOC_VERSION=3.9.2
+ENV GOIMPORTS_VERSION=379209517ffe
+ENV GOGO_PROTOBUF_VERSION=v1.3.0
+ENV GO_JUNIT_REPORT_VERSION=af01ea7f8024089b458d804d5cdf190f962a9a0c
+ENV K8S_TEST_INFRA_VERSION=41512c7491a99c6bdf330e1a76d45c8a10d3679b
 
 #this needs to match the version of Hugo used in maistra.io's netlify.toml file
 ENV HUGO_VERSION="0.69.2"
+
+ENV GOPROXY="https://proxy.golang.org,direct"
 
 # Set CI variable which can be checked by test scripts to verify
 # if running in the continuous integration environment.
@@ -31,14 +41,19 @@ RUN dnf -y update && \
 # Go tools
 ENV GOBIN=/usr/local/bin
 RUN GO111MODULE=off go get github.com/myitcv/gobin && \
-    gobin github.com/jstemmer/go-junit-report && \
-    gobin k8s.io/test-infra/robots/pr-creator@41512c7491a99c6bdf330e1a76d45c8a10d3679b && \
-    gobin k8s.io/test-infra/prow/cmd/checkconfig@41512c7491a99c6bdf330e1a76d45c8a10d3679b && \
+    gobin github.com/jstemmer/go-junit-report@${GO_JUNIT_REPORT_VERSION} && \
+    gobin k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION} && \
+    gobin k8s.io/test-infra/prow/cmd/checkconfig@${K8S_TEST_INFRA_VERSION} && \
     gobin github.com/mikefarah/yq/v3 && \
     gobin github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION} && \
     gobin istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} && \
     gobin istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} && \
     gobin istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} && \
+    gobin github.com/go-bindata/go-bindata/go-bindata@${GO_BINDATA_VERSION} && \
+    gobin github.com/maxbrunsfeld/counterfeiter/v6@${COUNTERFEITER_VERSION} && \
+    gobin golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION} && \
+    gobin github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION} && \
+    gobin istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} && \
     rm -rf /root/* /root/.cache /tmp/*
 
 # Python tools
@@ -54,10 +69,11 @@ RUN curl -sfL https://github.com/hadolint/hadolint/releases/download/${HADOLINT_
     chmod +x /usr/bin/hadolint
 
 # Helm
-RUN curl https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz | tar -xz linux-amd64/helm --strip=1 && mv helm /usr/local/bin
+RUN curl -sfL https://get.helm.sh/helm-${HELM2_VERSION}-linux-amd64.tar.gz | tar -xz linux-amd64/helm --strip=1 && mv helm /usr/local/bin && \
+    curl -sfL https://get.helm.sh/helm-${HELM3_VERSION}-linux-amd64.tar.gz | tar -xz linux-amd64/helm --strip=1 && mv helm /usr/local/bin/helm3
 
 # Hugo
-RUN curl -L https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz | tar -xz hugo && mv hugo /usr/local/bin
+RUN curl -sfL https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz | tar -xz hugo && mv hugo /usr/local/bin
 
 # Kubectl
 RUN curl -sfL https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && \
@@ -71,6 +87,12 @@ RUN curl -Lo /usr/local/bin/kind https://github.com/kubernetes-sigs/kind/release
 RUN curl -sfL https://install.goreleaser.com/github.com/ValeLint/vale.sh -o ./vale.sh && \
     chmod +x ./vale.sh && ./vale.sh -b /usr/local/bin ${VALE_VERSION} && \
     rm -f ./vale.sh
+
+# Protoc
+RUN curl -sfLO https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
+    unzip protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
+    mv bin/protoc /usr/local/bin && \
+    rm -rf /root/*
 
 ADD scripts/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
