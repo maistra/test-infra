@@ -20,6 +20,7 @@ ENV GOIMPORTS_VERSION=379209517ffe
 ENV GOGO_PROTOBUF_VERSION=v1.3.0
 ENV GO_JUNIT_REPORT_VERSION=af01ea7f8024089b458d804d5cdf190f962a9a0c
 ENV K8S_TEST_INFRA_VERSION=41512c7491a99c6bdf330e1a76d45c8a10d3679b
+ENV K8S_CODE_GENERATOR_VERSION=1.18.1
 
 #this needs to match the version of Hugo used in maistra.io's netlify.toml file
 ENV HUGO_VERSION="0.69.2"
@@ -55,6 +56,15 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION} && \
     gobin istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} && \
     rm -rf /root/* /root/.cache /tmp/*
+
+# gobin does not seem to be compatible with this pesky code-generator repo
+# Install the code generator tools, and hopefully only these tools, this way
+RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/defaulter-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION}
+RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/client-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION}
+RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/lister-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION}
+RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/informer-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION}
+RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/deepcopy-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION}
+RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/go-to-protobuf@kubernetes-${K8S_CODE_GENERATOR_VERSION}
 
 # Python tools
 RUN pip3 install --no-binary :all: autopep8==${AUTOPEP8_VERSION} && \
