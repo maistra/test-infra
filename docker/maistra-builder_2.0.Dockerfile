@@ -21,6 +21,8 @@ ENV GOGO_PROTOBUF_VERSION=v1.3.0
 ENV GO_JUNIT_REPORT_VERSION=af01ea7f8024089b458d804d5cdf190f962a9a0c
 ENV K8S_TEST_INFRA_VERSION=41512c7491a99c6bdf330e1a76d45c8a10d3679b
 ENV K8S_CODE_GENERATOR_VERSION=1.18.1
+ENV LICENSEE_VERSION=9.11.0
+ENV GOLANG_PROTOBUF_VERSION=v1.3.1
 
 #this needs to match the version of Hugo used in maistra.io's netlify.toml file
 ENV HUGO_VERSION="0.69.2"
@@ -35,8 +37,9 @@ ENV CI prow
 RUN dnf -y update && \
     dnf -y install fedpkg copr-cli jq xz unzip hostname golang \
                    make automake gcc gcc-c++ git ShellCheck which \
-                   moby-engine npm python3-pip rubygems \
-                   rubygem-asciidoctor ruby-devel zlib-devel && \
+                   moby-engine npm python3-pip rubygems cmake \
+                   rubygem-asciidoctor ruby-devel zlib-devel \
+                   openssl-devel && \
     dnf -y clean all
 
 # Go tools
@@ -55,6 +58,7 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION} && \
     gobin github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION} && \
     gobin istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} && \
+    gobin github.com/golang/protobuf/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
     rm -rf /root/* /root/.cache /tmp/*
 
 # gobin does not seem to be compatible with this pesky code-generator repo
@@ -72,7 +76,8 @@ RUN pip3 install --no-binary :all: autopep8==${AUTOPEP8_VERSION} && \
 
 # Ruby tools
 RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION} && \
-    gem install --no-wrappers --no-document html-proofer -v ${HTML_PROOFER}
+    gem install --no-wrappers --no-document html-proofer -v ${HTML_PROOFER} && \
+    gem install --no-wrappers --no-document licensee -v ${LICENSEE_VERSION}
 
 # Other lint tools
 RUN curl -sfL https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64 -o /usr/bin/hadolint && \
