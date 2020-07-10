@@ -222,6 +222,7 @@ presubmits:
         imagePullPolicy: Always
         command:
         - make
+        - maistra-gen-k8s-client
         - gen-check
         env:
         - name: BUILD_WITH_CONTAINER
