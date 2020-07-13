@@ -5,16 +5,16 @@ github_reporter:
 
 tide:
   merge_method:
-    Maistra: squash
+    maistra: squash
   target_url: https://prow.maistra.io/tide
 
   queries:
 
   - repos:
-    - Maistra/rpm-common
-    - Maistra/rpm-ior
-    - Maistra/rpm-istio-operator
-    - Maistra/test-infra
+    - maistra/rpm-common
+    - maistra/rpm-ior
+    - maistra/rpm-istio-operator
+    - maistra/test-infra
     labels:
     - "okay to merge"
     missingLabels:
@@ -24,8 +24,8 @@ tide:
     reviewApprovedRequired: true
 
   - repos:
-    - Maistra/rpm-ior
-    - Maistra/rpm-istio-operator
+    - maistra/rpm-ior
+    - maistra/rpm-istio-operator
     author: maistra-bot
     missingLabels:
     - do-not-merge

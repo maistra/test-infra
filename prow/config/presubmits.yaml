@@ -1,6 +1,6 @@
 presubmits:
-  Maistra/maistra.github.io:
-  - name: lint
+  maistra/maistra.github.io:
+  - name: maistra.github.io_lint
     decorate: true
     always_run: true
     skip_report: false
@@ -16,7 +16,7 @@ presubmits:
         - lint
     trigger: "(?m)^/test lint"
     rerun_command: "/test lint"
-  - name: check-links
+  - name: maistra.github.io_check-links
     decorate: true
     always_run: true
     skip_report: false
@@ -32,8 +32,8 @@ presubmits:
         - check-links
     trigger: "(?m)^/test check-links"
     rerun_command: "/test check-links"
-  Maistra/istio-operator:
-  - name: unittests
+  maistra/istio-operator:
+  - name: istio-operator_unittests
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
@@ -56,7 +56,7 @@ presubmits:
           value: /tmp/cache
         - name: TEST_FLAGS
           value: -v
-  - name: gen-check
+  - name: istio-operator_gen-check
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
@@ -76,7 +76,7 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
-  - name: release
+  - name: istio-operator_release
     decorate: true
     always_run: false
     path_alias: github.com/maistra/istio-operator
@@ -102,14 +102,14 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
-  Maistra/test-infra:
-  - name: lint
+  maistra/test-infra:
+  - name: test-infra_lint
     decorate: true
     always_run: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
     branches:
-      - master
+      - main
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.2"
@@ -117,13 +117,13 @@ presubmits:
         command:
         - make
         - lint
-  - name: gen-check
+  - name: test-infra_gen-check
     decorate: true
     always_run: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
     branches:
-      - master
+      - main
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.2"
@@ -131,13 +131,13 @@ presubmits:
         command:
         - make
         - gen-check
-  - name: build-containers
+  - name: test-infra_build-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
     run_if_changed: '^docker/'
     branches:
-      - master
+      - main
     max_concurrency: 1
     spec:
       containers:
@@ -149,16 +149,16 @@ presubmits:
         - build-containers
         securityContext:
           privileged: true
-  Maistra/istio:
-  - name: maistra-istio-1.2-unit
+
+  maistra/istio:
+  - name: istio_2.0-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     always_run: true
     path_alias: istio.io/istio
     skip_report: false
     branches:
-      - maistra-1.2-future
-    context: ci/prow/unit
+      - maistra-2.0
     rerun_command: /test unit
     spec:
       containers:
@@ -181,7 +181,102 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
 
-  - name: unittests
+  - name: istio_2.0-lint
+    trigger: (?m)^/test( | .* )lint,?($|\s.*)
+    decorate: true
+    always_run: true
+    path_alias: istio.io/istio
+    skip_report: false
+    branches:
+      - maistra-2.0
+    rerun_command: /test lint
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.0"
+        imagePullPolicy: Always
+        command:
+        - make
+        - lint
+        env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+
+  - name: istio_2.0-gencheck
+    trigger: (?m)^/test( | .* )gencheck,?($|\s.*)
+    decorate: true
+    always_run: true
+    path_alias: istio.io/istio
+    skip_report: false
+    branches:
+      - maistra-2.0
+    rerun_command: /test gencheck
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.0"
+        imagePullPolicy: Always
+        command:
+        - make
+        - maistra-gen-k8s-client
+        - gen-check
+        env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+
+  - name: istio_2.0-integration
+    trigger: (?m)^/test( | .* )integration,?($|\s.*)
+    rerun_command: /test integration
+    skip_report: false
+    max_concurrency: 1
+    always_run: true
+    branches:
+    - maistra-2.0
+    decorate: true
+    path_alias: istio.io/istio
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - prow/integ-suite-kind.sh
+        - test.integration.kube.presubmit
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        image: "quay.io/maistra-dev/maistra-builder:1.2"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
+
+  - name: istio_1.1-unit
     decorate: true
     always_run: true
     path_alias: istio.io/istio
@@ -194,6 +289,8 @@ presubmits:
         imagePullPolicy: Always
         command:
         - make
+        - -e
+        - T=-v
         - init
         - test
         env:
@@ -204,8 +301,48 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
 
-  Maistra/rpm-common:
-  - name: tests
+  - name: istio_1.1-integration
+    skip_report: false
+    max_concurrency: 1
+    always_run: true
+    branches:
+    - maistra-1.1
+    decorate: true
+    path_alias: istio.io/istio
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - prow/integ-suite-kind.sh
+        - test.integration.kube.presubmit
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        image: "quay.io/maistra-dev/maistra-builder:1.2"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
+
+  maistra/rpm-common:
+  - name: rpm-common_tests
     decorate: true
     always_run: true
     path_alias: maistra.io/rpm-common
@@ -222,8 +359,8 @@ presubmits:
         - make
         - test
 
-  Maistra/rpm-ior:
-  - name: tests
+  maistra/rpm-ior:
+  - name: rpm-ior_tests
     decorate: true
     always_run: true
     path_alias: maistra.io/rpm-ior
@@ -242,8 +379,8 @@ presubmits:
         - make
         - test
 
-  Maistra/rpm-istio-operator:
-  - name: tests
+  maistra/rpm-istio-operator:
+  - name: rpm-istio-operator_tests
     decorate: true
     always_run: true
     path_alias: maistra.io/rpm-istio-operator
@@ -270,7 +407,7 @@ presubmits:
     path_alias: github.com/maistra/test-infra
     skip_report: false
     branches:
-      - master
+      - main
     max_concurrency: 1
     spec:
       containers:

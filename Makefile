@@ -1,7 +1,7 @@
 HUB ?= quay.io/maistra-dev
 
 BUILD_IMAGE = maistra-builder
-BUILD_IMAGE_VERSIONS = $(BUILD_IMAGE)_1.2 $(BUILD_IMAGE)_1.1 ${BUILD_IMAGE}_1.0
+BUILD_IMAGE_VERSIONS = $(BUILD_IMAGE)_2.0 $(BUILD_IMAGE)_1.1 ${BUILD_IMAGE}_1.0
 
 ${BUILD_IMAGE}: $(BUILD_IMAGE_VERSIONS)
 
@@ -29,5 +29,5 @@ lint:
 
 # this will build the containers and then try to use them to build themselves again, making sure we didn't break docker support
 build-containers: maistra-builder
-	docker run --privileged -v ${PWD}:/work --workdir /work ${HUB}/maistra-builder:1.1 make maistra-builder_1.2
-	docker run --privileged -v ${PWD}:/work --workdir /work ${HUB}/maistra-builder:1.2 make maistra-builder_1.2
+	docker run --privileged -v ${PWD}:/work --workdir /work ${HUB}/maistra-builder:2.0 make maistra-builder_2.0
+	docker run --privileged -v ${PWD}:/work --workdir /work ${HUB}/maistra-builder:1.1 make maistra-builder_2.0

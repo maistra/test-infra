@@ -1,16 +1,16 @@
 # Test Infrastructure
 
-This repository is meant to hold all information required to deploy and run Maistra test infrastructure in an Infrastructe-as-Code fashion.
+This repository is meant to hold all information required to deploy and run maistra test infrastructure in an Infrastructe-as-Code fashion.
 
 ## Build Container
 
 The build container (`maistra-builder`) is used by Prow to run unit tests and the linters against [`maistra/istio`](https://github.com/maistra/istio). 
 
-To build the `maistra-builder` container image locally, run `make maistra-builder` in this repository. It will build all available versions of the container; generally, one per Maistra minor version: 1.0, 1.1, etc.
+To build the `maistra-builder` container image locally, run `make maistra-builder` in this repository. It will build all available versions of the container; generally, one per maistra minor version: 1.0, 1.1, etc.
 
 ## Using Prow
 
-The official Maistra Prow instance is available at https://prow.maistra.io. All commits to this repository's `master` branch will be auto-applied to that cluster.
+The official maistra Prow instance is available at https://prow.maistra.io. All commits to this repository's `main` branch will be auto-applied to that cluster.
 
 ### Prow Configuration
 
@@ -23,7 +23,7 @@ All jobs are located in the files `prow/config/presubmits.yaml` and `prow/config
 ```yaml
 presubmits:
   # the <github org>/<repository> this job is run against
-  Maistra/istio:
+  maistra/istio:
     # the job's name
   - name: unittests
     # `decorate` determines whether to wrap the container image using prow's init containers.

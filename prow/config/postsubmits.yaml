@@ -1,6 +1,6 @@
 postsubmits:
-  Maistra/test-infra:
-  - name: deploy-prow
+  maistra/test-infra:
+  - name: test-infra_deploy-prow
     decorate: true
     skip_report: false
     run_if_changed: '^prow/'
@@ -8,7 +8,7 @@ postsubmits:
       preset-prow-deployer: "true"
     max_concurrency: 1
     branches:
-    - master
+    - main
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.2"
@@ -17,13 +17,13 @@ postsubmits:
         - make
         - gen-check
         - update-prow
-  - name: push-containers
+  - name: test-infra_push-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
     run_if_changed: '^docker/'
     branches:
-      - master
+      - main
     labels:
       preset-quay-pusher: "true"
     max_concurrency: 1
@@ -38,8 +38,8 @@ postsubmits:
         securityContext:
           privileged: true
 
-  Maistra/ior:
-  - name: update-rpm
+  maistra/ior:
+  - name: ior_update-rpm
     decorate: true
     path_alias: maistra.io/ior
     skip_report: false
@@ -50,7 +50,7 @@ postsubmits:
     labels:
       preset-github: "true"
     extra_refs:
-    - base_ref: master
+    - base_ref: main
       org: maistra
       path_alias: maistra.io/test-infra
       repo: test-infra
@@ -68,8 +68,8 @@ postsubmits:
         - -l auto-merge
         - -m bump-rpm
 
-  Maistra/istio-operator:
-  - name: update-rpm
+  maistra/istio-operator:
+  - name: istio-operator_update-rpm
     decorate: true
     path_alias: maistra.io/istio-operator
     skip_report: false
@@ -80,7 +80,7 @@ postsubmits:
     labels:
       preset-github: "true"
     extra_refs:
-    - base_ref: master
+    - base_ref: main
       org: maistra
       path_alias: maistra.io/test-infra
       repo: test-infra
@@ -98,8 +98,8 @@ postsubmits:
         - -l auto-merge
         - -m bump-rpm
 
-  Maistra/rpm-common:
-  - name: update-rpm-common
+  maistra/rpm-common:
+  - name: rpm-common_update
     decorate: true
     path_alias: maistra.io/rpm-common
     skip_report: false
@@ -110,7 +110,7 @@ postsubmits:
     labels:
       preset-github: "true"
     extra_refs:
-    - base_ref: master
+    - base_ref: main
       org: maistra
       path_alias: maistra.io/test-infra
       repo: test-infra
