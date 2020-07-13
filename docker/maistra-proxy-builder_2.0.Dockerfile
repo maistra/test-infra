@@ -17,3 +17,4 @@ RUN mkdir -p /home/user && chmod 777 /home/user
 WORKDIR /work
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
+
