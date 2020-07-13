@@ -74,7 +74,7 @@ postsubmits:
     decorate: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
-    run_if_changed: '^docker/'
+    run_if_changed: '^docker/maistra-builder_.*\.Dockerfile'
     branches:
       - main
     labels:
@@ -88,6 +88,26 @@ postsubmits:
         - entrypoint
         - make
         - maistra-builder.push
+        securityContext:
+          privileged: true
+  - name: test-infra_push-proxy-containers
+    decorate: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    run_if_changed: '^docker/maistra-proxy-builder_.*\.Dockerfile'
+    branches:
+      - main
+    labels:
+      preset-quay-pusher: "true"
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:1.2"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - maistra-proxy-builder.push
         securityContext:
           privileged: true
 
@@ -375,7 +395,7 @@ presubmits:
     decorate: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
-    run_if_changed: '^docker/'
+    run_if_changed: '^docker/maistra-builder_.*\.Dockerfile'
     branches:
       - main
     max_concurrency: 1
@@ -389,6 +409,43 @@ presubmits:
         - build-containers
         securityContext:
           privileged: true
+  - name: test-infra_build-proxy-containers
+    decorate: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    run_if_changed: '^docker/maistra-proxy-builder_.*\.Dockerfile'
+    branches:
+      - main
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:1.2"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - build-proxy-containers
+        securityContext:
+          privileged: true
+
+  maistra/proxy:
+  - name: proxy_2.0-unit
+    trigger: (?m)^/test( | .* )unit,?($|\s.*)
+    decorate: true
+    always_run: true
+    path_alias: istio.io/proxy
+    skip_report: false
+    branches:
+      - maistra-1.2
+      - maistra-2.0
+      - jwendell/ci
+    rerun_command: /test unit
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-proxy-builder:2.0"
+        imagePullPolicy: Always
+        command:
+        - ./maistra/run-ci.sh
 
   maistra/istio:
   - name: istio_2.0-unit
