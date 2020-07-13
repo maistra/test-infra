@@ -12,6 +12,18 @@ ${BUILD_IMAGE}_%:
 ${BUILD_IMAGE}.push: ${BUILD_IMAGE}
 	docker push ${HUB}/${BUILD_IMAGE}
 
+BUILD_PROXY_IMAGE = maistra-proxy-builder
+BUILD_PROXY_IMAGE_VERSIONS = $(BUILD_PROXY_IMAGE)_2.0
+
+${BUILD_PROXY_IMAGE}: $(BUILD_PROXY_IMAGE_VERSIONS)
+
+${BUILD_PROXY_IMAGE}_%:
+	docker build -t ${HUB}/${BUILD_PROXY_IMAGE}:$* \
+				 -f docker/$@.Dockerfile docker
+
+${BUILD_PROXY_IMAGE}.push: ${BUILD_PROXY_IMAGE}
+	docker push ${HUB}/${BUILD_PROXY_IMAGE}
+
 gen-check: gen check-clean-repo
 
 gen:
@@ -31,3 +43,5 @@ lint:
 build-containers: maistra-builder
 	docker run --privileged -v ${PWD}:/work --workdir /work ${HUB}/maistra-builder:2.0 make maistra-builder_2.0
 	docker run --privileged -v ${PWD}:/work --workdir /work ${HUB}/maistra-builder:1.1 make maistra-builder_2.0
+
+build-proxy-containers: maistra-proxy-builder

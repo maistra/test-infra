@@ -47,6 +47,11 @@ plugins:
   - trigger
   - hold
   - wip
+  maistra/proxy:
+  - size
+  - trigger
+  - hold
+  - wip
 
 
 external_plugins:
