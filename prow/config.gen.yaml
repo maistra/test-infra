@@ -111,6 +111,37 @@ postsubmits:
         securityContext:
           privileged: true
 
+  maistra/envoy:
+  - name: envoy_2.0-update-proxy
+    decorate: true
+    path_alias: maistra.io/envoy
+    skip_report: false
+    branches:
+      - maistra-1.2
+      - maistra-2.0
+      # Allow for testing
+      - playground
+    labels:
+      preset-github: "true"
+    extra_refs:
+    - base_ref: main
+      org: maistra
+      path_alias: maistra.io/test-infra
+      repo: test-infra
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-proxy-builder:2.0"
+        imagePullPolicy: Always
+        command:
+        - ../test-infra/tools/automator.sh
+        - -o maistra
+        - -f /creds-github/github-token
+        - -r proxy
+        - -c make maistra-update-everything
+        - '-t Automator: Update Envoy and dependencies'
+        - -l auto-merge
+        - -m bump-envoy
+
   maistra/ior:
   - name: ior_update-rpm
     decorate: true
