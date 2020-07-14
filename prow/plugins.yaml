@@ -52,6 +52,11 @@ plugins:
   - trigger
   - hold
   - wip
+  maistra/envoy:
+  - size
+  - trigger
+  - hold
+  - wip
 
 
 external_plugins:
