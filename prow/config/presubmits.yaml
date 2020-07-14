@@ -135,7 +135,7 @@ presubmits:
     decorate: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
-    run_if_changed: '^docker/maistra-builder_.*\.Dockerfile'
+    run_if_changed: '^docker/maistra-builder_.*\.Dockerfile|^docker/scripts'
     branches:
       - main
     max_concurrency: 1
