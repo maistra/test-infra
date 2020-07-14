@@ -617,7 +617,7 @@ presubmits:
           value: -mod=vendor
         - name: BUILD_WITH_CONTAINER
           value: "0"
-        image: "quay.io/maistra-dev/maistra-builder:1.2"
+        image: "quay.io/maistra-dev/maistra-builder:1.1"
         imagePullPolicy: Always
         securityContext:
           privileged: true
