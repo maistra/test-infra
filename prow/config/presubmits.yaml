@@ -177,7 +177,6 @@ presubmits:
     skip_report: false
     branches:
       - maistra-2.0
-      - maistra-2.0
       - jwendell/ci
     rerun_command: /test unit
     spec:

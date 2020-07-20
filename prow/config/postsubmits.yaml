@@ -65,7 +65,6 @@ postsubmits:
     skip_report: false
     branches:
       - maistra-2.0
-      - maistra-2.0
       # Allow for testing
       - playground
     labels:
@@ -95,7 +94,7 @@ postsubmits:
     path_alias: maistra.io/ior
     skip_report: false
     branches:
-      - maistra-2.0
+      - maistra-1.1
       # Allow for testing
       - playground
     labels:
