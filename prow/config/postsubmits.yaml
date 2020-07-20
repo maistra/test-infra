@@ -64,7 +64,7 @@ postsubmits:
     path_alias: maistra.io/envoy
     skip_report: false
     branches:
-      - maistra-1.2
+      - maistra-2.0
       - maistra-2.0
       # Allow for testing
       - playground
@@ -95,7 +95,7 @@ postsubmits:
     path_alias: maistra.io/ior
     skip_report: false
     branches:
-      - maistra-1.2
+      - maistra-2.0
       # Allow for testing
       - playground
     labels:
@@ -125,7 +125,7 @@ postsubmits:
     path_alias: maistra.io/istio-operator
     skip_report: false
     branches:
-      - maistra-1.2
+      - maistra-2.0
       # Allow for testing
       - playground
     labels:
@@ -155,7 +155,7 @@ postsubmits:
     path_alias: maistra.io/rpm-common
     skip_report: false
     branches:
-      - maistra-1.2
+      - maistra-2.0
       # Allow for testing
       - playground
     labels:
