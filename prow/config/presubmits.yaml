@@ -138,7 +138,7 @@ presubmits:
     run_if_changed: '^docker/maistra-builder_.*\.Dockerfile|^docker/scripts'
     branches:
       - main
-    max_concurrency: 1
+    max_concurrency: 2
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.2"
@@ -156,7 +156,7 @@ presubmits:
     run_if_changed: '^docker/maistra-proxy-builder_.*\.Dockerfile'
     branches:
       - main
-    max_concurrency: 1
+    max_concurrency: 2
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.2"
@@ -175,6 +175,7 @@ presubmits:
     always_run: true
     path_alias: istio.io/proxy
     skip_report: false
+    max_concurrency: 1
     branches:
       - maistra-2.0
       - jwendell/ci
@@ -193,6 +194,7 @@ presubmits:
     always_run: true
     path_alias: istio.io/istio
     skip_report: false
+    max_concurrency: 2
     branches:
       - maistra-2.0
     rerun_command: /test unit
@@ -223,6 +225,7 @@ presubmits:
     always_run: true
     path_alias: istio.io/istio
     skip_report: false
+    max_concurrency: 2
     branches:
       - maistra-2.0
     rerun_command: /test lint
@@ -249,6 +252,7 @@ presubmits:
     always_run: true
     path_alias: istio.io/istio
     skip_report: false
+    max_concurrency: 2
     branches:
       - maistra-2.0
     rerun_command: /test gencheck
@@ -274,7 +278,7 @@ presubmits:
     trigger: (?m)^/test( | .* )integration,?($|\s.*)
     rerun_command: /test integration
     skip_report: false
-    max_concurrency: 1
+    max_concurrency: 2
     always_run: true
     branches:
     - maistra-2.0
@@ -339,7 +343,7 @@ presubmits:
 
   - name: istio_1.1-integration
     skip_report: false
-    max_concurrency: 1
+    max_concurrency: 2
     always_run: true
     branches:
     - maistra-1.1
