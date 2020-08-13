@@ -17,6 +17,13 @@ postsubmits:
         - make
         - gen-check
         - update-prow
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 1Gi
+
   - name: test-infra_push-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
@@ -37,6 +44,13 @@ postsubmits:
         - maistra-builder.push
         securityContext:
           privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
   - name: test-infra_push-proxy-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
@@ -57,6 +71,12 @@ postsubmits:
         - maistra-proxy-builder.push
         securityContext:
           privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
 
   maistra/envoy:
   - name: envoy_2.0-update-proxy
@@ -87,6 +107,12 @@ postsubmits:
         - '-t Automator: Update Envoy and dependencies'
         - -l auto-merge
         - -m bump-envoy
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 1Gi
 
   maistra/ior:
   - name: ior_update-rpm
@@ -117,6 +143,12 @@ postsubmits:
         - '-t Automator: update ior'
         - -l auto-merge
         - -m bump-rpm
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 1Gi
 
   maistra/istio-operator:
   - name: istio-operator_update-rpm
@@ -147,6 +179,12 @@ postsubmits:
         - '-t Automator: update istio-operator'
         - -l auto-merge
         - -m bump-rpm
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 1Gi
 
   maistra/rpm-common:
   - name: rpm-common_update
@@ -177,3 +215,9 @@ postsubmits:
         - '-t Automator: update rpm-common files'
         - -l auto-merge
         - -m rpm-common
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 1Gi

@@ -70,6 +70,13 @@ postsubmits:
         - make
         - gen-check
         - update-prow
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 1Gi
+
   - name: test-infra_push-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
@@ -90,6 +97,13 @@ postsubmits:
         - maistra-builder.push
         securityContext:
           privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
   - name: test-infra_push-proxy-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
@@ -110,6 +124,12 @@ postsubmits:
         - maistra-proxy-builder.push
         securityContext:
           privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
 
   maistra/envoy:
   - name: envoy_2.0-update-proxy
@@ -140,6 +160,12 @@ postsubmits:
         - '-t Automator: Update Envoy and dependencies'
         - -l auto-merge
         - -m bump-envoy
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 1Gi
 
   maistra/ior:
   - name: ior_update-rpm
@@ -170,6 +196,12 @@ postsubmits:
         - '-t Automator: update ior'
         - -l auto-merge
         - -m bump-rpm
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 1Gi
 
   maistra/istio-operator:
   - name: istio-operator_update-rpm
@@ -200,6 +232,12 @@ postsubmits:
         - '-t Automator: update istio-operator'
         - -l auto-merge
         - -m bump-rpm
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 1Gi
 
   maistra/rpm-common:
   - name: rpm-common_update
@@ -230,6 +268,12 @@ postsubmits:
         - '-t Automator: update rpm-common files'
         - -l auto-merge
         - -m rpm-common
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 1Gi
 presets:
 - labels:
     preset-prow-deployer: "true"
@@ -304,6 +348,12 @@ presubmits:
         command:
         - make
         - lint
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 4Gi
     trigger: "(?m)^/test lint"
     rerun_command: "/test lint"
   - name: maistra.github.io_check-links
@@ -320,6 +370,12 @@ presubmits:
         command:
         - make
         - check-links
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 4Gi
     trigger: "(?m)^/test check-links"
     rerun_command: "/test check-links"
   maistra/istio-operator:
@@ -346,6 +402,12 @@ presubmits:
           value: /tmp/cache
         - name: TEST_FLAGS
           value: -v
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
   - name: istio-operator_gen-check
     decorate: true
     always_run: true
@@ -366,6 +428,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
   - name: istio-operator_release
     decorate: true
     always_run: false
@@ -392,6 +460,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
   maistra/test-infra:
   - name: test-infra_lint
     decorate: true
@@ -407,6 +481,12 @@ presubmits:
         command:
         - make
         - lint
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
   - name: test-infra_gen-check
     decorate: true
     always_run: true
@@ -421,6 +501,12 @@ presubmits:
         command:
         - make
         - gen-check
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
   - name: test-infra_build-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
@@ -439,6 +525,12 @@ presubmits:
         - build-containers
         securityContext:
           privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
   - name: test-infra_build-proxy-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
@@ -457,6 +549,12 @@ presubmits:
         - build-proxy-containers
         securityContext:
           privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
 
   maistra/proxy:
   - name: proxy_2.0-unit
@@ -475,6 +573,12 @@ presubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/run-ci.sh
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
 
   maistra/istio:
   - name: istio_2.0-unit
@@ -506,6 +610,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 24Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
 
   - name: istio_2.0-lint
     trigger: (?m)^/test( | .* )lint,?($|\s.*)
@@ -532,6 +642,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 24Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
 
   - name: istio_2.0-gencheck
     trigger: (?m)^/test( | .* )gencheck,?($|\s.*)
@@ -559,6 +675,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
 
   - name: istio_2.0-integration
     trigger: (?m)^/test( | .* )integration,?($|\s.*)
@@ -592,6 +714,12 @@ presubmits:
         - mountPath: /sys/fs/cgroup
           name: cgroup
           readOnly: true
+        resources:
+          limits:
+            memory: 24Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
       volumes:
       - hostPath:
           path: /lib/modules
@@ -626,6 +754,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 24Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
 
   - name: istio_1.1-integration
     skip_report: false
@@ -657,6 +791,12 @@ presubmits:
         - mountPath: /sys/fs/cgroup
           name: cgroup
           readOnly: true
+        resources:
+          limits:
+            memory: 24Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
       volumes:
       - hostPath:
           path: /lib/modules
@@ -684,6 +824,12 @@ presubmits:
         command:
         - make
         - test
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
 
   maistra/rpm-ior:
   - name: rpm-ior_tests
@@ -704,6 +850,12 @@ presubmits:
         command:
         - make
         - test
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
 
   maistra/rpm-istio-operator:
   - name: rpm-istio-operator_tests
@@ -724,6 +876,12 @@ presubmits:
         command:
         - make
         - test
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
 
 ## The presubmits below are for the maistra-prow-testing org, which is our test bed
   maistra-prow-testing/test-infra:
@@ -745,6 +903,12 @@ presubmits:
         - maistra-builder
         securityContext:
           privileged: true
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
   maistra-prow-testing/istio-operator:
   - name: unittests
     decorate: true
@@ -766,6 +930,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
   - name: gen-check
     decorate: true
     always_run: true
@@ -786,6 +956,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
   maistra-prow-testing/istio:
   - name: unittests
     decorate: true
@@ -809,6 +985,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
   - name: integrationtests
     decorate: true
     always_run: true
@@ -831,6 +1013,12 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
 prowjob_namespace: default
 pod_namespace: test-pods
 sinker:
