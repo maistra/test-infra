@@ -581,6 +581,31 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
+  maistra/envoy:
+  - name: envoy_1.1-unit
+    trigger: (?m)^/test( | .* )unit,?($|\s.*)
+    decorate: true
+    always_run: true
+    path_alias: istio.io/envoy
+    skip_report: false
+    max_concurrency: 1
+    branches:
+      - maistra-1.1
+      - jwendell/ci
+    rerun_command: /test unit
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-proxy-builder:1.1"
+        imagePullPolicy: Always
+        command:
+        - ./maistra/run-ci.sh
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
   maistra/istio:
   - name: istio_2.0-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
