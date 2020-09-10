@@ -7,9 +7,9 @@ RUN dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
     dnf -y config-manager --set-enabled PowerTools && \
     dnf -y install git make libtool patch libatomic which \
-                   autoconf automake libtool cmake python3 \
-                   gcc gcc-c++ ninja-build golang annobin \
-                   java-11-openjdk-devel jq && \
+                   autoconf automake libtool cmake python2 python3 \
+                   gcc gcc-c++ ninja-build golang annobin libstdc++-static \
+                   java-11-openjdk-devel jq file diffutils && \
     dnf -y clean all
 
 # Bazel
