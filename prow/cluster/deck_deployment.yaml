@@ -49,7 +49,6 @@ spec:
         - --cookie-secret=/etc/cookie/secret
         - --plugin-config=/etc/plugins/plugins.yaml
         - --spyglass=true
-        - --gcs-no-auth=true
         volumeMounts:
         - name: cookie-secret
           mountPath: /etc/cookie
