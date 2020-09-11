@@ -560,6 +560,8 @@ presubmits:
   - name: proxy_2.0-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
+    decoration_config:
+      timeout: 5h0m0s
     always_run: true
     path_alias: istio.io/proxy
     skip_report: false
@@ -585,6 +587,8 @@ presubmits:
   - name: envoy_1.1-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
+    decoration_config:
+      timeout: 5h0m0s
     always_run: true
     path_alias: istio.io/envoy
     skip_report: false
@@ -608,6 +612,8 @@ presubmits:
   - name: envoy_2.0-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
+    decoration_config:
+      timeout: 5h0m0s
     always_run: true
     path_alias: istio.io/envoy
     skip_report: false
