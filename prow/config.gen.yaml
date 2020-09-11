@@ -37,16 +37,16 @@ deck:
       - artifacts/junit.*\.xml
 plank:
   job_url_prefix_config:
-    '*': "https://prow.maistra.io/view/gcs/"
+    '*': "https://prow.maistra.io/view/"
   default_decoration_configs:
     '*':
       timeout: 4h
       grace_period: 15s
       utility_images:
-        clonerefs: "gcr.io/k8s-prow/clonerefs:v20200715-e9245dbb90"
-        initupload: "gcr.io/k8s-prow/initupload:v20200715-e9245dbb90"
-        entrypoint: "gcr.io/k8s-prow/entrypoint:v20200715-e9245dbb90"
-        sidecar: "gcr.io/k8s-prow/sidecar:v20200715-e9245dbb90"
+        clonerefs: "gcr.io/k8s-prow/clonerefs:v20200910-8c70361b39"
+        initupload: "gcr.io/k8s-prow/initupload:v20200910-8c70361b39"
+        entrypoint: "gcr.io/k8s-prow/entrypoint:v20200910-8c70361b39"
+        sidecar: "gcr.io/k8s-prow/sidecar:v20200910-8c70361b39"
       gcs_configuration:
         path_strategy: explicit
         bucket: "maistra-prow-testing"
