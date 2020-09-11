@@ -3,6 +3,12 @@ deck:
     size_limit: 500000000  # 500 MB
     lenses:
     - lens:
+        name: metadata
+      required_files:
+      - started.json|finished.json
+      optional_files:
+      - podinfo.json
+    - lens:
         name: buildlog
         config:
           highlight_regexes:
@@ -17,3 +23,7 @@ deck:
         name: junit
       required_files:
       - artifacts/junit.*\.xml
+    - lens:
+        name: podinfo
+      required_files:
+      - podinfo.json
