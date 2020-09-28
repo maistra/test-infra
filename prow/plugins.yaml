@@ -57,6 +57,11 @@ plugins:
   - trigger
   - hold
   - wip
+  maistra/header-append-filter:
+  - size
+  - trigger
+  - hold
+  - wip
 
 
 external_plugins:

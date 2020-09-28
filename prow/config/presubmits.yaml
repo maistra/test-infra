@@ -609,6 +609,32 @@ presubmits:
             cpu: "2"
             memory: 2Gi
 
+  maistra/header-append-filter:
+  - name: header-append-filter_build-containers
+    decorate: true
+    path_alias: github.com/maistra/header-append-filter
+    skip_report: false
+    always_run: true
+    branches:
+      - main
+    max_concurrency: 2
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.0"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - container
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
 ## The presubmits below are for the maistra-prow-testing org, which is our test bed
   maistra-prow-testing/test-infra:
   - name: build-containers
