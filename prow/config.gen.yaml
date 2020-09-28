@@ -588,11 +588,10 @@ presubmits:
         - ./maistra/run-ci.sh
         resources:
           limits:
-            cpu: "8"
             memory: 16Gi
           requests:
-            cpu: "6"
-            memory: 8Gi
+            cpu: "4"
+            memory: 4Gi
 
   maistra/envoy:
   - name: envoy_1.1-unit
@@ -616,11 +615,10 @@ presubmits:
         - ./maistra/run-ci.sh
         resources:
           limits:
-            cpu: "8"
             memory: 16Gi
           requests:
-            cpu: "6"
-            memory: 8Gi
+            cpu: "4"
+            memory: 4Gi
   - name: envoy_2.0-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -641,11 +639,10 @@ presubmits:
         - ./maistra/run-ci.sh
         resources:
           limits:
-            cpu: "8"
             memory: 16Gi
           requests:
-            cpu: "6"
-            memory: 8Gi
+            cpu: "4"
+            memory: 4Gi
 
   maistra/istio:
   - name: istio_2.0-unit
