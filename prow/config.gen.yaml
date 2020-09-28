@@ -289,7 +289,6 @@ postsubmits:
   - name: header-append-filter_push-containers
     decorate: true
     path_alias: github.com/maistra/header-append-filter
-    always_run: true
     skip_report: false
     branches:
       - main
