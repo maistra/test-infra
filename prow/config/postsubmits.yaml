@@ -221,3 +221,30 @@ postsubmits:
           requests:
             cpu: "2"
             memory: 1Gi
+
+  maistra/header-append-filter:
+  - name: header-append-filter_push-containers
+    decorate: true
+    path_alias: github.com/maistra/header-append-filter
+    skip_report: false
+    branches:
+      - main
+    labels:
+      preset-quay-pusher: "true"
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.0"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - container.push
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi

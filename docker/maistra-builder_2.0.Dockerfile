@@ -109,6 +109,14 @@ RUN curl -sfLO https://github.com/protocolbuffers/protobuf/releases/download/v${
     mv bin/protoc /usr/local/bin && \
     rm -rf /root/*
 
+# Rust (for WASM filters)
+ENV CARGO_HOME "/rust"
+ENV RUSTUP_HOME "/rust"
+ENV PATH "${PATH}:/rust/bin"
+RUN mkdir /rust && \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+    rustup target add wasm32-unknown-unknown
+
 ADD scripts/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
 
