@@ -1109,6 +1109,8 @@ tide:
     - maistra/rpm-ior
     - maistra/rpm-istio-operator
     - maistra/test-infra
+    - maistra/proxy
+    - maistra/envoy
     labels:
     - "okay to merge"
     missingLabels:
