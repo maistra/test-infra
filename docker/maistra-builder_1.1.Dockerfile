@@ -16,7 +16,7 @@ RUN chmod -R +x /tmp/scripts/ && \
     rm -rf /tmp/scripts
 
 # Set CI variable which can be checked by test scripts to verify
-# if running in the continuous integration environment.
+# if running in the continuous integration environment
 ENV CI prow
 
 ADD scripts/entrypoint.sh /usr/local/bin/entrypoint

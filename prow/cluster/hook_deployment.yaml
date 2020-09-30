@@ -36,7 +36,6 @@ spec:
       containers:
       - name: hook
         image: gcr.io/k8s-prow/hook:v20200910-8c70361b39
-        imagePullPolicy: Always
         args:
         - --dry-run=false
         - --github-endpoint=https://api.github.com

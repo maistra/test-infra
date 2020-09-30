@@ -26,4 +26,8 @@ RUN mkdir -p /home/user && chmod 777 /home/user
 
 WORKDIR /work
 
+# Set CI variable which can be checked by test scripts to verify
+# if running in the continuous integration environment
+ENV CI prow
+
 RUN ln -s /usr/bin/python3 /usr/bin/python

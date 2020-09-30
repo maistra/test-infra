@@ -29,6 +29,7 @@ tide:
     - maistra/rpm-ior
     - maistra/rpm-istio-operator
     - maistra/proxy
+    - maistra/test-infra
     author: maistra-bot
     missingLabels:
     - do-not-merge

@@ -30,7 +30,7 @@ ENV HUGO_VERSION="0.69.2"
 ENV GOPROXY="https://proxy.golang.org,direct"
 
 # Set CI variable which can be checked by test scripts to verify
-# if running in the continuous integration environment.
+# if running in the continuous integration environment
 ENV CI prow
 
 # Install all dependencies available in RPM repos
