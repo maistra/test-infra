@@ -241,7 +241,7 @@ presubmits:
       - image: "quay.io/maistra-dev/maistra-proxy-builder:2.0"
         imagePullPolicy: Always
         command:
-        - ./maistra/run-ci.sh
+        - ./maistra/ci/pre-submit.sh
         resources:
           limits:
             memory: 16Gi

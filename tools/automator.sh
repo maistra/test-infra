@@ -99,6 +99,9 @@ function validate_args() {
   BRANCH="${BRANCH:-$(git describe --contains --all HEAD)}"
   TITLE="${TITLE:-Automator: Bump upstream}"
   MODIFIER="${MODIFIER:-automator}"
+
+  SCRIPT_PATH="$(mktemp -t script-XXXXXXXXXX)"
+  echo "${CMD}" >"${SCRIPT_PATH}"
 }
 
 function fetch_gh_data() {
@@ -168,7 +171,7 @@ function do_work() {
   pushd "${repo}"
 
   echo "Executing ${CMD}"
-  ${CMD}
+  bash "${SCRIPT_PATH}"
   git add .
 
   if git diff --cached --quiet --exit-code; then
@@ -189,9 +192,20 @@ function cleanup() {
   rm -rf "${TMP_DIR:-}"
 }
 
+function current_sha() {
+  git rev-parse HEAD
+}
+
+function export_globals() {
+  AUTOMATOR_SHA="$(current_sha)"
+
+  export AUTOMATOR_SHA
+}
+
 main() {
   parse_args "$@"
   fetch_gh_data
+  export_globals
 
   TMP_DIR=$(mktemp -d)
   cd "${TMP_DIR}"

@@ -56,3 +56,21 @@ presets:
   - name: creds-copr
     secret:
       secretName: copr
+
+- labels:
+    preset-gcs: "true"
+  env:
+  - name: GCS_PROJECT
+    value: "maistra-prow-testing"
+  - name: ARTIFACTS_GCS_PATH
+    value: "gs://maistra-prow-testing/proxy"
+  - name: GOOGLE_APPLICATION_CREDENTIALS
+    value: /creds-gcs/service-account.json
+  volumeMounts:
+  - name: creds-gcs
+    mountPath: /creds-gcs
+    readOnly: true
+  volumes:
+  - name: creds-gcs
+    secret:
+      secretName: gcs-credentials
