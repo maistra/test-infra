@@ -25,7 +25,13 @@ kubectl -n test-pods create secret generic copr --from-file=copr=secrets/copr-to
 # install nginx-ingress
 kubectl create namespace ingress || echo Skipping
 helm template --name ingress --namespace ingress \
-  --set rbac.create=true,controller.kind=DaemonSet,controller.service.type=ClusterIP,controller.hostNetwork=true \
+  --set rbac.create=true \
+  --set controller.kind=DaemonSet \
+  --set controller.service.type=ClusterIP,controller.hostNetwork=true \
+  --set controller.resources.requests.cpu=100m, \
+  --set controller.resources.requests.memory=64Mi \
+  --set controller.resources.limits.cpu=500m \
+  --set controller.resources.limits.memory=512Mi \
   nginx-ingress | kubectl apply -n ingress -f -
 
 # install cert-manager
