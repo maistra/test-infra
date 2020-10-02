@@ -8,5 +8,6 @@ curl https://dl.google.com/go/go1.13.6.linux-amd64.tar.gz | tar -xz -C /usr/loca
 
 go version
 
-export GOBIN=/usr/local/bin
+export GOPATH=/root/go
+
 go get github.com/jstemmer/go-junit-report
