@@ -18,6 +18,7 @@ RUN chmod -R +x /tmp/scripts/ && \
 # Set CI variable which can be checked by test scripts to verify
 # if running in the continuous integration environment.
 ENV CI prow
+ENV PATH /root/go/bin:${PATH}
 
 ADD scripts/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
