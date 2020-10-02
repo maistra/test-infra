@@ -167,6 +167,9 @@ postsubmits:
         - '-t Automator: Update proxy'
         - -l auto-merge
         - -m bump-proxy
+        env:
+        - name: ISTIO_ENVOY_BASE_URL
+          value: https://storage.googleapis.com/maistra-prow-testing/proxy
         resources:
           limits:
             memory: 4Gi
