@@ -83,6 +83,7 @@ postsubmits:
         resources:
           limits:
             memory: 4Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 1Gi
@@ -110,6 +111,7 @@ postsubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -137,6 +139,7 @@ postsubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -173,6 +176,7 @@ postsubmits:
         resources:
           limits:
             memory: 4Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 1Gi
@@ -198,6 +202,7 @@ postsubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -236,6 +241,7 @@ postsubmits:
         resources:
           limits:
             memory: 4Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 1Gi
@@ -272,6 +278,7 @@ postsubmits:
         resources:
           limits:
             memory: 4Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 1Gi
@@ -308,6 +315,7 @@ postsubmits:
         resources:
           limits:
             memory: 4Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 1Gi
@@ -344,6 +352,7 @@ postsubmits:
         resources:
           limits:
             memory: 4Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 1Gi
@@ -371,6 +380,7 @@ postsubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -469,6 +479,7 @@ presubmits:
         resources:
           limits:
             memory: 8Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 4Gi
@@ -491,6 +502,7 @@ presubmits:
         resources:
           limits:
             memory: 8Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 4Gi
@@ -523,6 +535,7 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -549,6 +562,7 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -581,6 +595,7 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -602,6 +617,7 @@ presubmits:
         resources:
           limits:
             memory: 4Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 2Gi
@@ -622,6 +638,7 @@ presubmits:
         resources:
           limits:
             memory: 4Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 2Gi
@@ -646,6 +663,7 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -670,6 +688,7 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -697,6 +716,7 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -724,6 +744,7 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -748,6 +769,7 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -786,6 +808,7 @@ presubmits:
         resources:
           limits:
             memory: 24Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -819,6 +842,7 @@ presubmits:
         resources:
           limits:
             memory: 24Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -853,6 +877,7 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -892,6 +917,7 @@ presubmits:
         resources:
           limits:
             memory: 24Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -932,6 +958,7 @@ presubmits:
         resources:
           limits:
             memory: 24Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -969,6 +996,7 @@ presubmits:
         resources:
           limits:
             memory: 24Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -1002,6 +1030,7 @@ presubmits:
         resources:
           limits:
             memory: 8Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 2Gi
@@ -1028,6 +1057,7 @@ presubmits:
         resources:
           limits:
             memory: 8Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 2Gi
@@ -1054,6 +1084,7 @@ presubmits:
         resources:
           limits:
             memory: 8Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 2Gi
@@ -1080,6 +1111,7 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
+            cpu: "4"
           requests:
             cpu: "4"
             memory: 4Gi
@@ -1107,6 +1139,7 @@ presubmits:
         resources:
           limits:
             memory: 8Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 2Gi
@@ -1160,6 +1193,7 @@ presubmits:
         resources:
           limits:
             memory: 8Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 2Gi
@@ -1189,6 +1223,7 @@ presubmits:
         resources:
           limits:
             memory: 8Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 2Gi
@@ -1217,6 +1252,7 @@ presubmits:
         resources:
           limits:
             memory: 8Gi
+            cpu: "4"
           requests:
             cpu: "2"
             memory: 2Gi
