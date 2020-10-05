@@ -27,3 +27,4 @@ RUN dnf clean all && dnf update -y
 
 VOLUME /var/lib/docker
 ENTRYPOINT ["entrypoint"]
+

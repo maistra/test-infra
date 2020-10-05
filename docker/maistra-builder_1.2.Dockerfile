@@ -74,3 +74,4 @@ ENV HOME /work
 
 VOLUME /var/lib/docker
 ENTRYPOINT ["entrypoint"]
+
