@@ -88,6 +88,7 @@ postsubmits:
     skip_report: false
     branches:
       - maistra-2.0
+      - maistra-1.1
       # Allow for testing
       - playground
     labels:
