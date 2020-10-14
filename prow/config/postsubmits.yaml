@@ -123,7 +123,7 @@ postsubmits:
   - name: proxy_2.0-postsubmit
     decorate: true
     decoration_config:
-      timeout: 5h0m0s
+      timeout: 6h0m0s
     path_alias: istio.io/proxy
     skip_report: false
     max_concurrency: 1
@@ -148,7 +148,7 @@ postsubmits:
   - name: proxy_2.0-update-istio
     decorate: true
     decoration_config:
-      timeout: 5h0m0s
+      timeout: 6h0m0s
     path_alias: maistra.io/proxy
     skip_report: false
     branches:
