@@ -207,6 +207,16 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+        volumeMounts:
+        - name: bazel-cache
+          mountPath: /bazel-cache
+        securityContext:
+          privileged: true
+      volumes:
+      - name: bazel-cache
+        hostPath:
+          path: /mnt/bazel-cache
+          type: DirectoryOrCreate
 
   - name: proxy_2.0-update-istio
     decorate: true
@@ -721,6 +731,16 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+        volumeMounts:
+        - name: bazel-cache
+          mountPath: /bazel-cache
+        securityContext:
+          privileged: true
+      volumes:
+      - name: bazel-cache
+        hostPath:
+          path: /mnt/bazel-cache
+          type: DirectoryOrCreate
   - name: proxy_1.1-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -746,6 +766,16 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+        volumeMounts:
+        - name: bazel-cache
+          mountPath: /bazel-cache
+        securityContext:
+          privileged: true
+      volumes:
+      - name: bazel-cache
+        hostPath:
+          path: /mnt/bazel-cache
+          type: DirectoryOrCreate
 
   maistra/envoy:
   - name: envoy_1.1-unit
@@ -774,6 +804,16 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+        volumeMounts:
+        - name: bazel-cache
+          mountPath: /bazel-cache
+        securityContext:
+          privileged: true
+      volumes:
+      - name: bazel-cache
+        hostPath:
+          path: /mnt/bazel-cache
+          type: DirectoryOrCreate
   - name: envoy_2.0-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -799,6 +839,16 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+        volumeMounts:
+        - name: bazel-cache
+          mountPath: /bazel-cache
+        securityContext:
+          privileged: true
+      volumes:
+      - name: bazel-cache
+        hostPath:
+          path: /mnt/bazel-cache
+          type: DirectoryOrCreate
 
   maistra/istio:
   - name: istio_2.0-unit

@@ -144,6 +144,16 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+        volumeMounts:
+        - name: bazel-cache
+          mountPath: /bazel-cache
+        securityContext:
+          privileged: true
+      volumes:
+      - name: bazel-cache
+        hostPath:
+          path: /mnt/bazel-cache
+          type: DirectoryOrCreate
 
   - name: proxy_2.0-update-istio
     decorate: true
