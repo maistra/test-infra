@@ -2,8 +2,8 @@
 set -e
 set -o pipefail
 
-SERVICE_ACCOUNT_NAME="prow-deployer"
-NAMESPACE="default"
+SERVICE_ACCOUNT_NAME=${SERVICE_ACCOUNT_NAME:-prow-deployer}
+NAMESPACE=${NAMESPACE:-default}
 KUBECFG_FILE_NAME="secrets/${SERVICE_ACCOUNT_NAME}-kubeconfig"
 TARGET_FOLDER="/tmp"
 

@@ -1,2 +1,2 @@
-prowjob_namespace: default
-pod_namespace: test-pods
+prowjob_namespace: ${NAMESPACE}
+pod_namespace: ${WORKER_NS}

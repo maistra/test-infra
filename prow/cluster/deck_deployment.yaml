@@ -15,7 +15,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: default
+  namespace: ${NAMESPACE}
   name: deck
   labels:
     app: deck
