@@ -18,7 +18,8 @@ kubectl -n "${NAMESPACE}" create configmap config --from-file=config.yaml=config
 kubectl -n "${NAMESPACE}" create configmap plugins --from-file=plugins.yaml=plugins.yaml --dry-run -o yaml | kubectl -n default replace configmap plugins -f -
 
 # update deployments etc.
-for file in ${DIR}/cluster/*; do
+for file in "${DIR}"/cluster/*; do
+  # shellcheck disable=SC2016 ## in case of sed expression first '' is not an actual variable to be replaced
   sed -e 's@${NAMESPACE}@'"${NAMESPACE}"'@' 's@${WORKER_NS}@'"${WORKER_NS}"'@' $file | kubectl apply -f -
 done
 

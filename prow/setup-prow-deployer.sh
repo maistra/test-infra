@@ -71,14 +71,14 @@ set_kube_config_values() {
 }
 
 create_clusterrolebinding() {
-    kubectl create clusterrolebinding ${SERVICE_ACCOUNT_NAME}-binding \
+    kubectl create clusterrolebinding "${SERVICE_ACCOUNT_NAME}-binding" \
         --clusterrole=cluster-admin \
-        --serviceaccount=${NAMESPACE}:${SERVICE_ACCOUNT_NAME}
+        --serviceaccount="${NAMESPACE}:${SERVICE_ACCOUNT_NAME}"
 }
 
 create_secret() {
-    kubectl create secret generic ${SERVICE_ACCOUNT_NAME}-kubeconfig \
-        --from-file=kubeconfig.yaml=${KUBECFG_FILE_NAME} \
+    kubectl create secret generic "${SERVICE_ACCOUNT_NAME}-kubeconfig" \
+        --from-file=kubeconfig.yaml="${KUBECFG_FILE_NAME}" \
         --namespace test-pods
 }
 
