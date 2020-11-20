@@ -16,6 +16,6 @@ echo "#======================================
 #======================================" > config.gen.yaml
 
 for file in "${DIR}"/config/*; do
-  # shellcheck disable=SC2016 ## in case of sed expression first '' is not an actual variable to be replaced
+  # shellcheck disable=SC2016 ## in case of sed expression first '' is not an actual variable to be expanded
   sed -e 's@${NAMESPACE}@'"${NAMESPACE}"'@' -e 's@${WORKER_NS}@'"${WORKER_NS}"'@' "${file}" >> "${DIR}"/config.gen.yaml
 done
