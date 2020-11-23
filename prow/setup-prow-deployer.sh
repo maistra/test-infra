@@ -4,6 +4,7 @@ set -o pipefail
 
 SERVICE_ACCOUNT_NAME=${SERVICE_ACCOUNT_NAME:-prow-deployer}
 NAMESPACE=${NAMESPACE:-default}
+WORKER_NS=${WORKER_NS:-test-pods}
 KUBECFG_FILE_NAME="secrets/${SERVICE_ACCOUNT_NAME}-kubeconfig"
 TARGET_FOLDER="/tmp"
 
@@ -79,7 +80,7 @@ create_clusterrolebinding() {
 create_secret() {
     kubectl create secret generic "${SERVICE_ACCOUNT_NAME}-kubeconfig" \
         --from-file=kubeconfig.yaml="${KUBECFG_FILE_NAME}" \
-        --namespace test-pods
+        --namespace "${WORKER_NS}"
 }
 
 create_service_account
