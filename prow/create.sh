@@ -26,20 +26,20 @@ kubectl -n "${WORKER_NS}" create secret generic copr --from-file=copr=secrets/co
 ./setup-prow-deployer.sh
 
 # install nginx-ingress
-kubectl create namespace ingress || echo Skipping
-helm template --name ingress --namespace ingress \
-  --set rbac.create=true \
-  --set controller.kind=DaemonSet \
-  --set controller.service.type=ClusterIP,controller.hostNetwork=true \
-  --set controller.resources.requests.cpu=100m, \
-  --set controller.resources.requests.memory=64Mi \
-  --set controller.resources.limits.cpu=500m \
-  --set controller.resources.limits.memory=512Mi \
-  nginx-ingress | kubectl apply -n ingress -f -
+# kubectl create namespace ingress || echo Skipping
+# helm template --name ingress --namespace ingress \
+#   --set rbac.create=true \
+#   --set controller.kind=DaemonSet \
+#   --set controller.service.type=ClusterIP,controller.hostNetwork=true \
+#   --set controller.resources.requests.cpu=100m, \
+#   --set controller.resources.requests.memory=64Mi \
+#   --set controller.resources.limits.cpu=500m \
+#   --set controller.resources.limits.memory=512Mi \
+#   nginx-ingress | kubectl apply -n ingress -f -
 
 # install cert-manager
-kubectl create namespace cert-manager || echo Skipping
-kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.13.0/cert-manager.yaml
+# kubectl create namespace cert-manager || echo Skipping
+# kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.13.0/cert-manager.yaml
 sleep 10
 
 # deploy prow
