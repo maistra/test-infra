@@ -11,7 +11,7 @@ WORKER_NS=${WORKER_NS:-test-pods}
 (kubectl get nodes | grep prow-worker-01) || (echo "Wrong cluster. Exiting..."; exit 1)
 
 # make sure we use the latest configuration
-sh gen-config.sh
+./gen-config.sh
 
 # update config and plugins
 kubectl -n "${NAMESPACE}" create configmap config --from-file=config.yaml=config.gen.yaml --dry-run -o yaml | kubectl -n default replace configmap config -f -
