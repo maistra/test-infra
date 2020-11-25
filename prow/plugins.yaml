@@ -1,4 +1,4 @@
 plugins:
-  maistra/istio-workspace-ci-test:
-  - size
+  maistra/istio-workspace:
+  - trigger
   
