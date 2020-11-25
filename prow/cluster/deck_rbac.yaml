@@ -18,6 +18,7 @@ rules:
       - get
       - list
       # Required when deck runs with `--rerun-creates-job=true`
+      - watch
       - create
 ---
 kind: Role
