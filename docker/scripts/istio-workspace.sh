@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+#set -o xtrace
 
 export GOPATH="`pwd`/"
 export GOBIN="$GOPATH/bin"
@@ -12,10 +14,5 @@ git clone https://github.com/$REPO_OWNER/$REPO_NAME.git
 cd $REPO_NAME
 git checkout $PULL_PULL_SHA
 
-oc login $QE_CLUSTER_ADDRESS -u $QE_IKE_CLUSTER_USER -p $QE_IKE_CLUSTER_PWD --insecure-skip-tls-verify=true
-     IKE_CLUSTER_USER=$QE_IKE_CLUSTER_USER \
-     IKE_CLUSTER_PWD=$QE_IKE_CLUSTER_PWD \
-     IKE_CLUSTER_HOST=$QE_IKE_CLUSTER_HOST \
-     ISTIO_NS=$QE_ISTIO_NS \
-     IKE_CLUSTER_ADDRESS=$QE_CLUSTER_ADDRESS \
+oc login $IKE_CLUSTER_ADDRESS -u $IKE_CLUSTER_USER -p $IKE_CLUSTER_PWD --insecure-skip-tls-verify=true
 make deps tools test-e2e
