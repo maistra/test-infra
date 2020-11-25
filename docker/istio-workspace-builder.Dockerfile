@@ -11,7 +11,7 @@ ENV CI prow
 
 # Install all dependencies available in RPM repos
 RUN dnf -y update && \
-    dnf -y install jq xz golang make wget which buildah && \
+    dnf -y install bash-completion jq xz golang ruby make wget which buildah && \
     dnf -y clean all
 
 # Go tools
@@ -25,6 +25,12 @@ RUN wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OC_VERSION
     mv kubectl /usr/local/bin/ && \
     chmod +x /usr/local/bin/kubectl && \
     rm oc.tar.gz && rm README.md
+
+# Telepresence
+RUN curl -s https://packagecloud.io/install/repositories/datawireio/telepresence/script.rpm.sh | os=fedora dist=32 bash && \
+    dnf -y install telepresence && \
+    dnf -y clean all && \
+    ln -s /usr/bin/fusermount3 /usr/bin/fusermount
 
 ADD scripts/istio-workspace.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
