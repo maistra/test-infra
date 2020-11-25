@@ -6,7 +6,7 @@ NAMESPACE=${NAMESPACE:-default}
 WORKER_NS=${WORKER_NS:-test-pods}
 
 # create test-pods namespace
-kubectl create "${NAMESPACE}" test-pods || echo Skipping
+kubectl create namespace "${WORKER_NS}" || echo Skipping
 
 # create configmaps
 kubectl -n "${NAMESPACE}" create cm config || echo Skipping
