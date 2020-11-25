@@ -13,9 +13,9 @@ kubectl -n "${NAMESPACE}" create cm config || echo Skipping
 kubectl -n "${NAMESPACE}" create cm plugins || echo Skipping
 
 # create secrets
-kubectl -n "${NAMESPACE}" create secret generic hmac-token --from-file=hmac=secrets/github-hmac-secret
-kubectl -n "${NAMESPACE}" create secret generic cookie --from-file=secret=secrets/cookie-secret
-kubectl -n "${NAMESPACE}" create secret generic oauth-token --from-file=oauth=secrets/github-token
+kubectl -n "${NAMESPACE}" create secret generic hmac-token --from-file=hmac=secrets/github-hmac-secret || echo Skipping
+kubectl -n "${NAMESPACE}" create secret generic cookie --from-file=secret=secrets/cookie-secret || echo Skipping
+kubectl -n "${NAMESPACE}" create secret generic oauth-token --from-file=oauth=secrets/github-token || echo Skipping
 
 kubectl -n "${WORKER_NS}" create secret generic github-token --from-file=github-token=secrets/github-token || echo Skipping
 kubectl -n "${WORKER_NS}" create secret generic gcs-credentials --from-file=service-account.json=secrets/gcs-credentials.json || echo Skipping
