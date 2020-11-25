@@ -3,6 +3,8 @@
 set -e
 #set -o xtrace
 
+export IKE_IMAGE_TAG="PR-$PULL_NUMBER"
+
 export GOPATH="`pwd`/"
 export GOBIN="$GOPATH/bin"
 export GOROOT=/usr/lib/golang/
