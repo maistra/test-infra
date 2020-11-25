@@ -96,7 +96,7 @@ function validate_args() {
   TOKEN="$(cat "${TOKEN_FILE}")"
   [ -z "${TOKEN}" ] && usage "Invalid token file"
 
-  BRANCH="${BRANCH:-$(git describe --contains --all HEAD)}"
+  BRANCH="${BRANCH:-$(git symbolic-ref --quiet --short HEAD)}"
   TITLE="${TITLE:-Automator: Bump upstream}"
   MODIFIER="${MODIFIER:-automator}"
 
