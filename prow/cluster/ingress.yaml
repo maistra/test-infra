@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  namespace: default
+  namespace: ${NAMESPACE}
   name: ing
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod

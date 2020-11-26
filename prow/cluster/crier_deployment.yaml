@@ -16,7 +16,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: crier
-  namespace: default
+  namespace: ${NAMESPACE}
   labels:
     app: crier
 spec:

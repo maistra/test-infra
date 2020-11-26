@@ -17,7 +17,7 @@ kind: Service
 metadata:
   labels:
     app: plank
-  namespace: default
+  namespace: ${NAMESPACE}
   name: plank
 spec:
   ports:
