@@ -4,7 +4,7 @@ set -e
 
 export IKE_IMAGE_TAG="PR-${PULL_NUMBER}"
 
-export GOPATH="`pwd`/"
+export GOPATH="$(pwd)/"
 export GOBIN="${GOPATH}/bin"
 export GOROOT=/usr/lib/golang/
 export PATH="${PATH}:${GOPATH}/bin"
