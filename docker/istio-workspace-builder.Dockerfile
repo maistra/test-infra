@@ -1,7 +1,6 @@
 FROM fedora:33  
 
-# Versions
-ENV OC_VERSION="4.5.5"
+ENV OC_VERSION="4.6.3"
 
 ENV GOPROXY="https://proxy.golang.org,direct"
 
@@ -38,6 +37,7 @@ RUN chmod +x /usr/local/bin/entrypoint
 RUN mkdir -p /work && chmod 777 /work
 WORKDIR /work
 ENV HOME /work
+ADD scripts/ike-builder-gitconfig /work/.gitconfig
 
 VOLUME /var/lib/docker
 ENTRYPOINT ["entrypoint"]
