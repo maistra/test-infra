@@ -91,12 +91,11 @@ You should have existing secrets for an already running cluster. You'll only nee
 1. Create a Service Account, store API credentials in `prow/secrets/gcs-credentials.json`
 1. Give the Service Account write permissions to the bucket you created
 
-#### COPR Credentials
-Some jobs run builds of RPM packages in [COPR](https://copr.fedorainfracloud.org/). In order to do that we need a valid COPR token. Make sure the COPR account associated with this token has the proper permissions to run builds on the desired COPR repository or group.
+#### Cluster Credentials
+To run the e2e tests you'll need some cluster credentials set.
 
-1. Create a [COPR](https://copr.fedorainfracloud.org/) account (if you don't have one already)
-1. Get a token for your account on the [COPR API website](https://copr.fedorainfracloud.org/api/).
-1. Save this token into the file `prow/secrets/copr-token-bot`.
+1. Store it in `prow/secrets/ike-cluster-credentials`
+1. `oc create secret generic ike-cluster-credentials --from-literal=IKE_CLUSTER_USER=xxxx --from-literal=IKE_CLUSTER_PWD=xxxxxx`
 
 ### Deploying Prow from Scratch
 

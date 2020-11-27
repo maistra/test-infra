@@ -1,0 +1,51 @@
+presubmits:
+  maistra/istio-workspace:
+  - name: e2e-tests-openshift
+    decorate: false
+    always_run: false
+    skip_report: false
+    trigger: "(?m)^/test openshift"
+    rerun_command: "/test openshift"
+    max_concurrency: 3
+    spec:
+      containers:
+      - image: "quay.io/maistra/istio-workspace-builder:latest"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        env:
+        - name: IKE_CLUSTER_ADDRESS
+          value: https://api.workspace.maistra.test:6443
+        - name: IKE_CLUSTER_HOST
+          value: apps.workspace.maistra.test
+        - name: IKE_E2E_MANAGE_CLUSTER
+          value: "false"
+        - name: IKE_CLUSTER_VERSION
+          value: "4"
+        - name: ISTIO_NS
+          value: istio-system
+        - name: IKE_INTERNAL_DOCKER_REGISTRY
+          value: quay.io
+        - name: IKE_EXTERNAL_DOCKER_REGISTRY
+          value: quay.io
+        - name: IKE_DOCKER_REPOSITORY
+          value: maistra
+        - name: PRE_BUILT_IMAGES
+          value: "true"
+        - name: IKE_CLUSTER_USER
+          valueFrom:
+            secretKeyRef:
+              name: ike-cluster-credentials
+              key: IKE_CLUSTER_USER
+        - name: IKE_CLUSTER_PWD
+          valueFrom:
+            secretKeyRef:
+              name: ike-cluster-credentials
+              key: IKE_CLUSTER_USER
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: "1"
+          requests:
+            cpu: "1"
+            memory: 1Gi
