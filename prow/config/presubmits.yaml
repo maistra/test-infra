@@ -41,7 +41,7 @@ presubmits:
           valueFrom:
             secretKeyRef:
               name: ike-cluster-credentials
-              key: IKE_CLUSTER_USER
+              key: IKE_CLUSTER_PWD
         resources:
           limits:
             memory: 4Gi
