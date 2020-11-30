@@ -31,8 +31,8 @@ RUN curl -s https://packagecloud.io/install/repositories/datawireio/telepresence
     dnf -y clean all && \
     ln -s /usr/bin/fusermount3 /usr/bin/fusermount
 
-ADD scripts/istio-workspace.sh /usr/local/bin/entrypoint
-RUN chmod +x /usr/local/bin/entrypoint
+ADD scripts/istio-workspace.sh /usr/local/bin/run-test.sh
+RUN chmod +x /usr/local/bin/run-test.sh
 
 RUN mkdir -p /work && chmod 777 /work
 WORKDIR /work
@@ -40,4 +40,3 @@ ENV HOME /work
 ADD scripts/ike-builder-gitconfig /work/.gitconfig
 
 VOLUME /var/lib/docker
-ENTRYPOINT ["entrypoint"]

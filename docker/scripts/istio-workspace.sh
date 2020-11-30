@@ -4,10 +4,12 @@ set -e
 
 export IKE_IMAGE_TAG="PR-${PULL_NUMBER}"
 
+mkdir -p /work/workspace && cd /work/workspace
+
 export GOPATH="$(pwd)/"
 export GOBIN="${GOPATH}/bin"
 export GOROOT=/usr/lib/golang/
-export PATH="${PATH}:${GOPATH}/bin"
+export PATH="${PATH}:${GOBIN}"
 
 mkdir -p "${GOPATH}"/src/github.com/"${REPO_OWNER}"/
 cd "${GOPATH}"/src/github.com/"${REPO_OWNER}"/

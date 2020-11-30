@@ -1,7 +1,7 @@
 presubmits:
   maistra/istio-workspace:
   - name: e2e-tests-openshift
-    decorate: false
+    decorate: true
     always_run: false
     skip_report: false
     trigger: "(?m)^/test openshift"
@@ -12,7 +12,7 @@ presubmits:
       - image: "quay.io/maistra/istio-workspace-builder:latest"
         imagePullPolicy: Always
         command:
-        - entrypoint
+        - run-test.sh
         env:
         - name: IKE_CLUSTER_ADDRESS
           value: https://api.workspace.maistra.test:6443
