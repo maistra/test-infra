@@ -19,6 +19,7 @@ rules:
       - create
       - list
       - update
+      - watch
       - patch
 ---
 kind: Role
