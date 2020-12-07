@@ -1272,7 +1272,7 @@ tide:
     maistra: squash
   target_url: https://prow.maistra.io/tide
   context_options:
-    from-branch-protection: true
+    from-branch-protection: false
 
   queries:
 
