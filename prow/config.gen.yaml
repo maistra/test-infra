@@ -6,7 +6,7 @@
 #======================================
 branch-protection:
   allow_disabled_policies: true
-  protect: false
+  protect: true
   orgs:
     maistra-prow-testing:
       required_pull_request_reviews:
@@ -1272,7 +1272,7 @@ tide:
     maistra: squash
   target_url: https://prow.maistra.io/tide
   context_options:
-    from-branch-protection: false
+    from-branch-protection: true
 
   queries:
 
