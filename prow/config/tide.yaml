@@ -4,6 +4,7 @@ github_reporter:
   - postsubmit
 
 tide:
+  merge_label: "don't squash"
   merge_method:
     maistra: squash
   target_url: https://prow.maistra.io/tide
