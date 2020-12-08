@@ -7,6 +7,8 @@ tide:
   merge_method:
     maistra: squash
   target_url: https://prow.maistra.io/tide
+  context_options:
+    from-branch-protection: true
 
   queries:
 
@@ -17,6 +19,7 @@ tide:
     - maistra/test-infra
     - maistra/proxy
     - maistra/envoy
+    - maistra/istio
     labels:
     - "okay to merge"
     missingLabels:
@@ -29,6 +32,7 @@ tide:
     - maistra/rpm-ior
     - maistra/rpm-istio-operator
     - maistra/proxy
+    - maistra/istio
     author: maistra-bot
     missingLabels:
     - do-not-merge

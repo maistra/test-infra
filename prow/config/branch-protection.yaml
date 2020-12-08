@@ -1,6 +1,6 @@
 branch-protection:
   allow_disabled_policies: true
-  protect: false
+  protect: true
   orgs:
     maistra-prow-testing:
       required_pull_request_reviews:

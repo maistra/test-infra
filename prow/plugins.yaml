@@ -2,18 +2,15 @@ plugins:
   maistra/maistra.github.io:
   - size
   - trigger
-  - lgtm
   - hold
   maistra-prow-testing:
   - size
   - trigger
-  - lgtm
   - hold
   - wip
   maistra/istio-operator:
   - size
   - trigger
-  - lgtm
   - hold
   - wip
   maistra/test-infra:
@@ -24,7 +21,6 @@ plugins:
   maistra/istio:
   - size
   - trigger
-  - lgtm
   - hold
   - wip
   maistra/ior:
