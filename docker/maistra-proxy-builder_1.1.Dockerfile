@@ -1,7 +1,7 @@
 FROM centos:8
 
 # Versions
-ENV K8S_TEST_INFRA_VERSION=41512c7491a99c6bdf330e1a76d45c8a10d3679b
+ENV K8S_TEST_INFRA_VERSION=229d6b4c8d
 
 RUN dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
