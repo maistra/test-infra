@@ -5,7 +5,7 @@ ENV K8S_TEST_INFRA_VERSION=41512c7491a99c6bdf330e1a76d45c8a10d3679b
 
 RUN dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
-    dnf -y config-manager --set-enabled PowerTools && \
+    dnf -y config-manager --set-enabled powertools && \
     dnf -y install git make libtool patch libatomic which \
                    autoconf automake libtool cmake python2 python3 \
                    gcc gcc-c++ ninja-build golang annobin libstdc++-static \

@@ -19,7 +19,7 @@ ENV PROTOC_VERSION=3.9.2
 ENV GOIMPORTS_VERSION=379209517ffe
 ENV GOGO_PROTOBUF_VERSION=v1.3.0
 ENV GO_JUNIT_REPORT_VERSION=af01ea7f8024089b458d804d5cdf190f962a9a0c
-ENV K8S_TEST_INFRA_VERSION=41512c7491a99c6bdf330e1a76d45c8a10d3679b
+ENV K8S_TEST_INFRA_VERSION=229d6b4c8d1eb4c0ccc00342ad21089068e0b827
 ENV K8S_CODE_GENERATOR_VERSION=1.18.1
 ENV LICENSEE_VERSION=9.11.0
 ENV GOLANG_PROTOBUF_VERSION=v1.3.1
@@ -46,8 +46,6 @@ RUN dnf -y update && \
 ENV GOBIN=/usr/local/bin
 RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/jstemmer/go-junit-report@${GO_JUNIT_REPORT_VERSION} && \
-    gobin k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION} && \
-    gobin k8s.io/test-infra/prow/cmd/checkconfig@${K8S_TEST_INFRA_VERSION} && \
     gobin github.com/mikefarah/yq/v3 && \
     gobin github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION} && \
     gobin istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} && \
@@ -61,14 +59,21 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/golang/protobuf/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
     rm -rf /root/* /root/.cache /tmp/*
 
+RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
+    cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
+    go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
+    go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go && \
+    rm -rf /root/* /root/.cache /tmp/*
+
 # gobin does not seem to be compatible with this pesky code-generator repo
 # Install the code generator tools, and hopefully only these tools, this way
-RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/defaulter-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION}
-RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/client-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION}
-RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/lister-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION}
-RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/informer-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION}
-RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/deepcopy-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION}
-RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/go-to-protobuf@kubernetes-${K8S_CODE_GENERATOR_VERSION}
+RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/defaulter-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
+    GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/client-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
+    GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/lister-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
+    GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/informer-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
+    GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/deepcopy-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
+    GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/go-to-protobuf@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
+    rm -rf /root/* /root/.cache /tmp/*
 
 # Python tools
 RUN pip3 install --no-binary :all: autopep8==${AUTOPEP8_VERSION} && \
