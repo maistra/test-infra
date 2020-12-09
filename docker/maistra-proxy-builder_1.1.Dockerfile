@@ -17,9 +17,11 @@ RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/down
     chmod +x /usr/bin/bazel
 
 # Go tools
-ENV GOBIN=/usr/local/bin
-RUN GO111MODULE=off go get github.com/myitcv/gobin && \
-    gobin k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION}
+RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
+    cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
+    go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
+    go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go && \
+    rm -rf /root/* /root/.cache /tmp/*
 
 ENV CC=gcc CXX=g++ USER=user HOME=/home/user
 RUN mkdir -p /home/user && chmod 777 /home/user
