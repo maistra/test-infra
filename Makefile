@@ -1,28 +1,16 @@
-HUB ?= quay.io/maistra-dev
+HUB ?= quay.io/maistra
+BUILD_IMAGE_PREFIX = istio-workspace
+BUILD_IMAGE_TAG ?= latest
+BUILD_IMAGES = $(BUILD_IMAGE_PREFIX)-builder-base $(BUILD_IMAGE_PREFIX)-image-builder $(BUILD_IMAGE_PREFIX)-tester
 
-BUILD_IMAGE = maistra-builder
-BUILD_IMAGE_VERSIONS = $(BUILD_IMAGE)_2.0 $(BUILD_IMAGE)_1.1 ${BUILD_IMAGE}_1.0
+images: $(BUILD_IMAGES)
 
-${BUILD_IMAGE}: $(BUILD_IMAGE_VERSIONS)
+${BUILD_IMAGE_PREFIX}-%:
+	$(eval IMAGE := ${BUILD_IMAGE_PREFIX}-$*:${BUILD_IMAGE_TAG})
 
-${BUILD_IMAGE}_%:
-	docker build -t ${HUB}/${BUILD_IMAGE}:$* \
+	docker build -t ${HUB}/${IMAGE} \
 				 -f docker/$@.Dockerfile docker
-
-${BUILD_IMAGE}.push: ${BUILD_IMAGE}
-	docker push ${HUB}/${BUILD_IMAGE}
-
-BUILD_PROXY_IMAGE = maistra-proxy-builder
-BUILD_PROXY_IMAGE_VERSIONS = $(BUILD_PROXY_IMAGE)_2.0 $(BUILD_PROXY_IMAGE)_1.1
-
-${BUILD_PROXY_IMAGE}: $(BUILD_PROXY_IMAGE_VERSIONS)
-
-${BUILD_PROXY_IMAGE}_%:
-	docker build -t ${HUB}/${BUILD_PROXY_IMAGE}:$* \
-				 -f docker/$@.Dockerfile docker
-
-${BUILD_PROXY_IMAGE}.push: ${BUILD_PROXY_IMAGE}
-	docker push ${HUB}/${BUILD_PROXY_IMAGE}
+	docker push ${HUB}/${IMAGE}
 
 gen-check: gen check-clean-repo
 
@@ -35,14 +23,3 @@ check-clean-repo:
 update-prow:
 	(cd prow; sh update.sh)
 
-lint:
-	find . -name '*.sh' -print0 | xargs -0 -r shellcheck
-	checkconfig -strict -config-path prow/config.gen.yaml -plugin-config prow/plugins.yaml
-	@scripts/check-resource-limits.sh
-
-# this will build the containers and then try to use them to build themselves again, making sure we didn't break docker support
-build-containers: maistra-builder
-	docker run --privileged -v ${PWD}:/work --workdir /work ${HUB}/maistra-builder:2.0 make maistra-builder_2.0
-	docker run --privileged -v ${PWD}:/work --workdir /work ${HUB}/maistra-builder:1.1 make maistra-builder_2.0
-
-build-proxy-containers: maistra-proxy-builder
