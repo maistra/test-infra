@@ -49,3 +49,32 @@ presubmits:
           requests:
             cpu: "1"
             memory: 1Gi
+    maistra/istio-workspace:
+    - name: build-images
+      decorate: false
+      always_run: false
+      skip_report: false
+      trigger: "(?m)^/build images"
+      rerun_command: "/build images"
+      max_concurrency: 3
+      spec:
+        containers:
+          - image: "quay.io/maistra/istio-workspace-image-builder:latest"
+            imagePullPolicy: Always
+            securityContext:
+              privileged: true
+            command:
+              - entrypoint
+            env:
+              - name: QUAY_AUTH_JSON
+                valueFrom:
+                  secretKeyRef:
+                    name: ike-cluster-credentials
+                    key: IKE_QUAY_AUTH # {\"auths\":{\"quay.io\":{\"auth\":\"Ym1hanNhazp4YjkyUDlVaHJaeXNnMWd1WkpsdU45Q2FGZk9aRkZ4Y2Nkdm9vM0RlUVBsSzV6WElrQnEzSEl5eDBYMFplU1pU\",\"email\":\"\"}}}
+            resources:
+              limits:
+                memory: 4Gi
+                cpu: "1"
+              requests:
+                cpu: "1"
+                memory: 1Gi
