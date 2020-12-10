@@ -3,6 +3,7 @@ plugins:
   - size
   - trigger
   - hold
+  - wip
   maistra-prow-testing:
   - size
   - trigger
@@ -54,6 +55,36 @@ plugins:
   - hold
   - wip
   maistra/header-append-filter:
+  - size
+  - trigger
+  - hold
+  - wip
+  maistra/istio-must-gather:
+  - size
+  - trigger
+  - hold
+  - wip
+  maistra/olm-metadata:
+  - size
+  - trigger
+  - hold
+  - wip
+  maistra/istio-images-centos:
+  - size
+  - trigger
+  - hold
+  - wip
+  maistra/istio-cni:
+  - size
+  - trigger
+  - hold
+  - wip
+  maistra/prometheus:
+  - size
+  - trigger
+  - hold
+  - wip
+  maistra/rpms:
   - size
   - trigger
   - hold
