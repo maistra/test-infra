@@ -34,16 +34,14 @@ ENV GOPROXY="https://proxy.golang.org,direct"
 ENV CI prow
 
 # Install all dependencies available in RPM repos
-RUN dnf -y update && \
+RUN curl -sfL https://download.docker.com/linux/fedora/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo && \
+    dnf -y update && \
     dnf -y install fedpkg copr-cli jq xz unzip hostname golang \
                    make automake gcc gcc-c++ git ShellCheck which \
-                   moby-engine npm python3-pip rubygems cmake \
+                   docker-ce npm python3-pip rubygems cmake \
                    rubygem-asciidoctor ruby-devel zlib-devel \
                    openssl-devel && \
     dnf -y clean all
-
-# Put docker tools in the right location
-RUN ln -s /usr/libexec/docker/docker-* /usr/bin/
 
 # Go tools
 ENV GOBIN=/usr/local/bin
