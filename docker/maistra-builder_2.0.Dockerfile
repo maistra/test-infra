@@ -42,6 +42,9 @@ RUN dnf -y update && \
                    openssl-devel && \
     dnf -y clean all
 
+# Put docker tools in the right location
+RUN ln -s /usr/libexec/docker/docker-* /usr/bin/
+
 # Go tools
 ENV GOBIN=/usr/local/bin
 RUN GO111MODULE=off go get github.com/myitcv/gobin && \
