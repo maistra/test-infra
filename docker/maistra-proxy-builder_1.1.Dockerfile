@@ -1,7 +1,7 @@
 FROM centos:8
 
 # Versions
-ENV K8S_TEST_INFRA_VERSION=41512c7491a99c6bdf330e1a76d45c8a10d3679b
+ENV K8S_TEST_INFRA_VERSION=229d6b4c8d
 
 RUN dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
@@ -17,9 +17,11 @@ RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/down
     chmod +x /usr/bin/bazel
 
 # Go tools
-ENV GOBIN=/usr/local/bin
-RUN GO111MODULE=off go get github.com/myitcv/gobin && \
-    gobin k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION}
+RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
+    cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
+    go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
+    go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go && \
+    rm -rf /root/* /root/.cache /tmp/*
 
 ENV CC=gcc CXX=g++ USER=user HOME=/home/user
 RUN mkdir -p /home/user && chmod 777 /home/user

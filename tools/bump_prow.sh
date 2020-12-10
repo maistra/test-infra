@@ -57,10 +57,15 @@ function get_remote_version() {
 
 
 function run_sed() {
-  local filter="s|gcr.io/k8s-prow/\([[:alnum:]_-]\+\):v[a-f0-9-]\+|gcr.io/k8s-prow/\1:${VERSION}|I"
-
   echo "Updating files"
-  find . -name '*.yaml' -print0 | xargs -0 -r sed -i "${filter}"
+
+  local filter_yaml="s|gcr.io/k8s-prow/\([[:alnum:]_-]\+\):v[a-f0-9-]\+|gcr.io/k8s-prow/\1:${VERSION}|I"
+  find . -name '*.yaml' -print0 | xargs -0 -r sed -i "${filter_yaml}"
+
+  local sha
+  sha=$(echo "${VERSION}" | cut -d- -f2)
+  local filter_dockerfile="s|ENV K8S_TEST_INFRA_VERSION=.*|ENV K8S_TEST_INFRA_VERSION=${sha}|"
+  find docker -name '*Dockerfile' -print0 | xargs -0 -r sed -i "${filter_dockerfile}"
 }
 
 function run_make_gen() {
