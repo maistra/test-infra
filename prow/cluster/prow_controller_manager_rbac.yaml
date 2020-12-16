@@ -1,4 +1,4 @@
-# Copyright 2019 The Kubernetes Authors All rights reserved.
+# Copyright 2020 The Kubernetes Authors All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,76 +12,102 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
----
-kind: ServiceAccount
 apiVersion: v1
+kind: ServiceAccount
 metadata:
-  annotations:
-    iam.gke.io/gcp-service-account: control-plane@k8s-prow.iam.gserviceaccount.com
-  name: crier
   namespace: ${NAMESPACE}
+  name: "prow-controller-manager"
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: ${NAMESPACE}
-  name: crier
+  name: "prow-controller-manager"
 rules:
 - apiGroups:
-    - "prow.k8s.io"
+  - coordination.k8s.io
   resources:
-    - "prowjobs"
+  - leases
+  resourceNames:
+  - prow-controller-manager-leader-lock
   verbs:
-    - "get"
-    - "watch"
-    - "list"
-    - "patch"
+  - get
+  - update
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  resourceNames:
+  - prow-controller-manager-leader-lock
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - events
+  verbs:
+  - create
+- apiGroups:
+  - prow.k8s.io
+  resources:
+  - prowjobs
+  verbs:
+  - get
+  - update
+  - list
+  - watch
+  - update
+  - patch
 ---
 kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   namespace: ${WORKER_NS}
-  name: crier
+  name: "prow-controller-manager"
 rules:
 - apiGroups:
-    - ""
+   - ""
   resources:
-    - "pods"
-    - "events"
+  - pods
   verbs:
-    - "get"
-    - "list"
-- apiGroups:
-    - ""
-  resources:
-    - "pods"
-  verbs:
-    - "patch"
+  - create
+  - delete
+  - list
+  - watch
+  - get
+  - patch
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: crier-namespaced
   namespace: ${NAMESPACE}
+  name: "prow-controller-manager"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: crier
+  name: "prow-controller-manager"
 subjects:
 - kind: ServiceAccount
-  name: crier
-  namespace: ${NAMESPACE}
+  name: "prow-controller-manager"
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: crier-namespaced
   namespace: ${WORKER_NS}
+  name: "prow-controller-manager"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: crier
+  name: "prow-controller-manager"
 subjects:
 - kind: ServiceAccount
-  name: crier
+  name: "prow-controller-manager"
   namespace: ${NAMESPACE}
