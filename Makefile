@@ -10,7 +10,7 @@ ${BUILD_IMAGE}_%:
 				 -f docker/$@.Dockerfile docker
 
 ${BUILD_IMAGE}.push: ${BUILD_IMAGE}
-	docker push ${HUB}/${BUILD_IMAGE}
+	docker push --all-tags ${HUB}/${BUILD_IMAGE}
 
 BUILD_PROXY_IMAGE = maistra-proxy-builder
 BUILD_PROXY_IMAGE_VERSIONS = $(BUILD_PROXY_IMAGE)_2.0 $(BUILD_PROXY_IMAGE)_1.1

@@ -24,7 +24,7 @@ ENV K8S_CODE_GENERATOR_VERSION=1.18.1
 ENV LICENSEE_VERSION=9.11.0
 ENV GOLANG_PROTOBUF_VERSION=v1.3.1
 
-#this needs to match the version of Hugo used in maistra.io's netlify.toml file
+# this needs to match the version of Hugo used in maistra.io's netlify.toml file
 ENV HUGO_VERSION="0.69.2"
 
 ENV GOPROXY="https://proxy.golang.org,direct"
