@@ -16,13 +16,15 @@
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  name: "crier"
+  annotations:
+    iam.gke.io/gcp-service-account: control-plane@k8s-prow.iam.gserviceaccount.com
+  name: crier
   namespace: ${NAMESPACE}
 ---
-kind: ClusterRole
+kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  # "namespace" omitted since ClusterRoles are not namespaced
+  namespace: ${NAMESPACE}
   name: crier
 rules:
 - apiGroups:
@@ -35,16 +37,51 @@ rules:
     - "list"
     - "patch"
 ---
-kind: ClusterRoleBinding
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: ${WORKER_NS}
+  name: crier
+rules:
+- apiGroups:
+    - ""
+  resources:
+    - "pods"
+    - "events"
+  verbs:
+    - "get"
+    - "list"
+- apiGroups:
+    - ""
+  resources:
+    - "pods"
+  verbs:
+    - "patch"
+---
+kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: "crier"
+  name: crier-namespaced
   namespace: ${NAMESPACE}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: "crier"
+  kind: Role
+  name: crier
 subjects:
 - kind: ServiceAccount
-  name: "crier"
+  name: crier
+  namespace: ${NAMESPACE}
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: crier-namespaced
+  namespace: ${WORKER_NS}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: crier
+subjects:
+- kind: ServiceAccount
+  name: crier
   namespace: ${NAMESPACE}
