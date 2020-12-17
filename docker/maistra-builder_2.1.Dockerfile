@@ -7,7 +7,7 @@ ENV HELM3_VERSION=v3.1.2
 ENV VALE_VERSION="v2.1.1"
 ENV KIND_VERSION="v0.9.0"
 ENV AUTOPEP8_VERSION=1.4.4
-ENV GOLANGCI_LINT_VERSION=v1.24.0
+ENV GOLANGCI_LINT_VERSION=v1.30.0
 ENV HADOLINT_VERSION=v1.17.2
 ENV MDL_VERSION=0.5.0
 ENV YAMLLINT_VERSION=1.17.0
@@ -58,6 +58,10 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION} && \
     gobin istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} && \
     gobin github.com/golang/protobuf/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
+    gobin github.com/gogo/protobuf/protoc-gen-gofast@${GOGO_PROTOBUF_VERSION} && \
+    gobin github.com/gogo/protobuf/protoc-gen-gogofast@${GOGO_PROTOBUF_VERSION} && \
+    gobin github.com/gogo/protobuf/protoc-gen-gogofaster@${GOGO_PROTOBUF_VERSION} && \
+    gobin github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION}  && \
     rm -rf /root/* /root/.cache /tmp/*
 
 RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
