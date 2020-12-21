@@ -62,6 +62,7 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/gogo/protobuf/protoc-gen-gogofast@${GOGO_PROTOBUF_VERSION} && \
     gobin github.com/gogo/protobuf/protoc-gen-gogofaster@${GOGO_PROTOBUF_VERSION} && \
     gobin github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION}  && \
+    mv /usr/local/bin/yq /usr/local/bin/yq-go && \
     rm -rf /root/* /root/.cache /tmp/*
 
 RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
@@ -82,7 +83,8 @@ RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/defaulter-g
 
 # Python tools
 RUN pip3 install --no-binary :all: autopep8==${AUTOPEP8_VERSION} && \
-    pip3 install yamllint==${YAMLLINT_VERSION}
+    pip3 install yamllint==${YAMLLINT_VERSION} && \
+    pip3 install yq && mv /usr/local/bin/yq /usr/local/bin/yq-python
 
 # Ruby tools
 RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION} && \
