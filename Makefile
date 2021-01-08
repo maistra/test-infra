@@ -1,7 +1,7 @@
 HUB ?= quay.io/maistra
 BUILD_IMAGE_PREFIX = istio-workspace
 BUILD_IMAGE_TAG ?= latest
-BUILD_IMAGES = $(BUILD_IMAGE_PREFIX)-builder-base $(BUILD_IMAGE_PREFIX)-image-builder $(BUILD_IMAGE_PREFIX)-tester
+BUILD_IMAGES = $(BUILD_IMAGE_PREFIX)-builder-base $(BUILD_IMAGE_PREFIX)-image-builder $(BUILD_IMAGE_PREFIX)-tester $(BUILD_IMAGE_PREFIX)-smee-client
 
 IMG_BUILDER:=docker
 

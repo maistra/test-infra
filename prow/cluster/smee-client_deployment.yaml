@@ -1,0 +1,26 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: smee-client
+  labels:
+    app: smee-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smee-client
+  template:
+    metadata:
+      name: smee-client
+      labels:
+        app: smee-client
+    spec:
+      containers:
+        - name: smee-client
+          image: quay.io/maistra/istio-workspace-smee-client:latest
+          imagePullPolicy: Always
+          env:
+            - name: SMEE_SOURCE
+              value: https://smee.io/muzSSCXPOw9sa1i
+            - name: SMEE_TARGET
+              value: http://hook:8888/hook
