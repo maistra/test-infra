@@ -1535,6 +1535,7 @@ tide:
     - maistra/istio-cni
     - maistra/prometheus
     - maistra/rpms
+    - maistra/ior
     labels:
     - "okay to merge"
     missingLabels:
