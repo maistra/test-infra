@@ -145,11 +145,12 @@ postsubmits:
             memory: 4Gi
 
   maistra/envoy:
-  - name: envoy_2.0-update-proxy
+  - name: envoy-update-proxy
     decorate: true
     path_alias: maistra.io/envoy
     skip_report: false
     branches:
+      - maistra-2.1
       - maistra-2.0
       - maistra-1.1
       # Allow for testing
@@ -183,7 +184,42 @@ postsubmits:
             memory: 1Gi
 
   maistra/proxy:
-  - name: proxy_2.0-postsubmit
+  - name: proxy-postsubmit
+    decorate: true
+    decoration_config:
+      timeout: 6h0m0s
+    path_alias: istio.io/proxy
+    skip_report: false
+    max_concurrency: 1
+    branches:
+      - maistra-2.1
+    labels:
+      preset-gcs: "true"
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-proxy-builder:2.1"
+        imagePullPolicy: Always
+        command:
+        - ./maistra/ci/post-submit.sh
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+        volumeMounts:
+        - name: bazel-cache
+          mountPath: /bazel-cache
+        securityContext:
+          privileged: true
+      volumes:
+      - name: bazel-cache
+        hostPath:
+          path: /mnt/bazel-cache
+          type: DirectoryOrCreate
+
+  - name: proxy-postsubmit
     decorate: true
     decoration_config:
       timeout: 6h0m0s
@@ -218,13 +254,14 @@ postsubmits:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
 
-  - name: proxy_2.0-update-istio
+  - name: proxy-update-istio
     decorate: true
     decoration_config:
       timeout: 6h0m0s
     path_alias: maistra.io/proxy
     skip_report: false
     branches:
+      - maistra-2.1
       - maistra-2.0
     labels:
       preset-github: "true"
@@ -748,7 +785,42 @@ presubmits:
             memory: 4Gi
 
   maistra/proxy:
-  - name: proxy_2.0-unit
+  - name: proxy-unit
+    trigger: (?m)^/test( | .* )unit,?($|\s.*)
+    decorate: true
+    decoration_config:
+      timeout: 6h0m0s
+    always_run: true
+    path_alias: istio.io/proxy
+    skip_report: false
+    max_concurrency: 1
+    branches:
+      - maistra-2.1
+    rerun_command: /test unit
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-proxy-builder:2.1"
+        imagePullPolicy: Always
+        command:
+        - ./maistra/ci/pre-submit.sh
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+        volumeMounts:
+        - name: bazel-cache
+          mountPath: /bazel-cache
+        securityContext:
+          privileged: true
+      volumes:
+      - name: bazel-cache
+        hostPath:
+          path: /mnt/bazel-cache
+          type: DirectoryOrCreate
+  - name: proxy-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
@@ -784,7 +856,7 @@ presubmits:
         hostPath:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
-  - name: proxy_1.1-unit
+  - name: proxy-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
@@ -821,7 +893,7 @@ presubmits:
           type: DirectoryOrCreate
 
   maistra/envoy:
-  - name: envoy_1.1-unit
+  - name: envoy-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
@@ -857,7 +929,7 @@ presubmits:
         hostPath:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
-  - name: envoy_2.0-unit
+  - name: envoy-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
@@ -872,6 +944,41 @@ presubmits:
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-proxy-builder:2.0"
+        imagePullPolicy: Always
+        command:
+        - ./maistra/run-ci.sh
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+        volumeMounts:
+        - name: bazel-cache
+          mountPath: /bazel-cache
+        securityContext:
+          privileged: true
+      volumes:
+      - name: bazel-cache
+        hostPath:
+          path: /mnt/bazel-cache
+          type: DirectoryOrCreate
+  - name: envoy-unit
+    trigger: (?m)^/test( | .* )unit,?($|\s.*)
+    decorate: true
+    decoration_config:
+      timeout: 6h0m0s
+    always_run: true
+    path_alias: istio.io/envoy
+    skip_report: false
+    max_concurrency: 1
+    branches:
+      - maistra-2.1
+    rerun_command: /test unit
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-proxy-builder:2.1"
         imagePullPolicy: Always
         command:
         - ./maistra/run-ci.sh
