@@ -10,7 +10,7 @@ RUN dnf -y upgrade --refresh && \
     dnf -y install git make libtool patch libatomic which \
                    autoconf automake libtool cmake python2 python3 \
                    gcc gcc-c++ ninja-build golang annobin libstdc++-static \
-                   java-11-openjdk-devel jq file diffutils && \
+                   java-11-openjdk-devel jq file diffutils lbzip2 && \
     dnf -y clean all
 
 # Bazel
