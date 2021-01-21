@@ -1,5 +1,8 @@
 FROM centos:8
 
+# In order to use gcc 9 in this image, make sure to run:
+#   source scl_source enable gcc-toolset-9
+
 # Versions
 ENV K8S_TEST_INFRA_VERSION=229d6b4c8d
 ENV GCLOUD_VERSION=312.0.0
@@ -7,9 +10,9 @@ ENV GCLOUD_VERSION=312.0.0
 RUN dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
     dnf -y config-manager --set-enabled powertools && \
-    dnf -y install git make libtool patch libatomic which \
+    dnf -y install git make libtool patch which ninja-build golang \
                    autoconf automake libtool cmake python2 python3 \
-                   gcc gcc-c++ ninja-build golang annobin libstdc++-static \
+                   gcc-toolset-9 gcc-toolset-9-libatomic-devel \
                    java-11-openjdk-devel jq file diffutils lbzip2 && \
     dnf -y clean all
 
@@ -25,7 +28,7 @@ RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
     rm -rf /root/* /root/.cache /tmp/*
 
 ENV CC=gcc CXX=g++ USER=user HOME=/home/user
-RUN mkdir -p /home/user && chmod 777 /home/user
+RUN useradd user && chmod 777 /home/user
 
 WORKDIR /work
 
