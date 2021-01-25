@@ -819,7 +819,7 @@ presubmits:
 
   maistra/proxy:
   - name: proxy-unit-clang
-    trigger: (?m)^/test( | .* )unit,?($|\s.*)
+    trigger: (?m)^/test( | .* )unit-clang,?($|\s.*)
     decorate: true
     decoration_config:
       timeout: 6h0m0s
@@ -828,8 +828,8 @@ presubmits:
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-2.1-clang
-    rerun_command: /test unit
+      - ^maistra-2.1-clang$
+    rerun_command: /test unit-clang
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-proxy-builder:2.1-clang"
@@ -1068,7 +1068,7 @@ presubmits:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
   - name: envoy-unit-clang
-    trigger: (?m)^/test( | .* )unit,?($|\s.*)
+    trigger: (?m)^/test( | .* )unit-clang,?($|\s.*)
     decorate: true
     decoration_config:
       timeout: 6h0m0s
@@ -1077,8 +1077,8 @@ presubmits:
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-2.1-clang
-    rerun_command: /test unit
+      - ^maistra-2.1-clang$
+    rerun_command: /test unit-clang
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-proxy-builder:2.1-clang"
