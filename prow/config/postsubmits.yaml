@@ -196,12 +196,47 @@ postsubmits:
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     labels:
       preset-gcs: "true"
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-proxy-builder:2.1"
+        imagePullPolicy: Always
+        command:
+        - ./maistra/ci/post-submit.sh
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+        volumeMounts:
+        - name: bazel-cache
+          mountPath: /bazel-cache
+        securityContext:
+          privileged: true
+      volumes:
+      - name: bazel-cache
+        hostPath:
+          path: /mnt/bazel-cache
+          type: DirectoryOrCreate
+
+  - name: proxy-postsubmit
+    decorate: true
+    decoration_config:
+      timeout: 6h0m0s
+    path_alias: istio.io/proxy
+    skip_report: false
+    max_concurrency: 1
+    branches:
+      - ^maistra-2.1-clang$
+    labels:
+      preset-gcs: "true"
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-proxy-builder:2.1-clang"
         imagePullPolicy: Always
         command:
         - ./maistra/ci/post-submit.sh
