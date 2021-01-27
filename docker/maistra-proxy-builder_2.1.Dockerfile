@@ -16,6 +16,18 @@ RUN dnf -y upgrade --refresh && \
                    java-11-openjdk-devel jq file diffutils lbzip2 && \
     dnf -y clean all
 
+# Add tools to compile WASM extensions, temporarily using COPR until we have them packaged for centos:8
+RUN dnf -y copr enable jwendell/clang && \
+    dnf -y copr enable jwendell/llvm && \
+    dnf -y copr enable jwendell/lld && \
+    dnf -y copr enable jwendell/binaryen && \
+    dnf -y upgrade --refresh && \
+    dnf -y install clang-10.0.1-1.el8 \
+                   llvm-10.0.1-4.el8 llvm-devel-10.0.1-4.el8 \
+                   lld-10.0.1-4.el8 \
+                   binaryen-90-1.el8 && \
+    dnf -y clean all
+
 # Bazel
 RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/3.4.1/bazel-3.4.1-linux-x86_64 && \
     chmod +x /usr/bin/bazel
