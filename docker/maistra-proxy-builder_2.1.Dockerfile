@@ -12,7 +12,7 @@ RUN dnf -y upgrade --refresh && \
     dnf -y config-manager --set-enabled powertools && \
     dnf -y install git make libtool patch which ninja-build golang \
                    autoconf automake libtool cmake python2 python3 \
-                   gcc-toolset-9 gcc-toolset-9-libatomic-devel \
+                   gcc-toolset-9 gcc-toolset-9-libatomic-devel annobin-annocheck \
                    java-11-openjdk-devel jq file diffutils lbzip2 && \
     dnf -y clean all
 
