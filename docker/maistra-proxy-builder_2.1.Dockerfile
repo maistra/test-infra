@@ -11,20 +11,20 @@ RUN dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
     dnf -y config-manager --set-enabled powertools && \
     dnf -y install git make libtool patch which ninja-build golang \
-                   autoconf automake libtool cmake python2 python3 \
+                   autoconf automake libtool cmake python2 python3 nodejs \
                    gcc-toolset-9 gcc-toolset-9-libatomic-devel annobin-annocheck \
                    java-11-openjdk-devel jq file diffutils lbzip2 && \
     dnf -y clean all
 
 # Add tools to compile WASM extensions, temporarily using COPR until we have them packaged for centos:8
-RUN dnf -y copr enable jwendell/clang && \
-    dnf -y copr enable jwendell/llvm && \
-    dnf -y copr enable jwendell/lld && \
+RUN dnf -y copr enable jwendell/clang11 && \
+    dnf -y copr enable jwendell/llvm11 && \
+    dnf -y copr enable jwendell/lld11 && \
     dnf -y copr enable jwendell/binaryen && \
     dnf -y upgrade --refresh && \
-    dnf -y install clang-10.0.1-1.el8 \
-                   llvm-10.0.1-4.el8 llvm-devel-10.0.1-4.el8 \
-                   lld-10.0.1-4.el8 \
+    dnf -y install clang-11.0.0-2.el8 clang-tools-extra-11.0.0-2.el8 clang-analyzer-11.0.0-2.el8 \
+                   llvm-11.0.0-3.el8 llvm-devel-11.0.0-3.el8 \
+                   lld-11.0.0-4.el8 \
                    binaryen-90-1.el8 && \
     dnf -y clean all
 
