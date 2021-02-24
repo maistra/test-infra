@@ -47,7 +47,7 @@ RUN curl -sfL https://download.docker.com/linux/fedora/docker-ce.repo -o /etc/yu
 ENV GOBIN=/usr/local/bin
 RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/jstemmer/go-junit-report@${GO_JUNIT_REPORT_VERSION} && \
-    gobin github.com/mikefarah/yq/v3 && \
+    gobin github.com/mikefarah/yq/v4 && \
     gobin github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION} && \
     gobin istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} && \
     gobin istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} && \
@@ -62,7 +62,6 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/gogo/protobuf/protoc-gen-gogofast@${GOGO_PROTOBUF_VERSION} && \
     gobin github.com/gogo/protobuf/protoc-gen-gogofaster@${GOGO_PROTOBUF_VERSION} && \
     gobin github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION}  && \
-    mv /usr/local/bin/yq /usr/local/bin/yq-go && \
     rm -rf /root/* /root/.cache /tmp/*
 
 RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
@@ -83,8 +82,7 @@ RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/defaulter-g
 
 # Python tools
 RUN pip3 install --no-binary :all: autopep8==${AUTOPEP8_VERSION} && \
-    pip3 install yamllint==${YAMLLINT_VERSION} && \
-    pip3 install yq && mv /usr/local/bin/yq /usr/local/bin/yq-python
+    pip3 install yamllint==${YAMLLINT_VERSION}
 
 # Ruby tools
 RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION} && \
