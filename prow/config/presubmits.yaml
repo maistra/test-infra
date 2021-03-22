@@ -1217,6 +1217,31 @@ presubmits:
     trigger: "(?m)^/test lint"
     rerun_command: "/test lint"
 
+  dgn/oidc-filter:
+  - name: build
+    decorate: true
+    always_run: true
+    path_alias: github.com/dgn/oidc-filter
+    skip_report: false
+    branches:
+      - master
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.1"
+        imagePullPolicy: Always
+        command:
+        - make
+        - clean
+        - build
+        resources:
+          limits:
+            memory: 8Gi
+            cpu: "4"
+          requests:
+            cpu: "1"
+            memory: 1Gi
+
 ## The presubmits below are for the maistra-prow-testing org, which is our test bed
   maistra-prow-testing/test-infra:
   - name: build-containers

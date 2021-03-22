@@ -90,6 +90,11 @@ plugins:
   - hold
   - wip
 
+  dgn/oidc-filter:
+  - size
+  - trigger
+  - hold
+  - wip
 
 external_plugins:
   maistra:
