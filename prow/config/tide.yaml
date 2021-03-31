@@ -31,6 +31,7 @@ tide:
     - maistra/prometheus
     - maistra/rpms
     - maistra/ior
+    - maistra/header-append-filter
     - dgn/oidc-filter
     labels:
     - "okay to merge"
