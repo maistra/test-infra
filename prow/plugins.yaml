@@ -9,6 +9,11 @@ plugins:
   - trigger
   - hold
   - wip
+  maistra/api:
+  - size
+  - trigger
+  - hold
+  - wip
   maistra/istio-operator:
   - size
   - trigger
