@@ -4,7 +4,7 @@ github_reporter:
   - postsubmit
 
 tide:
-  merge_label: "don't squash"
+  rebase_label: "don't squash"
   merge_method:
     maistra: squash
     dgn: squash
