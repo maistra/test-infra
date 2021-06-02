@@ -4,7 +4,7 @@ FROM centos:8
 #   source scl_source enable gcc-toolset-9
 
 # Versions
-ENV K8S_TEST_INFRA_VERSION=229d6b4c8d
+ENV K8S_TEST_INFRA_VERSION=03cf33ddeb
 ENV GCLOUD_VERSION=312.0.0
 
 RUN dnf -y upgrade --refresh && \
