@@ -1,3 +1,12 @@
+# Hack: Remove this once the base image has go 1.16
+FROM golang:1.16.4 AS go116
+
+ENV K8S_TEST_INFRA_VERSION=03cf33ddeb
+RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
+    cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
+    go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
+    go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go
+
 FROM fedora:32
 
 # Versions
@@ -61,11 +70,14 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     mv /usr/local/bin/yq /usr/local/bin/yq-go && \
     rm -rf /root/* /root/.cache /tmp/*
 
-RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
-    cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
-    go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
-    go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go && \
-    rm -rf /root/* /root/.cache /tmp/*
+# Hack: Revert this once the base image has go 1.16
+# RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
+#     cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
+#     go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
+#     go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go && \
+#     rm -rf /root/* /root/.cache /tmp/*
+COPY --from=go116 /usr/local/bin/pr-creator /usr/local/bin/pr-creator
+COPY --from=go116 /usr/local/bin/checkconfig /usr/local/bin/checkconfig
 
 # gobin does not seem to be compatible with this pesky code-generator repo
 # Install the code generator tools, and hopefully only these tools, this way
