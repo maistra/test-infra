@@ -39,6 +39,7 @@ spec:
         - --dry-run=false
         - --github-endpoint=https://api.github.com
         - --config-path=/etc/config/config.yaml
+        - --github-token-path=/etc/github/oauth
         ports:
           - name: http
             containerPort: 8888
