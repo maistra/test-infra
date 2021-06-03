@@ -38,6 +38,7 @@ spec:
         - --github-workers=1
         - --config-path=/etc/config/config.yaml
         - --github-endpoint=https://api.github.com
+        - --github-token-path=/etc/github/oauth
         volumeMounts:
         - name: config
           mountPath: /etc/config
