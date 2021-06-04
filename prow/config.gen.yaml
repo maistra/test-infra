@@ -61,6 +61,8 @@ plank:
         path_strategy: explicit
         bucket: "maistra-prow-testing"
       gcs_credentials_secret: "gcs-credentials"
+  pod_unscheduled_timeout: 6h
+  pod_pending_timeout: 6h
 postsubmits:
   maistra/test-infra:
   - name: test-infra_deploy-prow
