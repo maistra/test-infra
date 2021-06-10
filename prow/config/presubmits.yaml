@@ -1393,7 +1393,8 @@ presubmits:
     skip_report: false
     always_run: true
     branches:
-      - main
+      - maistra-2.1
+      - maistra-2.0
     max_concurrency: 2
     spec:
       containers:
