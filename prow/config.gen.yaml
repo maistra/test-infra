@@ -531,7 +531,8 @@ postsubmits:
     path_alias: github.com/maistra/header-append-filter
     skip_report: false
     branches:
-      - main
+      - maistra-2.1
+      - maistra-2.0
     labels:
       preset-quay-pusher: "true"
     max_concurrency: 1
@@ -2023,7 +2024,8 @@ presubmits:
     skip_report: false
     always_run: true
     branches:
-      - main
+      - maistra-2.1
+      - maistra-2.0
     max_concurrency: 2
     spec:
       containers:
