@@ -94,6 +94,9 @@ RUN pip3 install --no-binary :all: autopep8==${AUTOPEP8_VERSION} && \
     pip3 install yamllint==${YAMLLINT_VERSION} && \
     pip3 install yq && mv /usr/local/bin/yq /usr/local/bin/yq-python
 
+# Default yq to yq-go
+RUN ln -s /usr/local/bin/yq-go /usr/local/bin/yq
+
 # Ruby tools
 RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION} && \
     gem install --no-wrappers --no-document html-proofer -v ${HTML_PROOFER} && \
