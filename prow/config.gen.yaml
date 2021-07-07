@@ -2328,6 +2328,7 @@ tide:
     - maistra/ior
     - maistra/header-append-filter
     - maistra/api
+    - maistra/xns-informer
     - dgn/oidc-filter
     labels:
     - "okay to merge"
