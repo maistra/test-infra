@@ -34,11 +34,11 @@ RUN dnf -y copr enable jwendell/clang11 && \
     dnf -y install clang-11.0.0-2.el8 clang-tools-extra-11.0.0-2.el8 clang-analyzer-11.0.0-2.el8 \
                    llvm-11.0.0-3.el8 llvm-devel-11.0.0-3.el8 \
                    lld-11.0.0-4.el8 \
-                   binaryen-90-1.el8 && \
+                   binaryen-97.0.0-1.el8 && \
     dnf -y clean all
 
 # Bazel
-RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/3.4.1/bazel-3.4.1-linux-x86_64 && \
+RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/3.7.2/bazel-3.7.2-linux-x86_64 && \
     chmod +x /usr/bin/bazel
 
 # Go tools
