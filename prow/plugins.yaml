@@ -29,6 +29,11 @@ plugins:
   - trigger
   - hold
   - wip
+  maistra/xns-informer:
+  - size
+  - trigger
+  - hold
+  - wip
   maistra/ior:
   - size
   - trigger
