@@ -1,5 +1,5 @@
 # Hack: Remove this once the base image has go 1.16
-FROM golang:1.16.4 AS go116
+FROM golang:1.16 AS go116
 
 ENV K8S_TEST_INFRA_VERSION=03cf33ddeb
 RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
@@ -7,11 +7,11 @@ RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
     go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
     go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go
 
-FROM fedora:32
+FROM fedora:33
 
 # Versions
-ENV ISTIO_TOOLS_SHA=a6cc91a3424d81fea65314a7741a4ab2cda46c59
-ENV KUBECTL_VERSION="v1.17.0"
+ENV ISTIO_TOOLS_SHA=f4cf625fd815a0300e5ca541d03bc57057dad289
+ENV KUBECTL_VERSION="v1.20.0"
 ENV HELM3_VERSION=v3.1.2
 ENV VALE_VERSION="v2.1.1"
 ENV KIND_VERSION="v0.9.0"
@@ -25,11 +25,11 @@ ENV GO_BINDATA_VERSION=v3.1.2
 ENV COUNTERFEITER_VERSION=v6.2.3
 ENV PROTOC_VERSION=3.9.2
 ENV GOIMPORTS_VERSION=379209517ffe
-ENV GOGO_PROTOBUF_VERSION=v1.3.0
+ENV GOGO_PROTOBUF_VERSION=v1.3.2
 ENV GO_JUNIT_REPORT_VERSION=af01ea7f8024089b458d804d5cdf190f962a9a0c
 ENV K8S_CODE_GENERATOR_VERSION=1.18.1
 ENV LICENSEE_VERSION=9.11.0
-ENV GOLANG_PROTOBUF_VERSION=v1.3.1
+ENV GOLANG_PROTOBUF_VERSION=v1.3.2
 ENV FPM_VERSION=1.11.0
 
 #this needs to match the version of Hugo used in maistra.io's netlify.toml file
@@ -57,15 +57,10 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/jstemmer/go-junit-report@${GO_JUNIT_REPORT_VERSION} && \
     gobin github.com/mikefarah/yq/v3 && \
     gobin github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION} && \
-    gobin istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} && \
-    gobin istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} && \
-    gobin istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} && \
     gobin github.com/go-bindata/go-bindata/go-bindata@${GO_BINDATA_VERSION} && \
     gobin github.com/maxbrunsfeld/counterfeiter/v6@${COUNTERFEITER_VERSION} && \
     gobin golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION} && \
     gobin github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION} && \
-    gobin istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} && \
-    gobin istio.io/tools/cmd/protoc-gen-deepcopy@${ISTIO_TOOLS_SHA} && \
     gobin github.com/golang/protobuf/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
     gobin github.com/gogo/protobuf/protoc-gen-gofast@${GOGO_PROTOBUF_VERSION} && \
     gobin github.com/gogo/protobuf/protoc-gen-gogofast@${GOGO_PROTOBUF_VERSION} && \
@@ -73,6 +68,18 @@ RUN GO111MODULE=off go get github.com/myitcv/gobin && \
     gobin github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION}  && \
     mv /usr/local/bin/yq /usr/local/bin/yq-go && \
     rm -rf /root/* /root/.cache /tmp/*
+
+# Install latest version of Istio-owned tools in this release
+RUN gobin istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} && \
+    gobin istio.io/tools/cmd/annotations_prep@${ISTIO_TOOLS_SHA} && \
+    gobin istio.io/tools/cmd/cue-gen@${ISTIO_TOOLS_SHA} && \
+    gobin istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} && \
+    gobin istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} && \
+    gobin istio.io/tools/cmd/protoc-gen-deepcopy@${ISTIO_TOOLS_SHA} && \
+    gobin istio.io/tools/cmd/protoc-gen-jsonshim@${ISTIO_TOOLS_SHA} && \
+    gobin istio.io/tools/cmd/kubetype-gen@${ISTIO_TOOLS_SHA} && \
+    gobin istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} && \
+    gobin istio.io/tools/cmd/gen-release-notes@${ISTIO_TOOLS_SHA}
 
 # Hack: Revert this once the base image has go 1.16
 # RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
@@ -97,6 +104,9 @@ RUN GO111MODULE=on go get -ldflags="-s -w" k8s.io/code-generator/cmd/defaulter-g
 RUN pip3 install --no-binary :all: autopep8==${AUTOPEP8_VERSION} && \
     pip3 install yamllint==${YAMLLINT_VERSION} && \
     pip3 install yq && mv /usr/local/bin/yq /usr/local/bin/yq-python
+
+# Default yq to yq-go
+RUN ln -s /usr/local/bin/yq-go /usr/local/bin/yq
 
 # Ruby tools
 RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION} && \
