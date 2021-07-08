@@ -31,6 +31,7 @@ ENV K8S_CODE_GENERATOR_VERSION=1.18.1
 ENV LICENSEE_VERSION=9.11.0
 ENV GOLANG_PROTOBUF_VERSION=v1.3.2
 ENV FPM_VERSION=1.11.0
+ENV SHELLCHECK_VERSION=v0.7.1
 
 #this needs to match the version of Hugo used in maistra.io's netlify.toml file
 ENV HUGO_VERSION="0.69.2"
@@ -45,7 +46,7 @@ ENV CI prow
 RUN curl -sfL https://download.docker.com/linux/fedora/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo && \
     dnf -y update && \
     dnf -y install fedpkg copr-cli jq xz unzip hostname golang \
-                   make automake gcc gcc-c++ git ShellCheck which \
+                   make automake gcc gcc-c++ git which \
                    docker-ce npm python3-pip rubygems cmake \
                    rubygem-asciidoctor ruby-devel zlib-devel \
                    openssl-devel && \
@@ -113,6 +114,10 @@ RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION} && \
     gem install --no-wrappers --no-document html-proofer -v ${HTML_PROOFER} && \
     gem install --no-wrappers --no-document licensee -v ${LICENSEE_VERSION} && \
     gem install --no-document fpm -v ${FPM_VERSION}
+
+# ShellCheck linter
+RUN curl -sfL https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz | tar -xJ shellcheck-${SHELLCHECK_VERSION}/shellcheck --strip=1 && \
+    mv shellcheck /usr/bin/shellcheck
 
 # Other lint tools
 RUN curl -sfL https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64 -o /usr/bin/hadolint && \
