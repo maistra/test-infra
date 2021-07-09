@@ -1373,7 +1373,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     rerun_command: /test unit
     spec:
       containers:
@@ -1413,7 +1413,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     rerun_command: /test lint
     spec:
       containers:
@@ -1449,7 +1449,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     rerun_command: /test gencheck
     spec:
       containers:
@@ -1486,7 +1486,7 @@ presubmits:
     max_concurrency: 2
     always_run: true
     branches:
-    - maistra-2.1
+    - ^maistra-2.1$
     decorate: true
     path_alias: istio.io/istio
     spec:
