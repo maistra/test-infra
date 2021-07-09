@@ -1365,172 +1365,6 @@ presubmits:
           type: DirectoryOrCreate
 
   maistra/istio:
-  - name: istio_2.1-1.9-unit
-    trigger: (?m)^/test( | .* )unit,?($|\s.*)
-    decorate: true
-    always_run: true
-    path_alias: istio.io/istio
-    skip_report: false
-    max_concurrency: 2
-    branches:
-      - ^maistra-2.1-istio-1.9$
-    rerun_command: /test unit
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.1-1.9"
-        imagePullPolicy: Always
-        command:
-        - make
-        - -e
-        - T=-v
-        - build
-        - racetest
-        - binaries-test
-        env:
-        - name: BUILD_WITH_CONTAINER
-          value: "0"
-        - name: GOFLAGS
-          value: -mod=vendor
-        - name: XDG_CACHE_HOME
-          value: /tmp/cache
-        - name: GOCACHE
-          value: /tmp/cache
-        # FIXME: disabled until we have a proxy build
-        # - name: ISTIO_ENVOY_BASE_URL
-        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-        resources:
-          limits:
-            memory: 24Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-
-  - name: istio_2.1-1.9-lint
-    trigger: (?m)^/test( | .* )lint,?($|\s.*)
-    decorate: true
-    always_run: true
-    path_alias: istio.io/istio
-    skip_report: false
-    max_concurrency: 2
-    branches:
-      - ^maistra-2.1-istio-1.9$s
-    rerun_command: /test lint
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.1-1.9"
-        imagePullPolicy: Always
-        command:
-        - make
-        - lint
-        env:
-        - name: BUILD_WITH_CONTAINER
-          value: "0"
-        - name: GOFLAGS
-          value: -mod=vendor
-        - name: XDG_CACHE_HOME
-          value: /tmp/cache
-        - name: GOCACHE
-          value: /tmp/cache
-        # FIXME: disabled until we have a proxy build
-        # - name: ISTIO_ENVOY_BASE_URL
-        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-        resources:
-          limits:
-            memory: 24Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-
-  - name: istio_2.1-1.9-gencheck
-    trigger: (?m)^/test( | .* )gencheck,?($|\s.*)
-    decorate: true
-    always_run: true
-    path_alias: istio.io/istio
-    skip_report: false
-    max_concurrency: 2
-    branches:
-      - ^maistra-2.1-istio-1.9$
-    rerun_command: /test gencheck
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.1-1.9"
-        imagePullPolicy: Always
-        command:
-        - make
-        - gen-check
-        env:
-        - name: BUILD_WITH_CONTAINER
-          value: "0"
-        - name: GOFLAGS
-          value: -mod=vendor
-        - name: XDG_CACHE_HOME
-          value: /tmp/cache
-        - name: GOCACHE
-          value: /tmp/cache
-        # FIXME: disabled until we have a proxy build
-        # - name: ISTIO_ENVOY_BASE_URL
-        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-
-  - name: istio_2.1-1.9-integration
-    trigger: (?m)^/test( | .* )integration,?($|\s.*)
-    rerun_command: /test integration
-    skip_report: false
-    max_concurrency: 2
-    always_run: true
-    branches:
-    - ^maistra-2.1-istio-1.9$
-    decorate: true
-    path_alias: istio.io/istio
-    spec:
-      containers:
-      - command:
-        - entrypoint
-        - prow/integ-suite-kind.sh
-        - test.integration.kube.presubmit
-        env:
-        - name: GOFLAGS
-          value: -mod=vendor
-        - name: BUILD_WITH_CONTAINER
-          value: "0"
-        # FIXME: disabled until we have a proxy build
-        # - name: ISTIO_ENVOY_BASE_URL
-        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-        image: "quay.io/maistra-dev/maistra-builder:2.1-1.9"
-        imagePullPolicy: Always
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - mountPath: /lib/modules
-          name: modules
-          readOnly: true
-        - mountPath: /sys/fs/cgroup
-          name: cgroup
-          readOnly: true
-        resources:
-          limits:
-            memory: 24Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-      volumes:
-      - hostPath:
-          path: /lib/modules
-          type: Directory
-        name: modules
-      - hostPath:
-          path: /sys/fs/cgroup
-          type: Directory
-        name: cgroup
   - name: istio_2.1-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -1539,7 +1373,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - ^maistra-2.1$
+      - maistra-2.1
     rerun_command: /test unit
     spec:
       containers:
@@ -1579,7 +1413,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - ^maistra-2.1$
+      - maistra-2.1
     rerun_command: /test lint
     spec:
       containers:
@@ -1615,7 +1449,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - ^maistra-2.1$
+      - maistra-2.1
     rerun_command: /test gencheck
     spec:
       containers:
@@ -1652,7 +1486,7 @@ presubmits:
     max_concurrency: 2
     always_run: true
     branches:
-    - ^maistra-2.1$
+    - maistra-2.1
     decorate: true
     path_alias: istio.io/istio
     spec:
