@@ -1031,6 +1031,8 @@ presubmits:
         - entrypoint
         - make
         - e2e
+        securityContext:
+          privileged: true
         env:
         - name: XDG_CACHE_HOME
           value: /tmp/cache
