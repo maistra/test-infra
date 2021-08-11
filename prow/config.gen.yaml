@@ -629,6 +629,35 @@ presets:
   - name: creds-gcs
     secret:
       secretName: gcs-credentials
+
+- labels:
+    preset-aws: "true"
+  env:
+  - name: AWS_DEFAULT_PROFILE
+    valueFrom:
+      secretKeyRef:
+        name: aws
+        key: AWS_DEFAULT_PROFILE
+  - name: AWS_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: aws
+        key: AWS_ACCESS_KEY_ID
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: aws
+        key: AWS_SECRET_ACCESS_KEY
+  - name: OCP_PULL_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: aws
+        key: OCP_PULL_SECRET
+  - name: QUAY_PULL_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: aws
+        key: QUAY_PULL_SECRET
 presubmits:
   maistra/maistra.github.io:
   - name: maistra.github.io_lint
@@ -977,6 +1006,37 @@ presubmits:
           value: /tmp/cache
         - name: GOCACHE
           value: /tmp/cache
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+  - name: istio-operator_e2e_4.7
+    decorate: true
+    always_run: false
+    optional: true
+    path_alias: github.com/maistra/istio-operator
+    skip_report: true
+    branches:
+      - maistra-2.1
+    labels:
+      preset-aws: "true"
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.1"
+        imagePullPolicy: Always
+        command:
+        - make
+        - e2e
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        - name: OCP_VERSION
+          value: '4.7'
         resources:
           limits:
             memory: 16Gi

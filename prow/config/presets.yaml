@@ -74,3 +74,32 @@ presets:
   - name: creds-gcs
     secret:
       secretName: gcs-credentials
+
+- labels:
+    preset-aws: "true"
+  env:
+  - name: AWS_DEFAULT_PROFILE
+    valueFrom:
+      secretKeyRef:
+        name: aws
+        key: AWS_DEFAULT_PROFILE
+  - name: AWS_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: aws
+        key: AWS_ACCESS_KEY_ID
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: aws
+        key: AWS_SECRET_ACCESS_KEY
+  - name: OCP_PULL_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: aws
+        key: OCP_PULL_SECRET
+  - name: QUAY_PULL_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: aws
+        key: QUAY_PULL_SECRET
