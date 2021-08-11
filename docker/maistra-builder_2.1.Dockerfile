@@ -156,6 +156,11 @@ RUN mkdir /rust && \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     rustup target add wasm32-unknown-unknown
 
+# OpenShift tools
+RUN curl -sfL https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.7/openshift-install-linux.tar.gz | tar -xz openshift-install && mv openshift-install /usr/local/bin/openshift-install-4.7
+RUN curl -sfL https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.8/openshift-install-linux.tar.gz | tar -xz openshift-install && mv openshift-install /usr/local/bin/openshift-install-4.8
+RUN curl -sfL https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-4.8/openshift-client-linux.tar.gz | tar -xz oc && mv oc /usr/local/bin
+
 ADD scripts/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
 
