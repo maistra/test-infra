@@ -358,7 +358,7 @@ presubmits:
     always_run: false
     optional: true
     path_alias: github.com/maistra/istio-operator
-    skip_report: true
+    skip_report: false
     branches:
       - maistra-2.1
     labels:
@@ -380,6 +380,40 @@ presubmits:
           value: /tmp/cache
         - name: OCP_VERSION
           value: '4.7'
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+  - name: istio-operator_e2e_4.8
+    decorate: true
+    always_run: false
+    optional: true
+    path_alias: github.com/maistra/istio-operator
+    skip_report: false
+    branches:
+      - maistra-2.1
+    labels:
+      preset-aws: "true"
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.1"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - e2e
+        securityContext:
+          privileged: true
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        - name: OCP_VERSION
+          value: '4.8'
         resources:
           limits:
             memory: 16Gi
