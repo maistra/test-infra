@@ -19,6 +19,7 @@ branch-protection:
 deck:
   spyglass:
     size_limit: 500000000  # 500 MB
+    gcs_browser_prefix: https://gcsweb.maistra.io/gcs/
     lenses:
     - lens:
         name: metadata
