@@ -1187,9 +1187,8 @@ presubmits:
         imagePullPolicy: Always
         command:
         - make
+        - build
         - test
-        securityContext:
-          privileged: true
         resources:
           limits:
             memory: 16Gi

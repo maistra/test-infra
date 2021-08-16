@@ -32,6 +32,7 @@ ENV LICENSEE_VERSION=9.11.0
 ENV GOLANG_PROTOBUF_VERSION=v1.3.2
 ENV FPM_VERSION=1.11.0
 ENV SHELLCHECK_VERSION=v0.7.1
+ENV PROMU_VERSION=0.7.0
 
 #this needs to match the version of Hugo used in maistra.io's netlify.toml file
 ENV HUGO_VERSION="0.69.2"
@@ -146,6 +147,15 @@ RUN curl -sfL https://install.goreleaser.com/github.com/ValeLint/vale.sh -o ./va
 RUN curl -sfLO https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
     unzip protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
     mv bin/protoc /usr/local/bin && \
+    rm -rf /root/*
+
+# Yarn
+RUN npm install --global yarn
+
+# Promu
+RUN curl -sfLO https://github.com/prometheus/promu/releases/download/v${PROMU_VERSION}/promu-${PROMU_VERSION}.linux-amd64.tar.gz && \
+    tar -zxvf promu-${PROMU_VERSION}.linux-amd64.tar.gz && \
+    mv promu-${PROMU_VERSION}.linux-amd64/promu /usr/local/bin  && \
     rm -rf /root/*
 
 # Rust (for WASM filters)
