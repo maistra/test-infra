@@ -557,15 +557,13 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
-            cpu: "4"
+            cpu: "8"
           requests:
             cpu: "4"
             memory: 4Gi
         volumeMounts:
         - name: bazel-cache
           mountPath: /bazel-cache
-        securityContext:
-          privileged: true
       volumes:
       - name: bazel-cache
         hostPath:
@@ -592,15 +590,13 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
-            cpu: "4"
+            cpu: "8"
           requests:
             cpu: "4"
             memory: 4Gi
         volumeMounts:
         - name: bazel-cache
           mountPath: /bazel-cache
-        securityContext:
-          privileged: true
       volumes:
       - name: bazel-cache
         hostPath:
@@ -628,15 +624,13 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
-            cpu: "4"
+            cpu: "8"
           requests:
             cpu: "4"
             memory: 4Gi
         volumeMounts:
         - name: bazel-cache
           mountPath: /bazel-cache
-        securityContext:
-          privileged: true
       volumes:
       - name: bazel-cache
         hostPath:
@@ -663,15 +657,13 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
-            cpu: "4"
+            cpu: "8"
           requests:
             cpu: "4"
             memory: 4Gi
         volumeMounts:
         - name: bazel-cache
           mountPath: /bazel-cache
-        securityContext:
-          privileged: true
       volumes:
       - name: bazel-cache
         hostPath:
@@ -701,15 +693,13 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
-            cpu: "4"
+            cpu: "8"
           requests:
             cpu: "4"
             memory: 4Gi
         volumeMounts:
         - name: bazel-cache
           mountPath: /bazel-cache
-        securityContext:
-          privileged: true
       volumes:
       - name: bazel-cache
         hostPath:
@@ -736,15 +726,13 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
-            cpu: "4"
+            cpu: "8"
           requests:
             cpu: "4"
             memory: 4Gi
         volumeMounts:
         - name: bazel-cache
           mountPath: /bazel-cache
-        securityContext:
-          privileged: true
       volumes:
       - name: bazel-cache
         hostPath:
@@ -771,15 +759,13 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
-            cpu: "4"
+            cpu: "8"
           requests:
             cpu: "4"
             memory: 4Gi
         volumeMounts:
         - name: bazel-cache
           mountPath: /bazel-cache
-        securityContext:
-          privileged: true
       volumes:
       - name: bazel-cache
         hostPath:
@@ -806,15 +792,13 @@ presubmits:
         resources:
           limits:
             memory: 16Gi
-            cpu: "4"
+            cpu: "8"
           requests:
             cpu: "4"
             memory: 4Gi
         volumeMounts:
         - name: bazel-cache
           mountPath: /bazel-cache
-        securityContext:
-          privileged: true
       volumes:
       - name: bazel-cache
         hostPath:
