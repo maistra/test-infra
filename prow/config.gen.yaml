@@ -2230,6 +2230,7 @@ github_reporter:
 
 tide:
   rebase_label: "don't squash"
+  merge_label: "merge strategy"
   merge_method:
     maistra: squash
     dgn: squash
