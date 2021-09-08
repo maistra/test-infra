@@ -1232,6 +1232,9 @@ presubmits:
         - make
         - build
         - test
+        env:
+        - name: BUILD_PROMU
+          value: "false"
         resources:
           limits:
             memory: 16Gi
