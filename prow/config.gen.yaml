@@ -509,6 +509,7 @@ postsubmits:
         - ../test-infra/tools/automator.sh
         - -o maistra
         - -r istio-operator
+        - -b maistra-2.1
         - -f /creds-github/github-token
         - -c make clean update-1.0-charts update-1.1-charts update-2.0-charts
         - '-t Automator: Update charts from previous versions'
