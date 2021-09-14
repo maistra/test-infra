@@ -510,7 +510,7 @@ postsubmits:
         - -r istio-operator
         - -b maistra-2.0
         - -f /creds-github/github-token
-        - -c make clean gen
+        - -c make gen
         - '-t Automator: Update charts from previous versions'
         - -m update_charts_from_previous_versions
         - -l auto-merge
@@ -557,7 +557,7 @@ postsubmits:
         - -r istio-operator
         - -b maistra-2.1
         - -f /creds-github/github-token
-        - -c make clean gen
+        - -c make gen
         - '-t Automator: Update charts from previous versions'
         - -m update_charts_from_previous_versions
         - -l auto-merge
