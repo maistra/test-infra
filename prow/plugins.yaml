@@ -1,110 +1,131 @@
 plugins:
   maistra/maistra.github.io:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra-prow-testing:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/api:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/istio-operator:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/test-infra:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/istio:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/xns-informer:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/ior:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/rpm-common:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/rpm-ior:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/rpm-istio-operator:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/proxy:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/envoy:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/header-append-filter:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/istio-must-gather:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/olm-metadata:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/istio-images-centos:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/istio-cni:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/prometheus:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
   maistra/rpms:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
 
   dgn/oidc-filter:
-  - size
-  - trigger
-  - hold
-  - wip
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
 
 external_plugins:
   maistra:
