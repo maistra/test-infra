@@ -12,7 +12,7 @@ RUN dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm  && \
     dnf -y config-manager --set-enabled powertools && \
     dnf -y copr enable jwendell/binaryen && \
-    dnf -y install git make libtool patch which ninja-build golang \
+    dnf -y install git make libtool patch which ninja-build golang xz \
                    autoconf automake libtool cmake python2 python3 nodejs \
                    gcc-toolset-11 gcc-toolset-11-libatomic-devel gcc-toolset-11-annobin-plugin-gcc annobin-annocheck \
                    java-11-openjdk-devel jq file diffutils lbzip2 \
