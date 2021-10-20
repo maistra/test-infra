@@ -1,5 +1,8 @@
 FROM quay.io/centos/centos:stream8
 
+# In order to use gcc 9 in this image, make sure to run:
+#   source /opt/rh/gcc-toolset-9/enable
+
 # In order to use gcc 11 in this image, make sure to run:
 #   source /opt/rh/gcc-toolset-11/enable
 
@@ -14,8 +17,9 @@ RUN dnf -y upgrade --refresh && \
     dnf -y copr enable jwendell/binaryen && \
     dnf -y install git make libtool patch which ninja-build golang xz \
                    autoconf automake libtool cmake python2 python3 nodejs \
-                   gcc-toolset-11 gcc-toolset-11-libatomic-devel gcc-toolset-11-annobin-plugin-gcc annobin-annocheck \
-                   java-11-openjdk-devel jq file diffutils lbzip2 \
+                   gcc-toolset-9 gcc-toolset-9-libatomic-devel gcc-toolset-9-annobin \
+                   gcc-toolset-11 gcc-toolset-11-libatomic-devel gcc-toolset-11-annobin-plugin-gcc \
+                   java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
                    clang llvm lld \
                    binaryen && \
     dnf -y clean all
