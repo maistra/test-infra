@@ -1,7 +1,7 @@
 # Hack: Remove this once the base image has go 1.16
 FROM golang:1.16.4 AS go116
 
-ENV K8S_TEST_INFRA_VERSION=03cf33ddeb
+ENV K8S_TEST_INFRA_VERSION=5763223177
 RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
     cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
     go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
@@ -28,7 +28,7 @@ ENV PROTOC_VERSION=3.9.2
 ENV GOIMPORTS_VERSION=379209517ffe
 ENV GOGO_PROTOBUF_VERSION=v1.3.0
 ENV GO_JUNIT_REPORT_VERSION=af01ea7f8024089b458d804d5cdf190f962a9a0c
-ENV K8S_TEST_INFRA_VERSION=03cf33ddeb
+ENV K8S_TEST_INFRA_VERSION=5763223177
 ENV K8S_CODE_GENERATOR_VERSION=1.18.1
 ENV LICENSEE_VERSION=9.11.0
 ENV GOLANG_PROTOBUF_VERSION=v1.3.1
