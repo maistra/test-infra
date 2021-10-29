@@ -1,0 +1,33 @@
+periodics:
+- name: merge-upstream-envoy
+  decorate: true
+  cron: "00 05 * * 1-5"  # Run at 5:00 UTC every M-F
+  labels:
+    preset-github: "true"
+  extra_refs:
+  - org: maistra
+    repo: test-infra
+    base_ref: main
+  spec:
+    containers:
+    - image: "quay.io/maistra-dev/maistra-builder:main"
+      imagePullPolicy: Always
+      command:
+      - ./tools/automator-main.sh
+      - --org maistra
+      - --repo envoy
+      - --branch main
+      - --token-path /creds-github/github-token
+      - "--title=Automator: merge upstream changes to $AUTOMATOR_ORG/$AUTOMATOR_REPO@$AUTOMATOR_BRANCH"
+      - "--labels=merge strategy"
+      - --modifier=merge_upstream_envoy
+      - --merge-repository=https://github.com/envoyproxy/envoy.git
+      - --merge-branch=main
+      - --merge-failure-notify=@maistra/envoy
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: "2"
+        requests:
+          cpu: "1"
+          memory: 1Gi
