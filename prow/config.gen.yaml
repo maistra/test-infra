@@ -62,10 +62,10 @@ periodics:
       imagePullPolicy: Always
       command:
       - ./tools/automator-main.sh
-      - --org maistra
-      - --repo envoy
-      - --branch main
-      - --token-path /creds-github/github-token
+      - --org=maistra
+      - --repo=envoy
+      - --branch=main
+      - --token-path=/creds-github/github-token
       - "--title=Automator: merge upstream changes to $AUTOMATOR_ORG/$AUTOMATOR_REPO@$AUTOMATOR_BRANCH"
       - "--labels=merge strategy"
       - --modifier=merge_upstream_envoy
