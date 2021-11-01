@@ -24,6 +24,7 @@ periodics:
       - --merge-repository=https://github.com/envoyproxy/envoy.git
       - --merge-branch=main
       - --merge-failure-notify=@maistra/envoy
+      - --merge-strategy=merge
       resources:
         limits:
           memory: 2Gi
