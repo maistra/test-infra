@@ -1003,6 +1003,60 @@ presubmits:
           path: /sys/fs/cgroup
           type: Directory
         name: cgroup
+  - name: istio_2.1-multicluster-integration
+    trigger: (?m)^/test( | .* )multicluster\-integration,?($|\s.*)
+    rerun_command: /test multicluster-integration
+    skip_report: false
+    max_concurrency: 2
+    always_run: true
+    branches:
+    - ^maistra-2.1$
+    decorate: true
+    path_alias: istio.io/istio
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - prow/integ-suite-kind.sh
+        - --topology
+        - MULTICLUSTER
+        - test.integration.kube.presubmit
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: ISTIO_ENVOY_BASE_URL
+          value: https://storage.googleapis.com/maistra-prow-testing/proxy
+        - name: TEST_SELECT
+          value: -postsubmit,-flaky,+multicluster
+        image: "quay.io/maistra-dev/maistra-builder:2.1"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+        resources:
+          limits:
+            memory: 24Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
   - name: istio_2.0-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
