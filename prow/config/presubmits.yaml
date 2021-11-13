@@ -1003,10 +1003,11 @@ presubmits:
           path: /sys/fs/cgroup
           type: Directory
         name: cgroup
-  - name: istio_2.1-multicluster-integration
-    trigger: (?m)^/test( | .* )multicluster\-integration,?($|\s.*)
-    rerun_command: /test multicluster-integration
-    skip_report: false
+  - name: istio_2.1-integration-maistra-mc
+    trigger: (?m)^/test( | .* )integration\-maistra\-mc,?($|\s.*)
+    rerun_command: /test integration-maistra-mc
+    optional: true
+    skip_report: true
     max_concurrency: 2
     always_run: true
     branches:
@@ -1020,7 +1021,7 @@ presubmits:
         - prow/integ-suite-kind.sh
         - --topology
         - MULTICLUSTER
-        - test.integration.kube.presubmit
+        - test.integration.servicemesh.kube
         env:
         - name: GOFLAGS
           value: -mod=vendor
