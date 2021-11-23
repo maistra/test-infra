@@ -7,7 +7,7 @@ RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
     go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
     go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go
 
-FROM fedora:33
+FROM fedora:34
 
 # Versions
 ENV ISTIO_TOOLS_SHA=f4cf625fd815a0300e5ca541d03bc57057dad289
@@ -50,7 +50,7 @@ RUN curl -sfL https://download.docker.com/linux/fedora/docker-ce.repo -o /etc/yu
                    make automake gcc gcc-c++ git which \
                    docker-ce npm python3-pip rubygems cmake \
                    rubygem-asciidoctor ruby-devel zlib-devel \
-                   openssl-devel && \
+                   openssl-devel rubygem-rexml && \
     dnf -y clean all
 
 # Go tools
