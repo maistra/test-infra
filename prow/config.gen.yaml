@@ -1747,8 +1747,7 @@ presubmits:
   - name: istio_2.1-integration-maistra-mc
     trigger: (?m)^/test( | .* )integration\-maistra\-mc,?($|\s.*)
     rerun_command: /test integration-maistra-mc
-    optional: true
-    skip_report: true
+    skip_report: false
     max_concurrency: 2
     always_run: true
     branches:
