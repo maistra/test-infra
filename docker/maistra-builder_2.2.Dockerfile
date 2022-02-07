@@ -145,11 +145,11 @@ RUN pip3 install --no-binary :all: autopep8==${AUTOPEP8_VERSION} && \
 #   ERROR:  While executing gem ... (ArgumentError)
 #      Malformed version number string linux
 # On licensee
-#RUN echo MDL && gem install --no-wrappers --no-document mdl -v ${MDL_VERSION} && \
-#    echo HTML-PROOFER && gem install --no-wrappers --no-document html-proofer -v ${HTML_PROOFER_VERSION} && \
+RUN echo MDL && gem install --no-wrappers --no-document mdl -v ${MDL_VERSION} && \
+    echo HTML-PROOFER && gem install --no-wrappers --no-document html-proofer -v ${HTML_PROOFER_VERSION} && \
+    echo FPM && gem install --no-wrappers --no-document fpm -v ${FPM_VERSION} && \
+    rm -rf /root/* /root/.cache /root/.gem /tmp/*
 #    echo LICENSEE && gem install --no-wrappers --no-document licensee -v ${LICENSEE_VERSION} && \
-#    echo FPM && gem install --no-wrappers --no-document fpm -v ${FPM_VERSION} && \
-#    rm -rf /root/* /root/.cache /root/.gem /tmp/*
 
 # ShellCheck linter
 RUN curl -sfL https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz | tar -xJ shellcheck-${SHELLCHECK_VERSION}/shellcheck --strip=1 && \
