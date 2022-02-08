@@ -1391,8 +1391,8 @@ presubmits:
         - mountPath: /sys/fs/cgroup
           name: cgroup
           readOnly: true
-        - mountPath: /var/lib/docker/overlay2
-          name: overlay2
+        - mountPath: /var/lib/docker
+          name: varlibdocker
           readOnly: false
         resources:
           limits:
@@ -1410,10 +1410,8 @@ presubmits:
           path: /sys/fs/cgroup
           type: Directory
         name: cgroup
-      - hostPath:
-          path: /var/lib/docker/overlay2
-          type: Directory
-        name: overlay2
+      - emptyDir: {}
+        name: varlibdocker
   - name: istio_2.2-integration-maistra-mc
     trigger: (?m)^/test( | .* )integration\-maistra\-mc,?($|\s.*)
     rerun_command: /test integration-maistra-mc
@@ -1453,8 +1451,8 @@ presubmits:
         - mountPath: /sys/fs/cgroup
           name: cgroup
           readOnly: true
-        - mountPath: /var/lib/docker/overlay2
-          name: overlay2
+        - mountPath: /var/lib/docker
+          name: varlibdocker
           readOnly: false
         resources:
           limits:
@@ -1472,10 +1470,8 @@ presubmits:
           path: /sys/fs/cgroup
           type: Directory
         name: cgroup
-      - hostPath:
-          path: /var/lib/docker/overlay2
-          type: Directory
-        name: overlay2
+      - emptyDir: {}
+        name: varlibdocker
 
   - name: istio_2.0-unit
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
