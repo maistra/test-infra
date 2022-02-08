@@ -38,6 +38,7 @@ ENV GH_VERSION=2.3.0
 ENV K8S_TEST_INFRA_VERSION=ae26658abae0b1213549d1326b3b252422fe0215
 ENV GCLOUD_VERSION=362.0.0
 ENV SU_EXEC_VERSION=0.2
+ENV BAZEL_VERSION=4.1.0
 
 #this needs to match the version of Hugo used in maistra.io's netlify.toml file
 ENV HUGO_VERSION="0.69.2"
