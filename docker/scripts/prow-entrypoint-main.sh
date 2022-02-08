@@ -21,8 +21,6 @@ function log() {
   echo -e "$(date -u '+%Y-%m-%dT%H:%M:%S.%NZ')\t$*"
 }
 
-log "Starting test..."
-
 # optionally enable ipv6 docker
 export DOCKER_IN_DOCKER_IPV6_ENABLED=${DOCKER_IN_DOCKER_IPV6_ENABLED:-false}
 if [[ "${DOCKER_IN_DOCKER_IPV6_ENABLED}" == "true" ]]; then
@@ -68,9 +66,5 @@ set +x
 "$@"
 EXIT_VALUE=$?
 set -x
-
-# We cleanup in the trap as well, but just in case try to clean up here as well
-# shellcheck disable=SC2046
-cleanup
 
 exit "${EXIT_VALUE}"
