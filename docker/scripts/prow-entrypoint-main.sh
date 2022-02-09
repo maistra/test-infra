@@ -31,7 +31,7 @@ if [[ "${DOCKER_IN_DOCKER_IPV6_ENABLED}" == "true" ]]; then
 fi
 
 # Start docker daemon and wait for dockerd to start
-dockerd &
+dockerd --debug > "${ARTIFACTS:-}/dockerd.log" 2>&1 &
 
 log "Waiting for dockerd to start..."
 while :
@@ -50,6 +50,7 @@ function cleanup() {
   # shellcheck disable=SC2046
   docker kill $(docker ps -q) || true
   docker system prune -af || true
+  pkill -9 dockerd
   log "Cleanup complete"
 }
 
