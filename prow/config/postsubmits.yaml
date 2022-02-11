@@ -168,7 +168,7 @@ postsubmits:
       repo: test-infra
     spec:
       containers:
-      - image: "quay.io/maistra-dev/maistra-proxy-builder:2.2"
+      - image: "quay.io/maistra-dev/maistra-builder:2.2"
         imagePullPolicy: Always
         command:
         - ../test-infra/tools/automator.sh
@@ -269,7 +269,7 @@ postsubmits:
       preset-gcs: "true"
     spec:
       containers:
-      - image: "quay.io/maistra-dev/maistra-proxy-builder:2.2"
+      - image: "quay.io/maistra-dev/maistra-builder:2.2"
         imagePullPolicy: Always
         command:
         - ./maistra/ci/post-submit.sh
