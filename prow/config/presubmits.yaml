@@ -593,6 +593,10 @@ presubmits:
         - build-containers
         securityContext:
           privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 16Gi
@@ -600,6 +604,10 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
+
   - name: test-infra_build-proxy-containers
     decorate: true
     path_alias: github.com/maistra/test-infra
@@ -618,6 +626,10 @@ presubmits:
         - build-proxy-containers
         securityContext:
           privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 16Gi
@@ -625,6 +637,9 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
   maistra/prometheus:
   - name: prometheus-test
     decorate: true
@@ -1752,6 +1767,10 @@ presubmits:
         - container
         securityContext:
           privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 16Gi
@@ -1759,6 +1778,9 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
 
   - name: header-append-filter_test
     decorate: true
