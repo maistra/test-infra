@@ -70,7 +70,7 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    gcc-toolset-9 gcc-toolset-9-libatomic-devel gcc-toolset-9-annobin \
                    gcc-toolset-11 gcc-toolset-11-libatomic-devel gcc-toolset-11-annobin-plugin-gcc \
                    java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
-                   clang llvm lld ruby-devel zlib-devel openssl-devel \
+                   clang llvm lld ruby-devel zlib-devel openssl-devel python2-setuptools \
                    binaryen docker-ce python3-pip rubygems npm rpm-build && \
     dnf -y clean all
 
@@ -215,14 +215,16 @@ ENV RUSTUP_HOME "/rust"
 RUN mkdir /rust && \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     /rust/bin/rustup target add wasm32-unknown-unknown
-
-ADD scripts/prow-entrypoint-main.sh /usr/local/bin/entrypoint
-RUN chmod +x /usr/local/bin/entrypoint
+ENV PATH=/usr/local/google-cloud-sdk/bin:/rust/bin:$PATH
 
 RUN mkdir -p /work && chmod 777 /work
 WORKDIR /work
-ENV HOME /work
-ENV PATH=/usr/local/google-cloud-sdk/bin:/rust/bin:$PATH
+
+# Workarounds for proxy and bazel
+RUN useradd user && chmod 777 /home/user
+ENV USER=user HOME=/home/user
+RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN ln -s /etc/ssl/certs/ca-bundle.crt /etc/ssl/certs/ca-certificates.crt
 
 # mountpoints are mandatory for any host mounts.
 # mountpoints in /config are special.
@@ -251,6 +253,9 @@ RUN chmod 777 /go && \
     chmod 777 /home/.cache && \
     chmod 777 /home/.helm && \
     chmod 777 /home/.gsutil
+
+ADD scripts/prow-entrypoint-main.sh /usr/local/bin/entrypoint
+RUN chmod +x /usr/local/bin/entrypoint
 
 # Run config setup in local environments
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
