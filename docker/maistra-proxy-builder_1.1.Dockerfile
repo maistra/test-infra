@@ -1,7 +1,7 @@
 # Hack: Remove this once the base image has go 1.16
 FROM golang:1.16.4 AS go116
 
-ENV K8S_TEST_INFRA_VERSION=5763223177
+ENV K8S_TEST_INFRA_VERSION=aeeaba2bd2
 RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
     cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
     go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
@@ -10,7 +10,7 @@ RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
 FROM centos:8
 
 # Versions
-ENV K8S_TEST_INFRA_VERSION=5763223177
+ENV K8S_TEST_INFRA_VERSION=aeeaba2bd2
 
 RUN dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
