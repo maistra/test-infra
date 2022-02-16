@@ -14,8 +14,8 @@ WORKER_NS=${WORKER_NS:-test-pods}
 ./gen-config.sh
 
 # update config and plugins
-kubectl -n "${NAMESPACE}" create configmap config --from-file=config.yaml=config.gen.yaml --dry-run -o yaml | kubectl -n default replace configmap config -f -
-kubectl -n "${NAMESPACE}" create configmap plugins --from-file=plugins.yaml=plugins.yaml --dry-run -o yaml | kubectl -n default replace configmap plugins -f -
+kubectl -n "${NAMESPACE}" create configmap config --from-file=config.yaml=config.gen.yaml --dry-run -o yaml | kubectl -n "${NAMESPACE}"  replace configmap config -f -
+kubectl -n "${NAMESPACE}" create configmap plugins --from-file=plugins.yaml=plugins.yaml --dry-run -o yaml | kubectl -n "${NAMESPACE}"  replace configmap plugins -f -
 
 # update deployments etc.
 for file in "${DIR}"/cluster/*; do
@@ -24,6 +24,6 @@ for file in "${DIR}"/cluster/*; do
 done
 
 # restart deployments
-for deployment in $(kubectl get deployments -n default -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'); do
+for deployment in $(kubectl get deployments -n "${NAMESPACE}" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'); do
   kubectl -n "${NAMESPACE}" rollout restart deployment "${deployment}"
 done

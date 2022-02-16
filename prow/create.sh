@@ -5,7 +5,8 @@ set -ex
 NAMESPACE=${NAMESPACE:-default}
 WORKER_NS=${WORKER_NS:-test-pods}
 
-# create test-pods namespace
+# create needed namespaces if they don't exist
+kubectl create namespace "${NAMESPACE}" || echo Skipping
 kubectl create namespace "${WORKER_NS}" || echo Skipping
 
 # create configmaps
