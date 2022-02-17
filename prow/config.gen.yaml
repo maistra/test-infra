@@ -2206,7 +2206,11 @@ presubmits:
         # FIXME: Uncomment this when we have our 2.2 proxy in place
         # - name: ISTIO_ENVOY_BASE_URL
         #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-        image: "quay.io/maistra-dev/maistra-builder:2.2"
+
+        # FIXME: Using upstream for now, replace with our image
+        # image: "quay.io/maistra-dev/maistra-builder:2.2"
+        image: "gcr.io/istio-testing/build-tools:release-1.12-2022-02-14T16-31-01"
+
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -2266,7 +2270,11 @@ presubmits:
         #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
         - name: TEST_SELECT
           value: -postsubmit,-flaky,+multicluster
-        image: "quay.io/maistra-dev/maistra-builder:2.2"
+
+        # FIXME: Using upstream for now, replace with our image
+        # image: "quay.io/maistra-dev/maistra-builder:2.2"
+        image: "gcr.io/istio-testing/build-tools:release-1.12-2022-02-14T16-31-01"
+
         imagePullPolicy: Always
         securityContext:
           privileged: true
