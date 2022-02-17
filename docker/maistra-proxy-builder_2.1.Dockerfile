@@ -7,7 +7,7 @@ RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
     go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
     go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go
 
-FROM centos:8
+FROM quay.io/centos/centos:stream8
 
 # In order to use gcc 9 in this image, make sure to run:
 #   source scl_source enable gcc-toolset-9
