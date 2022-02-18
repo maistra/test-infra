@@ -7,7 +7,7 @@ RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
     go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
     go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go
 
-FROM centos:8
+FROM quay.io/centos/centos:stream8
 
 # Versions
 ENV K8S_TEST_INFRA_VERSION=5763223177
