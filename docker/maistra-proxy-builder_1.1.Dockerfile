@@ -1,5 +1,5 @@
 # Hack: Remove this once the base image has go 1.16
-FROM golang:1.16.4 AS go116
+FROM golang:1.16.14 AS go116
 
 ENV K8S_TEST_INFRA_VERSION=aeeaba2bd2
 RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
@@ -17,7 +17,7 @@ RUN dnf -y upgrade --refresh && \
     dnf -y config-manager --set-enabled powertools && \
     dnf -y install git make libtool patch libatomic which \
                    autoconf automake libtool cmake python2 python3 \
-                   gcc gcc-c++ ninja-build golang annobin libstdc++-static \
+                   gcc gcc-c++ ninja-build openssl-devel annobin libstdc++-static \
                    java-11-openjdk-devel jq file diffutils && \
     dnf -y clean all
 
@@ -41,3 +41,9 @@ RUN mkdir -p /home/user && chmod 777 /home/user
 WORKDIR /work
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# Install go 1.15 - Centos only has 1.16+ - The build needs go 1.15
+RUN curl -sfL -o /tmp/go.tar.gz https://go.dev/dl/go1.15.15.linux-amd64.tar.gz && \
+    tar -xzf /tmp/go.tar.gz -C /usr/local && rm -rf /tmp/*
+
+ENV PATH=/usr/local/go/bin:$PATH
