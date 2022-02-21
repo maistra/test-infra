@@ -1,12 +1,3 @@
-# Hack: Remove this once the base image has go 1.16
-FROM golang:1.16.4 AS go116
-
-ENV K8S_TEST_INFRA_VERSION=aeeaba2bd2
-RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
-    cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
-    go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
-    go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go
-
 FROM quay.io/centos/centos:stream8
 
 # In order to use gcc 9 in this image, make sure to run:
@@ -19,7 +10,7 @@ ENV GCLOUD_VERSION=312.0.0
 RUN dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
     dnf -y config-manager --set-enabled powertools && \
-    dnf -y install git make libtool patch which ninja-build golang \
+    dnf -y install git make libtool patch which ninja-build golang-0:1.16.7 openssl-devel \
                    autoconf automake libtool cmake python2 python3 nodejs \
                    gcc-toolset-9 gcc-toolset-9-libatomic-devel annobin-annocheck \
                    java-11-openjdk-devel jq file diffutils lbzip2 && \
@@ -30,7 +21,6 @@ RUN dnf -y copr enable jwendell/clang11 && \
     dnf -y copr enable jwendell/llvm11 && \
     dnf -y copr enable jwendell/lld11 && \
     dnf -y copr enable jwendell/binaryen && \
-    dnf -y upgrade --refresh && \
     dnf -y install clang-11.0.0-2.el8 clang-tools-extra-11.0.0-2.el8 clang-analyzer-11.0.0-2.el8 \
                    llvm-11.0.0-3.el8 llvm-devel-11.0.0-3.el8 \
                    lld-11.0.0-4.el8 \
@@ -42,14 +32,11 @@ RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/down
     chmod +x /usr/bin/bazel
 
 # Go tools
-# Hack: Revert this once the base image has go 1.16
-# RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
-#     cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
-#     go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
-#     go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go && \
-#     rm -rf /root/* /root/.cache /tmp/*
-COPY --from=go116 /usr/local/bin/pr-creator /usr/local/bin/pr-creator
-COPY --from=go116 /usr/local/bin/checkconfig /usr/local/bin/checkconfig
+RUN git clone https://github.com/kubernetes/test-infra.git /root/test-infra && \
+    cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
+    go build -o /usr/local/bin/checkconfig prow/cmd/checkconfig/main.go && \
+    go build -o /usr/local/bin/pr-creator robots/pr-creator/main.go && \
+    rm -rf /root/* /root/.cache /tmp/*
 
 ENV CC=gcc CXX=g++ USER=user HOME=/home/user
 RUN useradd user && chmod 777 /home/user
@@ -60,5 +47,5 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Google cloud tools
 RUN curl -sfL -o /tmp/gc.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-linux-x86_64.tar.gz && \
-    tar -xzf /tmp/gc.tar.gz -C /usr/local && rm -f /tmp/gc.tar.gz
+    tar -xzf /tmp/gc.tar.gz -C /usr/local && rm -rf /tmp/gc.tar.gz
 ENV PATH=/usr/local/google-cloud-sdk/bin:$PATH
