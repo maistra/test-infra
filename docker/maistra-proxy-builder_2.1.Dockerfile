@@ -13,7 +13,7 @@ RUN dnf -y upgrade --refresh && \
     dnf -y install git make libtool patch which ninja-build golang-0:1.16.7 openssl-devel \
                    autoconf automake libtool cmake python2 python3 nodejs \
                    gcc-toolset-9 gcc-toolset-9-libatomic-devel annobin-annocheck \
-                   java-11-openjdk-devel jq file diffutils lbzip2 && \
+                   java-11-openjdk-devel jq file diffutils lbzip2 xz && \
     dnf -y clean all
 
 # Add tools to compile WASM extensions, temporarily using COPR until we have them packaged for centos:8
