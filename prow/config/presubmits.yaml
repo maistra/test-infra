@@ -1,11 +1,11 @@
 presubmits:
   maistra/maistra.github.io:
-  - name: maistra.github.io_lint
+  - name: maistra.github.io_lint-1.1
     decorate: true
     always_run: true
     skip_report: false
     branches:
-      - maistra-1.1
+      - ^maistra-1.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.1"
@@ -22,12 +22,12 @@ presubmits:
             memory: 4Gi
     trigger: "(?m)^/test lint"
     rerun_command: "/test lint"
-  - name: maistra.github.io_check-links
+  - name: maistra.github.io_check-links-1.1
     decorate: true
     always_run: true
     skip_report: false
     branches:
-      - maistra-1.1
+      - ^maistra-1.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.1"
@@ -44,12 +44,12 @@ presubmits:
             memory: 4Gi
     trigger: "(?m)^/test check-links"
     rerun_command: "/test check-links"
-  - name: maistra.github.io_lint
+  - name: maistra.github.io_lint-2.0
     decorate: true
     always_run: true
     skip_report: false
     branches:
-      - maistra-2.0
+      - ^maistra-2.0$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.0"
@@ -66,12 +66,12 @@ presubmits:
             memory: 4Gi
     trigger: "(?m)^/test lint"
     rerun_command: "/test lint"
-  - name: maistra.github.io_check-links
+  - name: maistra.github.io_check-links-2.0
     decorate: true
     always_run: true
     skip_report: false
     branches:
-      - maistra-2.0
+      - ^maistra-2.0$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.0"
@@ -88,12 +88,12 @@ presubmits:
             memory: 4Gi
     trigger: "(?m)^/test check-links"
     rerun_command: "/test check-links"
-  - name: maistra.github.io_lint
+  - name: maistra.github.io_lint-2.1
     decorate: true
     always_run: true
     skip_report: false
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.1"
@@ -110,12 +110,12 @@ presubmits:
             memory: 4Gi
     trigger: "(?m)^/test lint"
     rerun_command: "/test lint"
-  - name: maistra.github.io_check-links
+  - name: maistra.github.io_check-links-2.1
     decorate: true
     always_run: true
     skip_report: false
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.1"
@@ -134,13 +134,13 @@ presubmits:
     rerun_command: "/test check-links"
 
   maistra/api:
-  - name: api_unittests
+  - name: api_unittests-2.1
     decorate: true
     always_run: true
     path_alias: github.com/maistra/api
     skip_report: false
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.1"
@@ -160,13 +160,13 @@ presubmits:
           requests:
             cpu: "1"
             memory: 1Gi
-  - name: api_gen-check
+  - name: api_gen-check-2.1
     decorate: true
     always_run: true
     path_alias: github.com/maistra/api
     skip_report: false
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.1"
@@ -187,13 +187,13 @@ presubmits:
             cpu: "1"
             memory: 1Gi
 
-  - name: api_unittests
+  - name: api_unittests-2.2
     decorate: true
     always_run: true
     path_alias: github.com/maistra/api
     skip_report: false
     branches:
-      - maistra-2.2
+      - ^maistra-2.2$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.2"
@@ -213,13 +213,13 @@ presubmits:
           requests:
             cpu: "1"
             memory: 1Gi
-  - name: api_gen-check
+  - name: api_gen-check-2.2
     decorate: true
     always_run: true
     path_alias: github.com/maistra/api
     skip_report: false
     branches:
-      - maistra-2.2
+      - ^maistra-2.2$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.2"
@@ -241,13 +241,13 @@ presubmits:
             memory: 1Gi
 
   maistra/istio-operator:
-  - name: istio-operator_unittests
+  - name: istio-operator_unittests-1.1
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
     branches:
-      - maistra-1.1
+      - ^maistra-1.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.1"
@@ -270,13 +270,13 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-  - name: istio-operator_gen-check
+  - name: istio-operator_gen-check-1.1
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
     branches:
-      - maistra-1.1
+      - ^maistra-1.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.1"
@@ -296,13 +296,13 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-  - name: istio-operator_unittests
+  - name: istio-operator_unittests-2.0
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
     branches:
-      - maistra-2.0
+      - ^maistra-2.0$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.0"
@@ -325,13 +325,13 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-  - name: istio-operator_gen-check
+  - name: istio-operator_gen-check-2.0
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
     branches:
-      - maistra-2.0
+      - ^maistra-2.0$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.0"
@@ -351,13 +351,13 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-  - name: istio-operator_unittests
+  - name: istio-operator_unittests-2.1
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.1"
@@ -380,13 +380,13 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-  - name: istio-operator_gen-check
+  - name: istio-operator_gen-check-2.1
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.1"
@@ -407,13 +407,13 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio-operator_unittests
+  - name: istio-operator_unittests-2.2
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
     branches:
-      - maistra-2.2
+      - ^maistra-2.2$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.2"
@@ -436,13 +436,13 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-  - name: istio-operator_gen-check
+  - name: istio-operator_gen-check-2.2
     decorate: true
     always_run: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
     branches:
-      - maistra-2.2
+      - ^maistra-2.2$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.2"
@@ -463,19 +463,19 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio-operator_e2e_4.7
+  - name: istio-operator_e2e_4.9
     decorate: true
     always_run: false
     optional: true
     path_alias: github.com/maistra/istio-operator
     skip_report: false
     branches:
-      - maistra-2.1
+      - ^maistra-2.2$
     labels:
       preset-aws: "true"
     spec:
       containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.1"
+      - image: "quay.io/maistra-dev/maistra-builder:2.2"
         imagePullPolicy: Always
         command:
         - entrypoint
@@ -489,41 +489,7 @@ presubmits:
         - name: GOCACHE
           value: /tmp/cache
         - name: OCP_VERSION
-          value: '4.7'
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-  - name: istio-operator_e2e_4.8
-    decorate: true
-    always_run: false
-    optional: true
-    path_alias: github.com/maistra/istio-operator
-    skip_report: false
-    branches:
-      - maistra-2.1
-    labels:
-      preset-aws: "true"
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.1"
-        imagePullPolicy: Always
-        command:
-        - entrypoint
-        - make
-        - e2e
-        securityContext:
-          privileged: true
-        env:
-        - name: XDG_CACHE_HOME
-          value: /tmp/cache
-        - name: GOCACHE
-          value: /tmp/cache
-        - name: OCP_VERSION
-          value: '4.8'
+          value: '4.9'
         resources:
           limits:
             memory: 16Gi
@@ -640,11 +606,12 @@ presubmits:
       volumes:
       - emptyDir: {}
         name: varlibdocker
+  
   maistra/prometheus:
-  - name: prometheus-test
+  - name: prometheus-test-2.1
     decorate: true
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     max_concurrency: 2
     spec:
       containers:
@@ -664,19 +631,42 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+  - name: prometheus-test-2.2
+    decorate: true
+    branches:
+      - ^maistra-2.2$
+    max_concurrency: 2
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.2"
+        imagePullPolicy: Always
+        command:
+        - make
+        - build
+        - test
+        env:
+        - name: BUILD_PROMU
+          value: "false"
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
 
   maistra/proxy:
-  - name: proxy-unit
+  - name: proxy-unit-2.1
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
-      timeout: 6h0m0s
+      timeout: 8h0m0s
     always_run: true
     path_alias: istio.io/proxy
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     rerun_command: /test unit
     spec:
       containers:
@@ -699,18 +689,17 @@ presubmits:
         hostPath:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
-  - name: proxy-unit
+  - name: proxy-unit-2.0
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
-      timeout: 6h0m0s
+      timeout: 8h0m0s
     always_run: true
     path_alias: istio.io/proxy
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-2.0
-      - jwendell/ci
+      - ^maistra-2.0$
     rerun_command: /test unit
     spec:
       containers:
@@ -733,17 +722,17 @@ presubmits:
         hostPath:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
-  - name: proxy-unit
+  - name: proxy-unit-1.1
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
-      timeout: 6h0m0s
+      timeout: 8h0m0s
     always_run: true
     path_alias: istio.io/proxy
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-1.1
+      - ^maistra-1.1$
     rerun_command: /test unit
     spec:
       containers:
@@ -766,17 +755,17 @@ presubmits:
         hostPath:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
-  - name: proxy-unit
+  - name: proxy-unit-2.2
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
-      timeout: 6h0m0s
+      timeout: 8h0m0s
     always_run: true
     path_alias: istio.io/proxy
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-2.2
+      - ^maistra-2.2$
     rerun_command: /test unit
     spec:
       containers:
@@ -801,18 +790,17 @@ presubmits:
           type: DirectoryOrCreate
 
   maistra/envoy:
-  - name: envoy-unit
+  - name: envoy-unit-1.1
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
-      timeout: 6h0m0s
+      timeout: 8h0m0s
     always_run: true
     path_alias: istio.io/envoy
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-1.1
-      - jwendell/ci
+      - ^maistra-1.1$
     rerun_command: /test unit
     spec:
       containers:
@@ -835,17 +823,17 @@ presubmits:
         hostPath:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
-  - name: envoy-unit
+  - name: envoy-unit-2.0
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
-      timeout: 6h0m0s
+      timeout: 8h0m0s
     always_run: true
     path_alias: istio.io/envoy
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-2.0
+      - ^maistra-2.0$
     rerun_command: /test unit
     spec:
       containers:
@@ -868,17 +856,17 @@ presubmits:
         hostPath:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
-  - name: envoy-unit
+  - name: envoy-unit-2.1
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
-      timeout: 6h0m0s
+      timeout: 8h0m0s
     always_run: true
     path_alias: istio.io/envoy
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-2.1
+      - ^maistra-2.1$
     rerun_command: /test unit
     spec:
       containers:
@@ -901,17 +889,17 @@ presubmits:
         hostPath:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
-  - name: envoy-unit
+  - name: envoy-unit-2.2
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
-      timeout: 6h0m0s
+      timeout: 8h0m0s
     always_run: true
     path_alias: istio.io/envoy
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-2.2
+      - ^maistra-2.2$
     rerun_command: /test unit
     spec:
       containers:
@@ -934,11 +922,11 @@ presubmits:
         hostPath:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
-  - name: envoy-unit
+  - name: envoy-unit-main
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     decoration_config:
-      timeout: 6h0m0s
+      timeout: 8h0m0s
     always_run: true
     path_alias: istio.io/envoy
     skip_report: false
@@ -969,7 +957,7 @@ presubmits:
           type: DirectoryOrCreate
 
   maistra/istio:
-  - name: istio_2.1-unit
+  - name: istio-unit-2.1
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     always_run: true
@@ -1009,7 +997,7 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio_2.1-lint
+  - name: istio-lint-2.1
     trigger: (?m)^/test( | .* )lint,?($|\s.*)
     decorate: true
     always_run: true
@@ -1045,7 +1033,7 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio_2.1-gencheck
+  - name: istio-gencheck-2.1
     trigger: (?m)^/test( | .* )gencheck,?($|\s.*)
     decorate: true
     always_run: true
@@ -1083,7 +1071,7 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio_2.1-integration
+  - name: istio-integration-2.1
     trigger: (?m)^/test( | .* )integration,?($|\s.*)
     rerun_command: /test integration
     skip_report: false
@@ -1133,7 +1121,7 @@ presubmits:
           path: /sys/fs/cgroup
           type: Directory
         name: cgroup
-  - name: istio_2.1-integration-maistra-mc
+  - name: istio-integration-maistra-mc-2.1
     trigger: (?m)^/test( | .* )integration\-maistra\-mc,?($|\s.*)
     rerun_command: /test integration-maistra-mc
     skip_report: false
@@ -1188,7 +1176,7 @@ presubmits:
           type: Directory
         name: cgroup
 
-  - name: istio_2.2-unit
+  - name: istio-unit-2.2
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     always_run: true
@@ -1229,7 +1217,7 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio_2.2-lint
+  - name: istio-lint-2.2
     trigger: (?m)^/test( | .* )lint,?($|\s.*)
     decorate: true
     always_run: true
@@ -1266,7 +1254,7 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio_2.2-gencheck
+  - name: istio-gencheck-2.2
     trigger: (?m)^/test( | .* )gencheck,?($|\s.*)
     decorate: true
     always_run: true
@@ -1305,7 +1293,7 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio_2.2-integration
+  - name: istio-integration-2.2
     trigger: (?m)^/test( | .* )integration,?($|\s.*)
     rerun_command: /test integration
     skip_report: false
@@ -1365,7 +1353,7 @@ presubmits:
         name: cgroup
       - emptyDir: {}
         name: varlibdocker
-  - name: istio_2.2-integration-maistra-mc
+  - name: istio-integration-maistra-mc-2.2
     trigger: (?m)^/test( | .* )integration\-maistra\-mc,?($|\s.*)
     rerun_command: /test integration-maistra-mc
     skip_report: false
@@ -1430,7 +1418,7 @@ presubmits:
       - emptyDir: {}
         name: varlibdocker
 
-  - name: istio_2.0-unit
+  - name: istio-unit-2.0
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     always_run: true
@@ -1438,7 +1426,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - maistra-2.0
+      - ^maistra-2.0$
     rerun_command: /test unit
     spec:
       containers:
@@ -1470,7 +1458,7 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio_2.0-lint
+  - name: istio-lint-2.0
     trigger: (?m)^/test( | .* )lint,?($|\s.*)
     decorate: true
     always_run: true
@@ -1478,7 +1466,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - maistra-2.0
+      - ^maistra-2.0$
     rerun_command: /test lint
     spec:
       containers:
@@ -1506,7 +1494,7 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio_2.0-gencheck
+  - name: istio-gencheck-2.0
     trigger: (?m)^/test( | .* )gencheck,?($|\s.*)
     decorate: true
     always_run: true
@@ -1514,7 +1502,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - maistra-2.0
+      - ^maistra-2.0$
     rerun_command: /test gencheck
     spec:
       containers:
@@ -1543,14 +1531,14 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio_2.0-integration
+  - name: istio-integration-2.0
     trigger: (?m)^/test( | .* )integration,?($|\s.*)
     rerun_command: /test integration
     skip_report: false
     max_concurrency: 2
     always_run: true
     branches:
-    - maistra-2.0
+    - ^maistra-2.0$
     decorate: true
     path_alias: istio.io/istio
     spec:
@@ -1594,13 +1582,13 @@ presubmits:
           type: Directory
         name: cgroup
 
-  - name: istio_1.1-unit
+  - name: istio-unit-1.1
     decorate: true
     always_run: true
     path_alias: istio.io/istio
     skip_report: false
     branches:
-      - maistra-1.1
+      - ^maistra-1.1$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:1.1"
@@ -1626,12 +1614,12 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio_1.1-integration
+  - name: istio-integration-1.1
     skip_report: false
     max_concurrency: 2
     always_run: true
     branches:
-    - maistra-1.1
+    - ^maistra-1.1$
     decorate: true
     path_alias: istio.io/istio
     spec:
@@ -1673,85 +1661,6 @@ presubmits:
           type: Directory
         name: cgroup
 
-  maistra/rpm-common:
-  - name: rpm-common_tests
-    decorate: true
-    always_run: true
-    path_alias: maistra.io/rpm-common
-    skip_report: false
-    branches:
-      - maistra-2.0
-      # Allow for testing
-      - playground
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.0"
-        imagePullPolicy: Always
-        command:
-        - make
-        - test
-        resources:
-          limits:
-            memory: 8Gi
-            cpu: "4"
-          requests:
-            cpu: "2"
-            memory: 2Gi
-
-  maistra/rpm-ior:
-  - name: rpm-ior_tests
-    decorate: true
-    always_run: true
-    path_alias: maistra.io/rpm-ior
-    skip_report: false
-    branches:
-      - maistra-2.0
-      # Allow for testing
-      - playground
-    labels:
-      preset-copr: "true"
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.0"
-        imagePullPolicy: Always
-        command:
-        - make
-        - test
-        resources:
-          limits:
-            memory: 8Gi
-            cpu: "4"
-          requests:
-            cpu: "2"
-            memory: 2Gi
-
-  maistra/rpm-istio-operator:
-  - name: rpm-istio-operator_tests
-    decorate: true
-    always_run: true
-    path_alias: maistra.io/rpm-istio-operator
-    skip_report: false
-    branches:
-      - maistra-2.0
-      # Allow for testing
-      - playground
-    labels:
-      preset-copr: "true"
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.0"
-        imagePullPolicy: Always
-        command:
-        - make
-        - test
-        resources:
-          limits:
-            memory: 8Gi
-            cpu: "4"
-          requests:
-            cpu: "2"
-            memory: 2Gi
-
   maistra/header-append-filter:
   - name: header-append-filter_build-containers
     decorate: true
@@ -1759,9 +1668,9 @@ presubmits:
     skip_report: false
     always_run: true
     branches:
-      - maistra-2.2
-      - maistra-2.1
-      - maistra-2.0
+      - ^maistra-2.2$
+      - ^maistra-2.1$
+      - ^maistra-2.0$
       # Allow for testing
       - playground
     max_concurrency: 2
@@ -1796,8 +1705,8 @@ presubmits:
     skip_report: false
     always_run: true
     branches:
-      - maistra-2.2
-      - maistra-2.1
+      - ^maistra-2.2$
+      - ^maistra-2.1$
       # Allow for testing
       - playground
     max_concurrency: 2
@@ -1822,8 +1731,8 @@ presubmits:
     skip_report: false
     always_run: true
     branches:
-      - maistra-2.2
-      - maistra-2.1
+      - ^maistra-2.2$
+      - ^maistra-2.1$
       # Allow for testing
       - playground
     max_concurrency: 2
@@ -1848,9 +1757,9 @@ presubmits:
     always_run: true
     skip_report: false
     branches:
-      - maistra-2.0
-      - maistra-2.1
-      - maistra-2.2
+      - ^maistra-2.0$
+      - ^maistra-2.1$
+      - ^maistra-2.2$
     spec:
       containers:
       - image: "quay.io/maistra-dev/maistra-builder:2.2"
