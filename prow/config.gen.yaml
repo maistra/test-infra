@@ -2846,9 +2846,6 @@ tide:
   queries:
 
   - repos:
-    - maistra/rpm-common
-    - maistra/rpm-ior
-    - maistra/rpm-istio-operator
     - maistra/test-infra
     - maistra/proxy
     - maistra/envoy
@@ -2875,10 +2872,9 @@ tide:
     reviewApprovedRequired: true
 
   - repos:
-    - maistra/rpm-ior
-    - maistra/rpm-istio-operator
     - maistra/proxy
     - maistra/istio
+    - maistra/istio-operator
     author: maistra-bot
     missingLabels:
     - do-not-merge
