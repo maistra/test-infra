@@ -82,15 +82,13 @@ postsubmits:
             memory: 4Gi
 
   maistra/envoy:
-  - name: envoy-update-proxy
+  - name: envoy-update-proxy-2.0
     decorate: true
     path_alias: maistra.io/envoy
     skip_report: false
     branches:
-      - maistra-2.0
-      - maistra-1.1
-      # Allow for testing
-      - playground
+      - ^maistra-2.0$
+      - ^maistra-1.1$
     labels:
       preset-github: "true"
     extra_refs:
@@ -119,7 +117,7 @@ postsubmits:
             cpu: "2"
             memory: 1Gi
 
-  - name: envoy-update-proxy
+  - name: envoy-update-proxy-2.1
     decorate: true
     path_alias: maistra.io/envoy
     skip_report: false
@@ -153,12 +151,14 @@ postsubmits:
             cpu: "2"
             memory: 1Gi
 
-  - name: envoy-update-proxy
+  - name: envoy-update-proxy-2.2
     decorate: true
     path_alias: maistra.io/envoy
     skip_report: false
     branches:
       - ^maistra-2.2$
+      # Allow for testing
+      - playground
     labels:
       preset-github: "true"
     extra_refs:
@@ -188,7 +188,7 @@ postsubmits:
             memory: 1Gi
 
   maistra/proxy:
-  - name: proxy-postsubmit
+  - name: proxy-postsubmit-2.1
     decorate: true
     decoration_config:
       timeout: 6h0m0s
@@ -221,7 +221,7 @@ postsubmits:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
 
-  - name: proxy-postsubmit
+  - name: proxy-postsubmit-2.2
     decorate: true
     decoration_config:
       timeout: 6h0m0s
@@ -254,7 +254,7 @@ postsubmits:
           path: /mnt/bazel-cache
           type: DirectoryOrCreate
 
-  - name: proxy-postsubmit
+  - name: proxy-postsubmit-2.0
     decorate: true
     decoration_config:
       timeout: 6h0m0s
@@ -262,7 +262,7 @@ postsubmits:
     skip_report: false
     max_concurrency: 1
     branches:
-      - maistra-2.0
+      - ^maistra-2.0$
     labels:
       preset-gcs: "true"
     spec:
@@ -294,9 +294,9 @@ postsubmits:
     path_alias: maistra.io/proxy
     skip_report: false
     branches:
-      - maistra-2.2
-      - maistra-2.1
-      - maistra-2.0
+      - ^maistra-2.2$
+      - ^maistra-2.1$
+      - ^maistra-2.0$
     labels:
       preset-github: "true"
     extra_refs:
@@ -329,7 +329,7 @@ postsubmits:
             memory: 1Gi
 
   maistra/api:
-  - name: api-update-istio
+  - name: api-update-istio-2.1
     decorate: true
     path_alias: maistra.io/api
     skip_report: false
@@ -371,7 +371,7 @@ postsubmits:
             cpu: "1"
             memory: 1Gi
 
-  - name: api-update-istio
+  - name: api-update-istio-2.2
     decorate: true
     path_alias: maistra.io/api
     skip_report: false
@@ -416,7 +416,7 @@ postsubmits:
             memory: 1Gi
 
   maistra/istio:
-  - name: istio-update-operator
+  - name: istio-update-operator-2.1
     decorate: true
     path_alias: maistra.io/istio
     skip_report: false
@@ -458,7 +458,7 @@ postsubmits:
             cpu: "2"
             memory: 1Gi
 
-  - name: istio-update-operator
+  - name: istio-update-operator-2.2
     decorate: true
     path_alias: maistra.io/istio
     skip_report: false
