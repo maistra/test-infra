@@ -63,6 +63,7 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
     dnf -y config-manager --set-enabled powertools && \
     dnf -y install epel-release epel-next-release && \
     dnf -y copr enable jwendell/binaryen && \
+    dnf -y copr enable jwendell/emsdk && \
     dnf -y module reset ruby nodejs && dnf -y module enable ruby:2.7 nodejs:12 && dnf -y module install ruby nodejs && \
     dnf -y install --nodocs --setopt=install_weak_deps=False \
                    git make libtool patch which ninja-build golang xz redhat-rpm-config \
@@ -71,7 +72,7 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    gcc-toolset-11 gcc-toolset-11-libatomic-devel gcc-toolset-11-annobin-plugin-gcc \
                    java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
                    clang llvm lld ruby-devel zlib-devel openssl-devel python2-setuptools \
-                   binaryen docker-ce python3-pip rubygems npm rpm-build && \
+                   binaryen emsdk docker-ce python3-pip rubygems npm rpm-build && \
     dnf -y clean all
 
 # Build and install a bunch of Go tools
