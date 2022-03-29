@@ -68,8 +68,8 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
     dnf -y install --nodocs --setopt=install_weak_deps=False \
                    git make libtool patch which ninja-build golang xz redhat-rpm-config \
                    autoconf automake libtool cmake python2 python3 \
-                   gcc-toolset-9 gcc-toolset-9-libatomic-devel gcc-toolset-9-annobin \
-                   gcc-toolset-11 gcc-toolset-11-libatomic-devel gcc-toolset-11-annobin-plugin-gcc \
+                   gcc-toolset-9 gcc-toolset-9-libatomic-devel gcc-toolset-9-annobin gcc-toolset-9-libasan-devel \
+                   gcc-toolset-11 gcc-toolset-11-libatomic-devel gcc-toolset-11-annobin-plugin-gcc gcc-toolset-11-libasan-devel\
                    java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
                    clang llvm lld ruby-devel zlib-devel openssl-devel python2-setuptools \
                    binaryen emsdk docker-ce python3-pip rubygems npm rpm-build && \
