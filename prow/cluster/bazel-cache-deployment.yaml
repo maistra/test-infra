@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bazel-cache
+  namespace: ${NAMESPACE}
+spec:
+  selector:
+    matchLabels:
+      app: bazel-cache
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bazel-cache
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: prow-master-03 # This could be a proper label such as `role: bazel-cache`
+
+      initContainers:
+      - name: setup-permissions
+        image: nginx:1.20 # Same image as the main container, keep them in sync
+        volumeMounts:
+          - name: cache
+            mountPath: /var/cache/bazel/cache
+            readOnly: false
+        command: ["chmod", "-R", "777", "/var/cache/bazel"]
+
+      containers:
+      - name: nginx
+        image: nginx:1.20
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/conf.d
+            readOnly: true
+          - name: cache
+            mountPath: /var/cache/bazel/cache
+            readOnly: false
+
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: bazel-cache-nginx-config
+        - name: cache
+          hostPath:
+            path: /mnt/bazel-cache
+            type: Directory
