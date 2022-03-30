@@ -205,6 +205,9 @@ postsubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/ci/post-submit.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -212,14 +215,6 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
 
   - name: proxy-postsubmit-2.2
     decorate: true
@@ -238,6 +233,9 @@ postsubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/ci/post-submit.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -245,14 +243,6 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
 
   - name: proxy-postsubmit-2.0
     decorate: true
@@ -271,6 +261,9 @@ postsubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/ci/post-submit.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -278,14 +271,6 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
 
   - name: proxy-update-istio
     decorate: true

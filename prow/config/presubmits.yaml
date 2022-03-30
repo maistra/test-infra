@@ -674,6 +674,9 @@ presubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/ci/pre-submit.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -681,14 +684,6 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
   - name: proxy-unit-2.0
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -707,6 +702,9 @@ presubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/ci/pre-submit.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -714,14 +712,6 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
   - name: proxy-unit-1.1
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -740,6 +730,9 @@ presubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/ci/pre-submit.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -747,14 +740,6 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
   - name: proxy-unit-2.2
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -773,6 +758,9 @@ presubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/ci/pre-submit.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -780,14 +768,6 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
 
   maistra/envoy:
   - name: envoy-unit-1.1
@@ -808,6 +788,9 @@ presubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/run-ci.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -815,14 +798,6 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
   - name: envoy-unit-2.0
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -841,6 +816,9 @@ presubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/run-ci.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -848,14 +826,6 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
   - name: envoy-unit-2.1
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -874,6 +844,9 @@ presubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/run-ci.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -881,14 +854,6 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
   - name: envoy-unit-2.2
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -907,6 +872,9 @@ presubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/run-ci.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -914,14 +882,6 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
   - name: envoy-unit-main
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -940,6 +900,9 @@ presubmits:
         imagePullPolicy: Always
         command:
         - ./maistra/run-ci.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
         resources:
           limits:
             memory: 16Gi
@@ -947,14 +910,6 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-        volumeMounts:
-        - name: bazel-cache
-          mountPath: /bazel-cache
-      volumes:
-      - name: bazel-cache
-        hostPath:
-          path: /mnt/bazel-cache
-          type: DirectoryOrCreate
 
   maistra/istio:
   - name: istio-unit-2.1
