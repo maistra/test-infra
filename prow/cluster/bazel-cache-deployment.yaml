@@ -13,6 +13,10 @@ spec:
       labels:
         app: bazel-cache
     spec:
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
       nodeSelector:
         kubernetes.io/hostname: prow-master-03 # This could be a proper label such as `role: bazel-cache`
 
