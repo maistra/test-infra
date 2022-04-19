@@ -37,6 +37,7 @@ spec:
         image: gcr.io/k8s-prow/tide:v20220418-5b1d25764f
         args:
         - --dry-run=false
+        - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --config-path=/etc/config/config.yaml
         - --github-token-path=/etc/github/oauth

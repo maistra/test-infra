@@ -45,6 +45,7 @@ spec:
         - --hook-url=http://hook:8888/plugin-help
         - --config-path=/etc/config/config.yaml
         - --github-token-path=/etc/github/oauth
+        - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --cookie-secret=/etc/cookie/secret
         - --plugin-config=/etc/plugins/plugins.yaml
