@@ -4,7 +4,7 @@ FROM quay.io/centos/centos:stream8
 #   source scl_source enable gcc-toolset-9
 
 # Versions
-ENV K8S_TEST_INFRA_VERSION=aeeaba2bd2
+ENV K8S_TEST_INFRA_VERSION=5b1d25764f
 ENV GCLOUD_VERSION=312.0.0
 
 RUN dnf -y upgrade --refresh && \
