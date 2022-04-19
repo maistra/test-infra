@@ -34,7 +34,7 @@ spec:
       serviceAccountName: "tide" # Uncomment for use with RBAC
       containers:
       - name: tide
-        image: gcr.io/k8s-prow/tide:v20220216-aeeaba2bd2
+        image: gcr.io/k8s-prow/tide:v20220418-5b1d25764f
         args:
         - --dry-run=false
         - --github-endpoint=https://api.github.com
