@@ -32,6 +32,7 @@ tide:
     - maistra/header-append-filter
     - maistra/api
     - maistra/xns-informer
+    - maistra/jwt_verify_lib
     - dgn/oidc-filter
     labels:
     - "okay to merge"

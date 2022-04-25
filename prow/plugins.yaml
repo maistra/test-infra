@@ -119,6 +119,12 @@ plugins:
     - trigger
     - hold
     - wip
+  maistra/jwt_verify_lib:
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
 
   dgn/oidc-filter:
     plugins:
