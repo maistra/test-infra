@@ -590,6 +590,66 @@ postsubmits:
           requests:
             cpu: "2"
             memory: 1Gi
+  ### Merge conflict detection jobs
+  - name: on_default_branch_change
+    labels:
+      trigger-on-default-branch-change: "true"
+      preset-conflict-resolution: "true"
+    decorate: true
+    decoration_config:
+      skip_cloning: true
+    skip_submodules: true
+    always_run: false 
+    spec:
+      containers:
+      - image: quay.io/maistra-dev/prow-propagate-patches:latest
+        imagePullPolicy: Always         
+        command: ["propagate-patches"]
+        args:
+          - "--repo=github.com/maistra/istio"
+          - "--patchset=github.com/maistra/patchset-maistra-istio"   
+  - name: patchset-updater
+    labels:
+      preset-conflict-resolution: "true"
+    decorate: true
+    decoration_config:
+      skip_cloning: true
+    always_run: true
+    optional: false
+    skip_submodules: true
+    branches:
+      - ^maistra-.*$
+    spec:
+      containers:
+        - image: "quay.io/maistra-dev/prow-create-patches:latest"
+          imagePullPolicy: Always            
+          command: ["create-patches"]
+          args:
+          - "--repo=github.com/maistra/istio"
+          - "--patchset=github.com/maistra/patchset-maistra-istio"
+          - "--main=maistra"
+          - "--dev=maistra-2.2"             
+  - name: patchset-verifier
+    labels:
+      preset-conflict-resolution: "true"
+    decorate: true
+    decoration_config:
+      skip_cloning: true
+    always_run: true
+    optional: false
+    skip_submodules: true
+    branches:
+      - ^maistra$
+    spec:
+      containers:
+        - image: "quay.io/maistra-dev/prow-check-conflicts:latest"
+          imagePullPolicy: Always           
+          command: ["check-conflicts"]
+          args:
+          - "--repo=github.com/maistra/istio"
+          - "--patchset=github.com/maistra/patchset-maistra-istio"
+          - "--main=maistra"
+          - "--dev=maistra-2.2"
 
   maistra/istio-operator:
   - name: update-charts-in-2.1
@@ -859,6 +919,19 @@ presets:
       secretKeyRef:
         name: aws
         key: QUAY_PULL_SECRET
+
+- labels:
+    preset-conflict-resolution: "true"
+  env:
+   - name: GIT_USER
+     value: "bartoszmajsak" # TODO is there env var for maistra-bot?
+   - name: GIT_EMAIL
+     value: "bartoszmajsak@gmail.com" # TODO is there env var for maistra-bot?
+   - name: GITHUB_TOKEN
+     valueFrom:
+       secretKeyRef:
+         name: github-token
+         key: github-token
 
 presubmits:
   maistra/maistra.github.io:
@@ -2477,6 +2550,40 @@ presubmits:
           path: /sys/fs/cgroup
           type: Directory
         name: cgroup
+
+  - name: patch-fix-validation
+    trigger: "(?m)^/resolved"
+    rerun_command: "/resolved"
+    decorate: true
+    always_run: false
+    optional: false
+    labels:
+      preset-conflict-resolution: "true"
+    spec:
+      containers:
+        - image: "quay.io/maistra-dev/prow-validate-resolution:latest"
+          imagePullPolicy: Always           
+          command: ["validate-resolution"]
+          args:
+            - "--repo=github.com/maistra/istio"
+            - "--patchset=github.com/maistra/patchset-maistra-istio"
+  - name: skip-patch
+    trigger: "(?m)^/skip-patch"
+    rerun_command: "/skip-patch"
+    decorate: true
+    always_run: false
+    optional: false
+    labels:
+      preset-conflict-resolution: "true"
+    spec:
+      containers:
+        - image: "quay.io/maistra-dev/prow-validate-resolution:latest"
+          imagePullPolicy: Always            
+          command: ["validate-resolution"]
+          args:
+            - "--repo=github.com/maistra/istio"
+            - "--patchset=github.com/maistra/patchset-maistra-istio"
+            - "--skip-patch"
 
   maistra/header-append-filter:
   - name: header-append-filter_build-containers

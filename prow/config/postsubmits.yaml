@@ -524,7 +524,7 @@ postsubmits:
           - "--repo=github.com/maistra/istio"
           - "--patchset=github.com/maistra/patchset-maistra-istio"
           - "--main=maistra"
-          - "--dev=maistra-2.2" ## TODO how to get the branch name?              
+          - "--dev=maistra-2.2"             
   - name: patchset-verifier
     labels:
       preset-conflict-resolution: "true"
@@ -545,7 +545,7 @@ postsubmits:
           - "--repo=github.com/maistra/istio"
           - "--patchset=github.com/maistra/patchset-maistra-istio"
           - "--main=maistra"
-          - "--dev=maistra-2.2" ## TODO how to get the branch name?
+          - "--dev=maistra-2.2"
 
   maistra/istio-operator:
   - name: update-charts-in-2.1
