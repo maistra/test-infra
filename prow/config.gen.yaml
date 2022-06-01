@@ -608,6 +608,13 @@ postsubmits:
         args:
           - "--repo=github.com/maistra/istio"
           - "--patchset=github.com/maistra/patchset-maistra-istio"   
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: "4"
+          requests:
+            cpu: "2"
+            memory: 2Gi
   - name: patchset-updater
     labels:
       preset-conflict-resolution: "true"
@@ -627,7 +634,14 @@ postsubmits:
           - "--repo=github.com/maistra/istio"
           - "--patchset=github.com/maistra/patchset-maistra-istio"
           - "--main=maistra"
-          - "--dev=maistra-2.2"             
+          - "--dev=maistra-2.2" 
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: "4"
+            requests:
+              cpu: "2"
+              memory: 2Gi            
   - name: patchset-verifier
     labels:
       preset-conflict-resolution: "true"
@@ -648,6 +662,13 @@ postsubmits:
           - "--patchset=github.com/maistra/patchset-maistra-istio"
           - "--main=maistra"
           - "--dev=maistra-2.2"
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: "4"
+            requests:
+              cpu: "2"
+              memory: 2Gi
 
   maistra/istio-operator:
   - name: update-charts-in-2.1
@@ -2564,6 +2585,13 @@ presubmits:
           args:
             - "--repo=github.com/maistra/istio"
             - "--patchset=github.com/maistra/patchset-maistra-istio"
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: "4"
+            requests:
+              cpu: "2"
+              memory: 2Gi
   - name: skip-patch
     trigger: "(?m)^/skip-patch"
     rerun_command: "/skip-patch"
@@ -2580,6 +2608,13 @@ presubmits:
             - "--repo=github.com/maistra/istio"
             - "--patchset=github.com/maistra/patchset-maistra-istio"
             - "--skip-patch"
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: "4"
+            requests:
+              cpu: "2"
+              memory: 2Gi
 
   maistra/header-append-filter:
   - name: header-append-filter_build-containers
