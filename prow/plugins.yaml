@@ -139,6 +139,10 @@ external_plugins:
     events:
       - issue_comment
       - pull_request
+  - name: patch-propagator
+    endpoint: http://prow-patch-propagator
+    events:
+      - repository
       
   maistra-prow-testing:
   - name: cherrypicker
