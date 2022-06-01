@@ -103,3 +103,16 @@ presets:
       secretKeyRef:
         name: aws
         key: QUAY_PULL_SECRET
+
+- labels:
+    preset-conflict-resolution: "true"
+  env:
+   - name: GIT_USER
+     value: "bartoszmajsak" # TODO is there env var for maistra-bot?
+   - name: GIT_EMAIL
+     value: "bartoszmajsak@gmail.com" # TODO is there env var for maistra-bot?
+   - name: GITHUB_TOKEN
+     valueFrom:
+       secretKeyRef:
+         name: github-token
+         key: github-token

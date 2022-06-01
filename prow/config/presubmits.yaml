@@ -1616,6 +1616,40 @@ presubmits:
           type: Directory
         name: cgroup
 
+  - name: patch-fix-validation
+    trigger: "(?m)^/resolved"
+    rerun_command: "/resolved"
+    decorate: true
+    always_run: false
+    optional: false
+    labels:
+      preset-conflict-resolution: "true"
+    spec:
+      containers:
+        - image: "quay.io/maistra-dev/prow-validate-resolution:latest"
+          imagePullPolicy: Always           
+          command: ["validate-resolution"]
+          args:
+            - "--repo=github.com/maistra/istio"
+            - "--patchset=github.com/maistra/patchset-maistra-istio"
+  - name: skip-patch
+    trigger: "(?m)^/skip-patch"
+    rerun_command: "/skip-patch"
+    decorate: true
+    always_run: false
+    optional: false
+    labels:
+      preset-conflict-resolution: "true"
+    spec:
+      containers:
+        - image: "quay.io/maistra-dev/prow-validate-resolution:latest"
+          imagePullPolicy: Always            
+          command: ["validate-resolution"]
+          args:
+            - "--repo=github.com/maistra/istio"
+            - "--patchset=github.com/maistra/patchset-maistra-istio"
+            - "--skip-patch"
+
   maistra/header-append-filter:
   - name: header-append-filter_build-containers
     decorate: true

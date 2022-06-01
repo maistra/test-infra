@@ -486,6 +486,66 @@ postsubmits:
           requests:
             cpu: "2"
             memory: 1Gi
+  ### Merge conflict detection jobs
+  - name: on_default_branch_change
+    labels:
+      trigger-on-default-branch-change: "true"
+      preset-conflict-resolution: "true"
+    decorate: true
+    decoration_config:
+      skip_cloning: true
+    skip_submodules: true
+    always_run: false 
+    spec:
+      containers:
+      - image: quay.io/maistra-dev/prow-propagate-patches:latest
+        imagePullPolicy: Always         
+        command: ["propagate-patches"]
+        args:
+          - "--repo=github.com/maistra/istio"
+          - "--patchset=github.com/maistra/patchset-maistra-istio"   
+  - name: patchset-updater
+    labels:
+      preset-conflict-resolution: "true"
+    decorate: true
+    decoration_config:
+      skip_cloning: true
+    always_run: true
+    optional: false
+    skip_submodules: true
+    branches:
+      - ^maistra-.*$
+    spec:
+      containers:
+        - image: "quay.io/maistra-dev/prow-create-patches:latest"
+          imagePullPolicy: Always            
+          command: ["create-patches"]
+          args:
+          - "--repo=github.com/maistra/istio"
+          - "--patchset=github.com/maistra/patchset-maistra-istio"
+          - "--main=maistra"
+          - "--dev=maistra-2.2" ## TODO how to get the branch name?              
+  - name: patchset-verifier
+    labels:
+      preset-conflict-resolution: "true"
+    decorate: true
+    decoration_config:
+      skip_cloning: true
+    always_run: true
+    optional: false
+    skip_submodules: true
+    branches:
+      - ^maistra$
+    spec:
+      containers:
+        - image: "quay.io/maistra-dev/prow-check-conflicts:latest"
+          imagePullPolicy: Always           
+          command: ["check-conflicts"]
+          args:
+          - "--repo=github.com/maistra/istio"
+          - "--patchset=github.com/maistra/patchset-maistra-istio"
+          - "--main=maistra"
+          - "--dev=maistra-2.2" ## TODO how to get the branch name?
 
   maistra/istio-operator:
   - name: update-charts-in-2.1
