@@ -615,7 +615,6 @@ postsubmits:
     decoration_config:
       skip_cloning: true
     always_run: true
-    optional: false
     skip_submodules: true
     branches:
       - ^maistra-.*$
@@ -636,7 +635,6 @@ postsubmits:
     decoration_config:
       skip_cloning: true
     always_run: true
-    optional: false
     skip_submodules: true
     branches:
       - ^maistra$
@@ -2556,7 +2554,6 @@ presubmits:
     rerun_command: "/resolved"
     decorate: true
     always_run: false
-    optional: false
     labels:
       preset-conflict-resolution: "true"
     spec:
@@ -2572,7 +2569,6 @@ presubmits:
     rerun_command: "/skip-patch"
     decorate: true
     always_run: false
-    optional: false
     labels:
       preset-conflict-resolution: "true"
     spec:
