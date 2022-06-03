@@ -1373,6 +1373,249 @@ presubmits:
       - emptyDir: {}
         name: varlibdocker
 
+  - name: istio-unit-maistra
+    trigger: (?m)^/test( | .* )unit,?($|\s.*)
+    decorate: true
+    always_run: true
+    path_alias: istio.io/istio
+    skip_report: false
+    max_concurrency: 2
+    branches:
+      - ^maistra$
+    rerun_command: /test unit
+    spec:
+      containers:
+      - image: "gcr.io/istio-testing/build-tools:master-2022-05-23T15-41-52"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        command:
+        - entrypoint
+        - make
+        - -e
+        - T=-v
+        - build
+        - racetest
+        - binaries-test
+        env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        # FIXME: Uncomment this when we have our 2.2 proxy in place
+        # - name: ISTIO_ENVOY_BASE_URL
+        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
+        resources:
+          limits:
+            memory: 24Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
+  - name: istio-lint-maistra
+    trigger: (?m)^/test( | .* )lint,?($|\s.*)
+    decorate: true
+    always_run: true
+    path_alias: istio.io/istio
+    skip_report: false
+    max_concurrency: 2
+    branches:
+      - ^maistra$
+    rerun_command: /test lint
+    spec:
+      containers:
+      - image: "gcr.io/istio-testing/build-tools:master-2022-05-23T15-41-52"
+        imagePullPolicy: Always
+        command:
+        - make
+        - lint
+        env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        # FIXME: Uncomment this when we have our 2.2 proxy in place
+        # - name: ISTIO_ENVOY_BASE_URL
+        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
+        resources:
+          limits:
+            memory: 24Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
+  - name: istio-gencheck-maistra
+    trigger: (?m)^/test( | .* )gencheck,?($|\s.*)
+    decorate: true
+    always_run: true
+    path_alias: istio.io/istio
+    skip_report: false
+    max_concurrency: 2
+    branches:
+      - ^maistra$
+    rerun_command: /test gencheck
+    spec:
+      containers:
+      - image: "gcr.io/istio-testing/build-tools:master-2022-05-23T15-41-52"
+        imagePullPolicy: Always
+        command:
+        - make
+      # TODO: uncomment once it's back on the branch
+      # - maistra-gen-k8s-client
+        - gen-check
+        env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        # FIXME: Uncomment this when we have our 2.2 proxy in place
+        # - name: ISTIO_ENVOY_BASE_URL
+        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
+  - name: istio-integration-maistra
+    trigger: (?m)^/test( | .* )integration,?($|\s.*)
+    rerun_command: /test integration
+    skip_report: false
+    max_concurrency: 2
+    always_run: true
+    branches:
+    - ^maistra$
+    decorate: true
+    path_alias: istio.io/istio
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - prow/integ-suite-kind.sh
+        - test.integration.kube.presubmit
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: INTEGRATION_TEST_FLAGS
+          value: ' --istio.test.retries=1 '
+        # FIXME: Uncomment this when we have our proxy in place
+        # - name: ISTIO_ENVOY_BASE_URL
+        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
+
+        image: "gcr.io/istio-testing/build-tools:master-2022-05-20T20-45-15"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
+        resources:
+          limits:
+            memory: 24Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
+      - emptyDir: {}
+        name: varlibdocker
+
+  - name: istio-integration-maistra-mc
+    trigger: (?m)^/test( | .* )integration\-maistra\-mc,?($|\s.*)
+    rerun_command: /test integration-maistra-mc
+    skip_report: false
+    max_concurrency: 2
+    always_run: true
+    branches:
+    - ^maistra$
+    decorate: true
+    path_alias: istio.io/istio
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - prow/integ-suite-kind.sh
+        - --topology
+        - MULTICLUSTER
+        - test.integration.kube
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: INTEGRATION_TEST_FLAGS
+          value: ' --istio.test.retries=1 '
+        # FIXME: Uncomment this when we have our 2.2 proxy in place
+        # - name: ISTIO_ENVOY_BASE_URL
+        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
+        - name: TEST_SELECT
+          value: -postsubmit,-flaky,+multicluster
+        image: "gcr.io/istio-testing/build-tools:master-2022-05-20T20-45-15"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
+        resources:
+          limits:
+            memory: 24Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
+      - emptyDir: {}
+        name: varlibdocker
+
   - name: istio-unit-2.0
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
