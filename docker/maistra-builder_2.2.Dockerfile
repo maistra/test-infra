@@ -66,7 +66,8 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
     dnf -y copr enable jwendell/emsdk && \
     dnf -y module reset ruby nodejs && dnf -y module enable ruby:2.7 nodejs:12 && dnf -y module install ruby nodejs && \
     dnf -y install --nodocs --setopt=install_weak_deps=False \
-                   git make libtool patch which ninja-build golang xz redhat-rpm-config \
+                   git make libtool patch which ninja-build xz redhat-rpm-config \
+                   go-toolset-0:1.17.5-1.module_el8.6.0+1052+72a6db00 \
                    autoconf automake libtool cmake python2 python3 libstdc++-static \
                    gcc-toolset-9 gcc-toolset-9-libatomic-devel gcc-toolset-9-annobin gcc-toolset-9-libasan-devel \
                    java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
@@ -172,9 +173,10 @@ RUN curl -sfL https://storage.googleapis.com/kubernetes-release/release/${KUBECT
     chmod +x /usr/local/bin/kubectl
 
 # Docs
-RUN curl -sfL https://install.goreleaser.com/github.com/ValeLint/vale.sh -o ./vale.sh && \
-    chmod +x ./vale.sh && ./vale.sh -b /usr/local/bin ${VALE_VERSION} && \
-    rm -rf ./vale.sh /root/* /root/.cache /tmp/*
+#FIXME: Vale is not working
+# RUN curl -sfL https://install.goreleaser.com/github.com/ValeLint/vale.sh -o ./vale.sh && \
+#     chmod +x ./vale.sh && ./vale.sh -b /usr/local/bin ${VALE_VERSION} && \
+#     rm -rf ./vale.sh /root/* /root/.cache /tmp/*
 
 # Protoc
 RUN curl -sfLO https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
