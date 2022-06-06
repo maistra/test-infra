@@ -119,9 +119,10 @@ RUN curl -Lo /usr/local/bin/kind https://github.com/kubernetes-sigs/kind/release
     chmod +x /usr/local/bin/kind
 
 # Docs
-RUN curl -sfL https://install.goreleaser.com/github.com/ValeLint/vale.sh -o ./vale.sh && \
-    chmod +x ./vale.sh && ./vale.sh -b /usr/local/bin ${VALE_VERSION} && \
-    rm -f ./vale.sh
+#FIXME: Vale is not working
+# RUN curl -sfL https://install.goreleaser.com/github.com/ValeLint/vale.sh -o ./vale.sh && \
+#     chmod +x ./vale.sh && ./vale.sh -b /usr/local/bin ${VALE_VERSION} && \
+#     rm -f ./vale.sh
 
 # Protoc
 RUN curl -sfLO https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
