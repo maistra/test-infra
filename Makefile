@@ -14,7 +14,7 @@ ${BUILD_IMAGE}.push: ${BUILD_IMAGE}
 	$(CONTAINER_CLI) push --all-tags ${HUB}/${BUILD_IMAGE}
 
 BUILD_PROXY_IMAGE = maistra-proxy-builder
-BUILD_PROXY_IMAGE_VERSIONS = $(BUILD_PROXY_IMAGE)_2.1 $(BUILD_PROXY_IMAGE)_2.0 $(BUILD_PROXY_IMAGE)_1.1
+BUILD_PROXY_IMAGE_VERSIONS = $(BUILD_PROXY_IMAGE)_2.1 $(BUILD_PROXY_IMAGE)_2.0
 
 ${BUILD_PROXY_IMAGE}: $(BUILD_PROXY_IMAGE_VERSIONS)
 
@@ -41,9 +41,6 @@ lint:
 	checkconfig -strict -config-path prow/config.gen.yaml -plugin-config prow/plugins.yaml
 	@scripts/check-resource-limits.sh
 
-# this will build the containers and then try to use them to build themselves again, making sure we didn't break docker support
-build-containers: maistra-builder
-	$(CONTAINER_CLI) run --privileged -v ${PWD}:/work --workdir /work  --entrypoint entrypoint ${HUB}/maistra-builder:2.3 make maistra-builder_2.3
-	$(CONTAINER_CLI) run --privileged -v ${PWD}:/work --workdir /work  --entrypoint entrypoint ${HUB}/maistra-builder:2.2 make maistra-builder_2.2
-
-build-proxy-containers: maistra-proxy-builder
+# these will build the containers and then try to use them to build themselves again, making sure we didn't break docker support
+build-containers-%: ${BUILD_IMAGE}_%
+	$(CONTAINER_CLI) run --privileged -v ${PWD}:/work --workdir /work  --entrypoint entrypoint ${HUB}/maistra-builder:$* make maistra-builder_$*
