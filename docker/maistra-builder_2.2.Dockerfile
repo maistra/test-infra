@@ -57,6 +57,7 @@ ENV CI prow
 WORKDIR /root
 
 # Install all dependencies available in RPM repos
+# Stick with clang 13, the default version got bumped to 14.
 RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo && \
     dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core && \
@@ -71,7 +72,8 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    autoconf automake libtool cmake python2 python3 libstdc++-static \
                    gcc-toolset-9 gcc-toolset-9-libatomic-devel gcc-toolset-9-annobin gcc-toolset-9-libasan-devel \
                    java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
-                   clang llvm lld compiler-rt ruby-devel zlib-devel openssl-devel python2-setuptools \
+                   ruby-devel zlib-devel openssl-devel python2-setuptools \
+                   clang-0:13.0.0-3.module_el8.6.0+1074+380cef3f llvm-0:13.0.0-3.module_el8.6.0+1029+6594c364 lld-0:13.0.0-2.module_el8.6.0+1064+393664b9 compiler-rt-0:13.0.0-1.module_el8.6.0+1029+6594c364 \
                    binaryen emsdk docker-ce python3-pip rubygems npm rpm-build && \
     dnf -y clean all
 
