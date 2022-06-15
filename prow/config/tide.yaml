@@ -4,6 +4,7 @@ github_reporter:
   - postsubmit
 
 tide:
+  blocker_label: merge-blocker
   rebase_label: "don't squash"
   merge_label: "merge strategy"
   merge_method:
