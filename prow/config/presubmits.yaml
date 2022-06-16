@@ -901,6 +901,34 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+  - name: proxy-unit-2.3
+    trigger: (?m)^/test( | .* )unit,?($|\s.*)
+    decorate: true
+    decoration_config:
+      timeout: 8h0m0s
+    always_run: true
+    path_alias: istio.io/proxy
+    skip_report: false
+    max_concurrency: 1
+    branches:
+      - ^maistra-2.3$
+    rerun_command: /test unit
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
+        imagePullPolicy: Always
+        command:
+        - ./maistra/ci/pre-submit.sh
+        env:
+        - name: BAZEL_REMOTE_CACHE
+          value: http://bazel-cache.default/cache
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "8"
+          requests:
+            cpu: "4"
+            memory: 4Gi
 
   maistra/envoy:
   - name: envoy-unit-1.1
