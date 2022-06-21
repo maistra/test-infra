@@ -50,10 +50,6 @@ ENV GOSUMDB=sum.golang.org
 ENV GOPATH=/go
 ENV GOCACHE=/gocache
 
-# Set CI variable which can be checked by test scripts to verify
-# if running in the continuous integration environment.
-ENV CI prow
-
 WORKDIR /root
 
 # Install all dependencies available in RPM repos
