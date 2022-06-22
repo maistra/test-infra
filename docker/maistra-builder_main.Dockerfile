@@ -43,10 +43,6 @@ ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GO111MODULE=on
 ENV GOBIN=/usr/local/bin
 
-# Set CI variable which can be checked by test scripts to verify
-# if running in the continuous integration environment.
-ENV CI prow
-
 WORKDIR /root
 
 # Install all dependencies available in RPM repos
