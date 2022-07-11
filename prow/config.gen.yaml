@@ -643,12 +643,9 @@ postsubmits:
     path_alias: maistra.io/istio-operator
     skip_report: false
     branches:
-    - ^maistra-1.0$
     - ^maistra-1.1$
     - ^maistra-2.0$
     - ^maistra-2.1$
-    # Allow for testing
-    - playground
     labels:
       preset-github: "true"
     extra_refs:
@@ -666,7 +663,55 @@ postsubmits:
         - -r istio-operator
         - -b maistra-2.2
         - -f /creds-github/github-token
-        - -c make clean update-1.0-charts update-1.1-charts update-2.0-charts update-2.1-charts
+        - -c make clean update-1.1-charts update-2.0-charts update-2.1-charts
+        - '-t Automator: Update charts from previous versions'
+        - -m update_charts_from_previous_versions
+        - -l auto-merge
+        env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: "4"
+          requests:
+            cpu: "2"
+            memory: 1Gi
+
+  - name: update-charts-in-2.3
+    decorate: true
+    path_alias: maistra.io/istio-operator
+    skip_report: false
+    branches:
+    - ^maistra-2.0$
+    - ^maistra-2.1$
+    - ^maistra-2.2$
+    # Allow for testing
+    - playground
+    labels:
+      preset-github: "true"
+    extra_refs:
+    - base_ref: main
+      org: maistra
+      path_alias: maistra.io/test-infra
+      repo: test-infra
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
+        imagePullPolicy: Always
+        command:
+        - ../test-infra/tools/automator.sh
+        - -o maistra
+        - -r istio-operator
+        - -b maistra-2.3
+        - -f /creds-github/github-token
+        - -c make clean update-2.0-charts update-2.1-charts update-2.2-charts
         - '-t Automator: Update charts from previous versions'
         - -m update_charts_from_previous_versions
         - -l auto-merge
