@@ -1583,7 +1583,7 @@ presubmits:
       - emptyDir: {}
         name: varlibdocker
 
-  - name: istio-unit-maistra
+  - name: istio-unit-main
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
     always_run: true
@@ -1591,7 +1591,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - ^maistra$
+      - ^maistra-main$
     rerun_command: /test unit
     spec:
       containers:
@@ -1627,7 +1627,7 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio-lint-maistra
+  - name: istio-lint-main
     trigger: (?m)^/test( | .* )lint,?($|\s.*)
     decorate: true
     always_run: true
@@ -1635,7 +1635,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - ^maistra$
+      - ^maistra-main$
     rerun_command: /test lint
     spec:
       containers:
@@ -1664,7 +1664,7 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio-gencheck-maistra
+  - name: istio-gencheck-main
     trigger: (?m)^/test( | .* )gencheck,?($|\s.*)
     decorate: true
     always_run: true
@@ -1672,7 +1672,7 @@ presubmits:
     skip_report: false
     max_concurrency: 2
     branches:
-      - ^maistra$
+      - ^maistra-main$
     rerun_command: /test gencheck
     spec:
       containers:
@@ -1703,14 +1703,14 @@ presubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: istio-integration-maistra
+  - name: istio-integration-main
     trigger: (?m)^/test( | .* )integration,?($|\s.*)
     rerun_command: /test integration
     skip_report: false
     max_concurrency: 2
     always_run: true
     branches:
-    - ^maistra$
+    - ^maistra-main$
     decorate: true
     path_alias: istio.io/istio
     spec:
@@ -1763,14 +1763,14 @@ presubmits:
       - emptyDir: {}
         name: varlibdocker
 
-  - name: istio-integration-maistra-mc
+  - name: istio-integration-main-mc
     trigger: (?m)^/test( | .* )integration\-maistra\-mc,?($|\s.*)
     rerun_command: /test integration-maistra-mc
     skip_report: false
     max_concurrency: 2
     always_run: true
     branches:
-    - ^maistra$
+    - ^maistra-main$
     decorate: true
     path_alias: istio.io/istio
     spec:
