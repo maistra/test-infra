@@ -1423,7 +1423,7 @@ presubmits:
       - main
     spec:
       containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.2"
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
         imagePullPolicy: Always
         command:
         - make
@@ -1444,7 +1444,7 @@ presubmits:
       - main
     spec:
       containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.2"
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
         imagePullPolicy: Always
         command:
         - make
