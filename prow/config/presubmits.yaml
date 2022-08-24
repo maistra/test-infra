@@ -534,11 +534,11 @@ presubmits:
         - lint
         resources:
           limits:
-            memory: 1Gi
-            cpu: "1"
+            memory: 4Gi
+            cpu: "4"
           requests:
-            cpu: "1"
-            memory: 1Gi
+            cpu: "4"
+            memory: 2Gi
 
   maistra/test-infra:
   - name: test-infra_lint
