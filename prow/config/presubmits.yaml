@@ -1618,7 +1618,7 @@ presubmits:
       containers:
         # FIXME: Using upstream for now, replace with our image
         # image: "quay.io/maistra-dev/maistra-builder:2.3"
-      - image: "gcr.io/istio-testing/build-tools:master-2022-05-23T15-41-52"
+      - image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -1664,7 +1664,7 @@ presubmits:
       containers:
         # FIXME: Using upstream for now, replace with our image
         # image: "quay.io/maistra-dev/maistra-builder:2.3"
-      - image: "gcr.io/istio-testing/build-tools:master-2022-05-23T15-41-52"
+      - image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
         imagePullPolicy: Always
         command:
         - make
@@ -1703,7 +1703,7 @@ presubmits:
       containers:
         # FIXME: Using upstream for now, replace with our image
         # image: "quay.io/maistra-dev/maistra-builder:2.3"
-      - image: "gcr.io/istio-testing/build-tools:master-2022-05-23T15-41-52"
+      - image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
         imagePullPolicy: Always
         command:
         - make
@@ -1759,7 +1759,7 @@ presubmits:
 
         # FIXME: Using upstream for now, replace with our image
         # image: "quay.io/maistra-dev/maistra-builder:2.3"
-        image: "gcr.io/istio-testing/build-tools:master-2022-05-20T20-45-15"
+        image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -1821,7 +1821,7 @@ presubmits:
 
         # FIXME: Using upstream for now, replace with our image
         # image: "quay.io/maistra-dev/maistra-builder:2.3"
-        image: "gcr.io/istio-testing/build-tools:master-2022-05-20T20-45-15"
+        image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -1883,7 +1883,7 @@ presubmits:
 
         # FIXME: Using upstream for now, replace with our image
         # image: "quay.io/maistra-dev/maistra-builder:2.3"
-        image: "gcr.io/istio-testing/build-tools:master-2022-05-20T20-45-15"
+        image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -1945,7 +1945,7 @@ presubmits:
 
         # FIXME: Using upstream for now, replace with our image
         # image: "quay.io/maistra-dev/maistra-builder:2.3"
-        image: "gcr.io/istio-testing/build-tools:master-2022-05-20T20-45-15"
+        image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -2007,7 +2007,7 @@ presubmits:
 
         # FIXME: Using upstream for now, replace with our image
         # image: "quay.io/maistra-dev/maistra-builder:2.3"
-        image: "gcr.io/istio-testing/build-tools:master-2022-05-20T20-45-15"
+        image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -2069,7 +2069,7 @@ presubmits:
 
         # FIXME: Using upstream for now, replace with our image
         # image: "quay.io/maistra-dev/maistra-builder:2.3"
-        image: "gcr.io/istio-testing/build-tools:master-2022-05-20T20-45-15"
+        image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -2135,7 +2135,7 @@ presubmits:
 
         # FIXME: Using upstream for now, replace with our image
         # image: "quay.io/maistra-dev/maistra-builder:2.3"
-        image: "gcr.io/istio-testing/build-tools:master-2022-05-20T20-45-15"
+        image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
         imagePullPolicy: Always
         securityContext:
           privileged: true
