@@ -58,8 +58,7 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
     dnf -y install dnf-plugins-core && \
     dnf -y config-manager --set-enabled powertools && \
     dnf -y install epel-release epel-next-release && \
-    dnf -y copr enable jwendell/binaryen && \
-    dnf -y copr enable jwendell/emsdk && \
+    dnf -y copr enable @maistra/istio-2.3 centos-stream-8-x86_64 && \
     dnf -y module reset ruby nodejs python38 && dnf -y module enable ruby:2.7 nodejs:12 python38 && dnf -y module install ruby nodejs python38 && \
     dnf -y install --nodocs --setopt=install_weak_deps=False \
                    git make libtool patch which ninja-build golang xz redhat-rpm-config \
