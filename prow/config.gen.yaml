@@ -47,6 +47,13 @@ deck:
         name: podinfo
       required_files:
       - podinfo.json
+  rerun_auth_configs:
+    '*':
+      github_team_slugs:
+      - org: maistra
+        slug: istio
+      - org: maistra
+        slug: envoy
 
 
 plank:
