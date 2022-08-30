@@ -3588,6 +3588,50 @@ presubmits:
     trigger: "(?m)^/test lint"
     rerun_command: "/test lint"
 
+  maistra/istio-images-centos:
+  - name: istio-images_lint-2.2
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/istio-images-centos
+    skip_report: false
+    branches:
+      - ^maistra-2.2$
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.2"
+        imagePullPolicy: Always
+        command:
+        - make
+        - lint
+        resources:
+          limits:
+            memory: 1Gi
+            cpu: "1"
+          requests:
+            cpu: "1"
+            memory: 1Gi
+  - name: istio-images_lint-2.3
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/istio-images-centos
+    skip_report: false
+    branches:
+      - ^maistra-2.3$
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
+        imagePullPolicy: Always
+        command:
+        - make
+        - lint
+        resources:
+          limits:
+            memory: 1Gi
+            cpu: "1"
+          requests:
+            cpu: "1"
+            memory: 1Gi
+
   dgn/oidc-filter:
   - name: build
     decorate: true
@@ -3753,49 +3797,6 @@ presubmits:
           requests:
             cpu: "2"
             memory: 2Gi
-
-  - name: istio-images_lint-2.2
-    decorate: true
-    always_run: true
-    path_alias: github.com/maistra/istio-images-centos
-    skip_report: false
-    branches:
-      - ^maistra-2.2$
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.2"
-        imagePullPolicy: Always
-        command:
-        - make
-        - lint
-        resources:
-          limits:
-            memory: 1Gi
-            cpu: "1"
-          requests:
-            cpu: "1"
-            memory: 1Gi
-  - name: istio-images_lint-2.3
-    decorate: true
-    always_run: true
-    path_alias: github.com/maistra/istio-images-centos
-    skip_report: false
-    branches:
-      - ^maistra-2.3$
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.3"
-        imagePullPolicy: Always
-        command:
-        - make
-        - lint
-        resources:
-          limits:
-            memory: 1Gi
-            cpu: "1"
-          requests:
-            cpu: "1"
-            memory: 1Gi
 
 prowjob_namespace: default
 pod_namespace: test-pods
