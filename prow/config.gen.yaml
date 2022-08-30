@@ -3753,7 +3753,8 @@ presubmits:
           requests:
             cpu: "2"
             memory: 2Gi
-
+  
+  maistra/istio-images-centos:
   - name: istio-images_lint-2.2
     decorate: true
     always_run: true
