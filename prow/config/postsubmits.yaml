@@ -157,6 +157,40 @@ postsubmits:
     skip_report: false
     branches:
       - ^maistra-2.2$
+    labels:
+      preset-github: "true"
+    extra_refs:
+    - base_ref: main
+      org: maistra
+      path_alias: maistra.io/test-infra
+      repo: test-infra
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.2"
+        imagePullPolicy: Always
+        command:
+        - ../test-infra/tools/automator.sh
+        - -o maistra
+        - -f /creds-github/github-token
+        - -r proxy
+        - -c make maistra-update-everything
+        - '-t Automator: Update Envoy and dependencies'
+        - -l auto-merge
+        - -m bump-envoy
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: "4"
+          requests:
+            cpu: "2"
+            memory: 1Gi
+
+  - name: envoy-update-proxy-2.3
+    decorate: true
+    path_alias: maistra.io/envoy
+    skip_report: false
+    branches:
+      - ^maistra-2.3$
       # Allow for testing
       - playground
     labels:
@@ -168,7 +202,7 @@ postsubmits:
       repo: test-infra
     spec:
       containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.2"
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
         imagePullPolicy: Always
         command:
         - ../test-infra/tools/automator.sh
