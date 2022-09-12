@@ -54,6 +54,7 @@ WORKDIR /root
 
 # Install all dependencies available in RPM repos
 RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo && \
+    curl -sfL https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
     dnf -y upgrade --refresh && \
     dnf -y install dnf-plugins-core && \
     dnf -y config-manager --set-enabled powertools && \
@@ -66,7 +67,7 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
                    ruby-devel zlib-devel openssl-devel python2-setuptools \
                    clang llvm lld compiler-rt libatomic \
-                   binaryen emsdk docker-ce rubygems npm rpm-build && \
+                   binaryen emsdk docker-ce rubygems npm yarn rpm-build && \
     dnf -y clean all
 
 # Build and install a bunch of Go tools
@@ -177,10 +178,6 @@ RUN curl -sfLO https://github.com/protocolbuffers/protobuf/releases/download/v${
     unzip protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
     mv bin/protoc /usr/local/bin && \
     rm -rf /root/* /root/.cache /tmp/*
-
-# Yarn
-RUN npm install --global yarn && \
-    rm -rf /root/* /root/.cache /root/.npm /tmp/*
 
 # Promu
 RUN curl -sfLO https://github.com/prometheus/promu/releases/download/v${PROMU_VERSION}/promu-${PROMU_VERSION}.linux-amd64.tar.gz && \
