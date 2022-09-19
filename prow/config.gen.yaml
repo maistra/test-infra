@@ -3695,10 +3695,11 @@ presubmits:
             cpu: "1"
             memory: 1Gi
 
-  - name: xns-informers_unittests-2.1
+  maistra/xns-informer:
+  - name: xns-informer_unittests-2.1
     decorate: true
     always_run: true
-    path_alias: github.com/maistra/xns-informers
+    path_alias: github.com/maistra/xns-informer
     skip_report: false
     branches:
       - ^maistra-2.1$
@@ -3721,10 +3722,10 @@ presubmits:
           requests:
             cpu: "1"
             memory: 1Gi
-  - name: xns-informers_gen-check-2.1
+  - name: xns-informer_gen-check-2.1
     decorate: true
     always_run: true
-    path_alias: github.com/maistra/xns-informers
+    path_alias: github.com/maistra/xns-informer
     skip_report: false
     branches:
       - ^maistra-2.1$
@@ -3748,10 +3749,10 @@ presubmits:
             cpu: "1"
             memory: 1Gi
 
-  - name: xns-informers_unittests-2.2
+  - name: xns-informer_unittests-2.2
     decorate: true
     always_run: true
-    path_alias: github.com/maistra/xns-informers
+    path_alias: github.com/maistra/xns-informer
     skip_report: false
     branches:
       - ^maistra-2.2$
@@ -3774,10 +3775,10 @@ presubmits:
           requests:
             cpu: "1"
             memory: 1Gi
-  - name: xns-informers_gen-check-2.2
+  - name: xns-informer_gen-check-2.2
     decorate: true
     always_run: true
-    path_alias: github.com/maistra/xns-informers
+    path_alias: github.com/maistra/xns-informer
     skip_report: false
     branches:
       - ^maistra-2.2$
@@ -3801,10 +3802,10 @@ presubmits:
             cpu: "1"
             memory: 1Gi
 
-  - name: xns-informers_unittests-2.3
+  - name: xns-informer_unittests-2.3
     decorate: true
     always_run: true
-    path_alias: github.com/maistra/xns-informers
+    path_alias: github.com/maistra/xns-informer
     skip_report: false
     branches:
       - ^maistra-2.3$
@@ -3827,10 +3828,10 @@ presubmits:
           requests:
             cpu: "1"
             memory: 1Gi
-  - name: xns-informers_gen-check-2.3
+  - name: xns-informer_gen-check-2.3
     decorate: true
     always_run: true
-    path_alias: github.com/maistra/xns-informers
+    path_alias: github.com/maistra/xns-informer
     skip_report: false
     branches:
       - ^maistra-2.3$
