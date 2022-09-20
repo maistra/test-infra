@@ -240,6 +240,59 @@ presubmits:
             cpu: "1"
             memory: 1Gi
 
+  - name: api_unittests-2.3
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/api
+    skip_report: false
+    branches:
+      - ^maistra-2.3$
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
+        imagePullPolicy: Always
+        command:
+        - make
+        - test
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "1"
+            memory: 1Gi
+  - name: api_gen-check-2.3
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/api
+    skip_report: false
+    branches:
+      - ^maistra-2.3$
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
+        imagePullPolicy: Always
+        command:
+        - make
+        - gen-check
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "1"
+            memory: 1Gi
+
   maistra/istio-operator:
   - name: istio-operator_unittests-1.1
     decorate: true
