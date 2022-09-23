@@ -1,0 +1,49 @@
+periodics:
+- name: push-istio-images-centos-2.2
+  decorate: true
+  cron: "00 03 * * *"  # Run at 3:00 UTC everyday
+  path_alias: github.com/maistra/istio-images-centos
+  branches:
+    - ^maistra-2.2$
+  labels:
+    preset-quay-pusher: "true"
+  spec:
+    containers:
+    - image: "quay.io/maistra-dev/maistra-builder:2.2"
+      imagePullPolicy: Always
+      command:
+      - ./create-images.sh
+      - -h quay.io/maistra
+      - -t 2.2.x-daily-$(date +%Y-%m-%d)
+      - -p
+      resources:
+        limits:
+          memory: 16Gi
+          cpu: "4"
+        requests:
+          cpu: "4"
+          memory: 4Gi
+- name: push-istio-images-centos-2.3
+  decorate: true
+  cron: "00 03 * * *"  # Run at 3:00 UTC everyday
+  path_alias: github.com/maistra/istio-images-centos
+  branches:
+    - ^maistra-2.3$
+  labels:
+    preset-quay-pusher: "true"
+  spec:
+    containers:
+    - image: "quay.io/maistra-dev/maistra-builder:2.3"
+      imagePullPolicy: Always
+      command:
+      - ./create-images.sh
+      - -h quay.io/maistra
+      - -t 2.3.x-daily-$(date +%Y-%m-%d)
+      - -p
+      resources:
+        limits:
+          memory: 16Gi
+          cpu: "4"
+        requests:
+          cpu: "4"
+          memory: 4Gi

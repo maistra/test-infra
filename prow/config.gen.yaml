@@ -55,7 +55,55 @@ deck:
       - org: maistra
         slug: envoy
 
-
+periodics:
+- name: push-istio-images-centos-2.2
+  decorate: true
+  cron: "00 03 * * *"  # Run at 3:00 UTC everyday
+  path_alias: github.com/maistra/istio-images-centos
+  branches:
+    - ^maistra-2.2$
+  labels:
+    preset-quay-pusher: "true"
+  spec:
+    containers:
+    - image: "quay.io/maistra-dev/maistra-builder:2.2"
+      imagePullPolicy: Always
+      command:
+      - ./create-images.sh
+      - -h quay.io/maistra
+      - -t 2.2.x-daily-$(date +%Y-%m-%d)
+      - -p
+      resources:
+        limits:
+          memory: 16Gi
+          cpu: "4"
+        requests:
+          cpu: "4"
+          memory: 4Gi
+- name: push-istio-images-centos-2.3
+  decorate: true
+  cron: "00 03 * * *"  # Run at 3:00 UTC everyday
+  path_alias: github.com/maistra/istio-images-centos
+  branches:
+    - ^maistra-2.3$
+  labels:
+    preset-quay-pusher: "true"
+  spec:
+    containers:
+    - image: "quay.io/maistra-dev/maistra-builder:2.3"
+      imagePullPolicy: Always
+      command:
+      - ./create-images.sh
+      - -h quay.io/maistra
+      - -t 2.3.x-daily-$(date +%Y-%m-%d)
+      - -p
+      resources:
+        limits:
+          memory: 16Gi
+          cpu: "4"
+        requests:
+          cpu: "4"
+          memory: 4Gi
 plank:
   job_url_prefix_config:
     '*': "https://prow.maistra.io/view/"
@@ -3726,6 +3774,27 @@ presubmits:
           requests:
             cpu: "1"
             memory: 1Gi
+  - name: istio-images_validate-2.2
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/istio-images-centos
+    skip_report: false
+    branches:
+      - ^maistra-2.2$
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.2"
+        imagePullPolicy: Always
+        command:
+        - ./create-images.sh
+        - -b
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 2Gi
   - name: istio-images_lint-2.3
     decorate: true
     always_run: true
@@ -3747,6 +3816,27 @@ presubmits:
           requests:
             cpu: "1"
             memory: 1Gi
+  - name: istio-images_validate-2.3
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/istio-images-centos
+    skip_report: false
+    branches:
+      - ^maistra-2.3$
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
+        imagePullPolicy: Always
+        command:
+        - ./create-images.sh
+        - -b
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 2Gi
 
   maistra/xns-informer:
   - name: xns-informer_unittests-2.1
