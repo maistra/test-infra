@@ -2,11 +2,12 @@ periodics:
 - name: push-istio-images-centos-2.2
   decorate: true
   cron: "00 03 * * *"  # Run at 3:00 UTC everyday
-  path_alias: github.com/maistra/istio-images-centos
-  branches:
-    - ^maistra-2.2$
   labels:
     preset-quay-pusher: "true"
+  extra_refs:
+  - org: maistra
+    repo: istio-images-centos
+    base_ref: maistra-2.2
   spec:
     containers:
     - image: "quay.io/maistra-dev/maistra-builder:2.2"
@@ -26,11 +27,12 @@ periodics:
 - name: push-istio-images-centos-2.3
   decorate: true
   cron: "00 03 * * *"  # Run at 3:00 UTC everyday
-  path_alias: github.com/maistra/istio-images-centos
-  branches:
-    - ^maistra-2.3$
   labels:
     preset-quay-pusher: "true"
+  extra_refs:
+  - org: maistra
+    repo: istio-images-centos
+    base_ref: maistra-2.3
   spec:
     containers:
     - image: "quay.io/maistra-dev/maistra-builder:2.3"
