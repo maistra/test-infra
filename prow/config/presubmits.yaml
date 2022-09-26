@@ -2804,6 +2804,50 @@ presubmits:
           requests:
             cpu: "1"
             memory: 1Gi
+  - name: istio-images_validate-2.2
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/istio-images-centos
+    skip_report: false
+    branches:
+      - ^maistra-2.2$
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.2"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - ./create-images.sh
+        - -b
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 2Gi
+  - name: istio-images_validate-2.3
+    decorate: true
+    always_run: true
+    path_alias: github.com/maistra/istio-images-centos
+    skip_report: false
+    branches:
+      - ^maistra-2.3$
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - ./create-images.sh
+        - -b
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 2Gi
 
   maistra/xns-informer:
   - name: xns-informer_unittests-2.1
