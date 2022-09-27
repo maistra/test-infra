@@ -3762,6 +3762,12 @@ presubmits:
         - entrypoint
         - ./create-images.sh
         - -b
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 4Gi
@@ -3769,6 +3775,10 @@ presubmits:
           requests:
             cpu: "4"
             memory: 2Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
+
   - name: istio-images_validate-2.3
     decorate: true
     always_run: true
@@ -3784,6 +3794,12 @@ presubmits:
         - entrypoint
         - ./create-images.sh
         - -b
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 4Gi
@@ -3791,6 +3807,9 @@ presubmits:
           requests:
             cpu: "4"
             memory: 2Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
 
   maistra/xns-informer:
   - name: xns-informer_unittests-2.1
