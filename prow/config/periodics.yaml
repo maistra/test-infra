@@ -1,5 +1,5 @@
 periodics:
-- name: push-istio-images-centos-2.2
+- name: daily-images-2.2
   decorate: true
   cron: "00 03 * * *"  # Run at 3:00 UTC everyday
   labels:
@@ -13,10 +13,17 @@ periodics:
     - image: "quay.io/maistra-dev/maistra-builder:2.2"
       imagePullPolicy: Always
       command:
+      - entrypoint
       - ./create-images.sh
-      - -h quay.io/maistra
-      - -t 2.2.x-daily-$(date +%Y-%m-%d)
+      - -hquay.io/maistra
+      - -tDAILY
       - -p
+      securityContext:
+        privileged: true
+      volumeMounts:
+      - mountPath: /var/lib/docker
+        name: varlibdocker
+        readOnly: false
       resources:
         limits:
           memory: 16Gi
@@ -24,9 +31,12 @@ periodics:
         requests:
           cpu: "4"
           memory: 4Gi
-- name: push-istio-images-centos-2.3
+    volumes:
+    - emptyDir: {}
+      name: varlibdocker
+- name: daily-images-2.3
   decorate: true
-  cron: "00 03 * * *"  # Run at 3:00 UTC everyday
+  cron: "00 04 * * *"  # Run at 4:00 UTC everyday
   labels:
     preset-quay-pusher: "true"
   extra_refs:
@@ -38,10 +48,17 @@ periodics:
     - image: "quay.io/maistra-dev/maistra-builder:2.3"
       imagePullPolicy: Always
       command:
+      - entrypoint
       - ./create-images.sh
-      - -h quay.io/maistra
-      - -t 2.3.x-daily-$(date +%Y-%m-%d)
+      - -hquay.io/maistra
+      - -tDAILY
       - -p
+      securityContext:
+        privileged: true
+      volumeMounts:
+      - mountPath: /var/lib/docker
+        name: varlibdocker
+        readOnly: false
       resources:
         limits:
           memory: 16Gi
@@ -49,3 +66,6 @@ periodics:
         requests:
           cpu: "4"
           memory: 4Gi
+    volumes:
+    - emptyDir: {}
+      name: varlibdocker
