@@ -13,6 +13,8 @@ tide:
   target_url: https://prow.maistra.io/tide
   context_options:
     from-branch-protection: true
+    # Treat unknown contexts as optional
+    skip-unknown-contexts: true
 
   queries:
 
