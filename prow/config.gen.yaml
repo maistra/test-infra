@@ -55,7 +55,77 @@ deck:
       - org: maistra
         slug: envoy
 
-
+periodics:
+- name: daily-images-2.2
+  decorate: true
+  cron: "00 03 * * *"  # Run at 3:00 UTC everyday
+  labels:
+    preset-quay-pusher: "true"
+  extra_refs:
+  - org: maistra
+    repo: istio-images-centos
+    base_ref: maistra-2.2
+  spec:
+    containers:
+    - image: "quay.io/maistra-dev/maistra-builder:2.2"
+      imagePullPolicy: Always
+      command:
+      - entrypoint
+      - ./create-images.sh
+      - -hquay.io/maistra
+      - -tDAILY
+      - -p
+      securityContext:
+        privileged: true
+      volumeMounts:
+      - mountPath: /var/lib/docker
+        name: varlibdocker
+        readOnly: false
+      resources:
+        limits:
+          memory: 16Gi
+          cpu: "4"
+        requests:
+          cpu: "4"
+          memory: 4Gi
+    volumes:
+    - emptyDir: {}
+      name: varlibdocker
+- name: daily-images-2.3
+  decorate: true
+  cron: "00 04 * * *"  # Run at 4:00 UTC everyday
+  labels:
+    preset-quay-pusher: "true"
+  extra_refs:
+  - org: maistra
+    repo: istio-images-centos
+    base_ref: maistra-2.3
+  spec:
+    containers:
+    - image: "quay.io/maistra-dev/maistra-builder:2.3"
+      imagePullPolicy: Always
+      command:
+      - entrypoint
+      - ./create-images.sh
+      - -hquay.io/maistra
+      - -tDAILY
+      - -p
+      securityContext:
+        privileged: true
+      volumeMounts:
+      - mountPath: /var/lib/docker
+        name: varlibdocker
+        readOnly: false
+      resources:
+        limits:
+          memory: 16Gi
+          cpu: "4"
+        requests:
+          cpu: "4"
+          memory: 4Gi
+    volumes:
+    - emptyDir: {}
+      name: varlibdocker
 plank:
   job_url_prefix_config:
     '*': "https://prow.maistra.io/view/"
