@@ -1,17 +1,17 @@
 FROM quay.io/centos/centos:stream8
 
 # Versions
-ENV ISTIO_TOOLS_SHA=release-1.12
-ENV KUBECTL_VERSION="v1.20.4"
-ENV HELM3_VERSION=v3.4.2
-ENV KIND_VERSION="v0.11.1"
+ENV ISTIO_TOOLS_SHA=release-1.14
+ENV KUBECTL_VERSION="v1.23.4"
+ENV HELM3_VERSION=v3.8.2
+ENV KIND_VERSION="v0.14.0"
 ENV AUTOPEP8_VERSION=1.4.4
 ENV GOLANGCI_LINT_VERSION=v1.44.0
-ENV HADOLINT_VERSION=v1.22.1
+ENV HADOLINT_VERSION=v2.10.0
 ENV MDL_VERSION=0.11.0
 ENV YAMLLINT_VERSION=1.24.2
 ENV GO_BINDATA_VERSION=v3.1.2
-ENV PROTOC_VERSION=3.18.0
+ENV PROTOC_VERSION=3.19.4
 ENV GOIMPORTS_VERSION=v0.1.0
 ENV GOGO_PROTOBUF_VERSION=v1.3.2
 ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
@@ -19,7 +19,7 @@ ENV K8S_CODE_GENERATOR_VERSION=1.23.4
 ENV LICENSEE_VERSION=9.15.1
 ENV GOLANG_PROTOBUF_VERSION=v1.27.1
 ENV FPM_VERSION=1.12.0
-ENV SHELLCHECK_VERSION=v0.7.1
+ENV SHELLCHECK_VERSION=v0.8.0
 ENV JUNIT_MERGER_VERSION=adf1545b49509db1f83c49d1de90bbcb235642a8
 ENV PROMU_VERSION=0.7.0
 ENV VALE_VERSION="v2.1.1"
@@ -27,16 +27,16 @@ ENV HTML_PROOFER_VERSION=3.19.0
 ENV COUNTERFEITER_VERSION=v6.2.3
 ENV PROTOTOOL_VERSION=v1.10.0
 ENV PROTOLOCK_VERSION=v0.14.0
-ENV PROTOC_GEN_VALIDATE_VERSION=v0.6.1
+ENV PROTOC_GEN_VALIDATE_VERSION=v0.6.7
 ENV PROTOC_GEN_GRPC_GATEWAY_VERSION=v1.8.6
 ENV JSONNET_VERSION=v0.15.0
 ENV JB_VERSION=v0.3.1
 ENV PROTOC_GEN_SWAGGER_VERSION=v1.8.6
 ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
 ENV BENCHSTAT_VERSION=9c9101da8316
-ENV GH_VERSION=2.3.0
+ENV GH_VERSION=2.10.1
 ENV K8S_TEST_INFRA_VERSION=b3a9f2479e
-ENV GCLOUD_VERSION=362.0.0
+ENV GCLOUD_VERSION=393.0.0
 ENV SU_EXEC_VERSION=0.2
 ENV BAZEL_VERSION=5.1.1
 
@@ -98,12 +98,13 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VE
     go install istio.io/tools/cmd/cue-gen@${ISTIO_TOOLS_SHA} && \
     go install istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} && \
     go install istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/protoc-gen-deepcopy@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/protoc-gen-jsonshim@${ISTIO_TOOLS_SHA} && \
+    go install istio.io/tools/cmd/protoc-gen-golang-deepcopy@${ISTIO_TOOLS_SHA} && \
+    go install istio.io/tools/cmd/protoc-gen-golang-jsonshim@${ISTIO_TOOLS_SHA} && \
     go install istio.io/tools/cmd/kubetype-gen@${ISTIO_TOOLS_SHA} && \
     go install istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} && \
     go install istio.io/tools/cmd/gen-release-notes@${ISTIO_TOOLS_SHA} && \
     \
+    go install -ldflags="-s -w" k8s.io/code-generator/cmd/applyconfiguration-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
     go install -ldflags="-s -w" k8s.io/code-generator/cmd/defaulter-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
     go install -ldflags="-s -w" k8s.io/code-generator/cmd/client-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
     go install -ldflags="-s -w" k8s.io/code-generator/cmd/lister-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
