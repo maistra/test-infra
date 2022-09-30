@@ -55,4 +55,4 @@ lint:
 
 # these will build the containers and then try to use them to build themselves again, making sure we didn't break docker support
 build-containers-%: ${BUILD_IMAGE}_%
-	$(CONTAINER_CLI) run --privileged -v ${PWD}:/work --workdir /work  --entrypoint entrypoint ${HUB}/maistra-builder:$* make maistra-builder_$*
+	$(CONTAINER_CLI) run --privileged -v ${PWD}:/work --workdir /work -v /var/lib/docker --entrypoint entrypoint ${HUB}/maistra-builder:$* make maistra-builder_$*
