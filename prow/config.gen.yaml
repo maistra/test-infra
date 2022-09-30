@@ -172,11 +172,11 @@ postsubmits:
             cpu: "2"
             memory: 1Gi
 
-  - name: test-infra_push-containers
+  - name: test-infra_push-containers-2.0
     decorate: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
-    run_if_changed: '^docker/maistra-builder_.*\.Dockerfile|^docker/scripts'
+    run_if_changed: '^docker/maistra-builder_2\.0\.Dockerfile|^docker/scripts'
     branches:
       - main
     labels:
@@ -189,7 +189,7 @@ postsubmits:
         command:
         - entrypoint
         - make
-        - maistra-builder.push
+        - maistra-builder_2.0.push
         securityContext:
           privileged: true
         resources:
@@ -200,11 +200,95 @@ postsubmits:
             cpu: "4"
             memory: 4Gi
 
-  - name: test-infra_push-proxy-containers
+  - name: test-infra_push-containers-2.1
     decorate: true
     path_alias: github.com/maistra/test-infra
     skip_report: false
-    run_if_changed: '^docker/maistra-proxy-builder_.*\.Dockerfile'
+    run_if_changed: '^docker/maistra-builder_2\.1\.Dockerfile|^docker/scripts'
+    branches:
+      - main
+    labels:
+      preset-quay-pusher: "true"
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.1"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - maistra-builder_2.1.push
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
+  - name: test-infra_push-containers-2.2
+    decorate: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    run_if_changed: '^docker/maistra-builder_2\.2\.Dockerfile|^docker/scripts'
+    branches:
+      - main
+    labels:
+      preset-quay-pusher: "true"
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.2"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - maistra-builder_2.2.push
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
+  - name: test-infra_push-containers-2.3
+    decorate: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    run_if_changed: '^docker/maistra-builder_2\.3\.Dockerfile|^docker/scripts'
+    branches:
+      - main
+    labels:
+      preset-quay-pusher: "true"
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - maistra-builder_2.3.push
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
+  - name: test-infra_push-proxy-containers-2.0
+    decorate: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    run_if_changed: '^docker/maistra-proxy-builder_2\.0\.Dockerfile'
     branches:
       - main
     labels:
@@ -217,7 +301,35 @@ postsubmits:
         command:
         - entrypoint
         - make
-        - maistra-proxy-builder.push
+        - maistra-proxy-builder_2.0.push
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+
+  - name: test-infra_push-proxy-containers-2.1
+    decorate: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    run_if_changed: '^docker/maistra-proxy-builder_2\.1\.Dockerfile'
+    branches:
+      - main
+    labels:
+      preset-quay-pusher: "true"
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.1"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - maistra-proxy-builder_2.1.push
         securityContext:
           privileged: true
         resources:
