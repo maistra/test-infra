@@ -192,6 +192,10 @@ postsubmits:
         - maistra-builder_2.0.push
         securityContext:
           privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 16Gi
@@ -199,6 +203,9 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
 
   - name: test-infra_push-containers-2.1
     decorate: true
@@ -220,6 +227,10 @@ postsubmits:
         - maistra-builder_2.1.push
         securityContext:
           privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 16Gi
@@ -227,6 +238,9 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
 
   - name: test-infra_push-containers-2.2
     decorate: true
@@ -248,6 +262,10 @@ postsubmits:
         - maistra-builder_2.2.push
         securityContext:
           privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 16Gi
@@ -255,6 +273,9 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
 
   - name: test-infra_push-containers-2.3
     decorate: true
@@ -276,6 +297,10 @@ postsubmits:
         - maistra-builder_2.3.push
         securityContext:
           privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 16Gi
@@ -283,6 +308,9 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
 
   - name: test-infra_push-proxy-containers-2.0
     decorate: true
@@ -304,6 +332,10 @@ postsubmits:
         - maistra-proxy-builder_2.0.push
         securityContext:
           privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 16Gi
@@ -311,6 +343,9 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
 
   - name: test-infra_push-proxy-containers-2.1
     decorate: true
@@ -332,6 +367,10 @@ postsubmits:
         - maistra-proxy-builder_2.1.push
         securityContext:
           privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 16Gi
@@ -339,6 +378,9 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
 
   maistra/envoy:
   - name: envoy-update-proxy-2.0
