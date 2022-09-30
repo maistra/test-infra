@@ -76,7 +76,6 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VE
     go install github.com/gogo/protobuf/protoc-gen-gogofast@${GOGO_PROTOBUF_VERSION} && \
     go install github.com/gogo/protobuf/protoc-gen-gogofaster@${GOGO_PROTOBUF_VERSION} && \
     go install github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION} && \
-    go install github.com/protobuf-tools/protoc-gen-deepcopy@v0.0.3 && \
     \
     go install github.com/uber/prototool/cmd/prototool@${PROTOTOOL_VERSION} && \
     go install github.com/nilslice/protolock/cmd/protolock@${PROTOLOCK_VERSION} && \
@@ -99,7 +98,7 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VE
     go install istio.io/tools/cmd/cue-gen@${ISTIO_TOOLS_SHA} && \
     go install istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} && \
     go install istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/protoc-gen-golang-deepcopy@${ISTIO_TOOLS_SHA} && \
+    go install istio.io/tools/cmd/protoc-gen-deepcopy@${ISTIO_TOOLS_SHA} && \
     go install istio.io/tools/cmd/protoc-gen-golang-jsonshim@${ISTIO_TOOLS_SHA} && \
     go install istio.io/tools/cmd/kubetype-gen@${ISTIO_TOOLS_SHA} && \
     go install istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} && \
