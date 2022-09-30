@@ -76,6 +76,7 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VE
     go install github.com/gogo/protobuf/protoc-gen-gogofast@${GOGO_PROTOBUF_VERSION} && \
     go install github.com/gogo/protobuf/protoc-gen-gogofaster@${GOGO_PROTOBUF_VERSION} && \
     go install github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION} && \
+    go install github.com/protobuf-tools/protoc-gen-deepcopy@v0.0.3 && \
     \
     go install github.com/uber/prototool/cmd/prototool@${PROTOTOOL_VERSION} && \
     go install github.com/nilslice/protolock/cmd/protolock@${PROTOLOCK_VERSION} && \
