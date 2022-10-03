@@ -15,7 +15,6 @@ periodics:
       command:
       - entrypoint
       - ./create-images.sh
-      - -hquay.io/maistra
       - -tDAILY
       - -p
       securityContext:
@@ -50,7 +49,6 @@ periodics:
       command:
       - entrypoint
       - ./create-images.sh
-      - -hquay.io/maistra
       - -tDAILY
       - -p
       securityContext:
