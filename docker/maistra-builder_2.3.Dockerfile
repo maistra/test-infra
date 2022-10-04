@@ -18,6 +18,7 @@ ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
 ENV K8S_CODE_GENERATOR_VERSION=1.23.4
 ENV LICENSEE_VERSION=9.15.1
 ENV GOLANG_PROTOBUF_VERSION=v1.27.1
+ENV GOLANG_GRPC_PROTOBUF_VERSION=v1.2.0
 ENV FPM_VERSION=1.12.0
 ENV SHELLCHECK_VERSION=v0.8.0
 ENV JUNIT_MERGER_VERSION=adf1545b49509db1f83c49d1de90bbcb235642a8
@@ -36,9 +37,13 @@ ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
 ENV BENCHSTAT_VERSION=9c9101da8316
 ENV GH_VERSION=2.10.1
 ENV K8S_TEST_INFRA_VERSION=b3a9f2479e
+ENV BUF_VERSION=v1.1.0
 ENV GCLOUD_VERSION=393.0.0
 ENV SU_EXEC_VERSION=0.2
 ENV BAZEL_VERSION=5.1.1
+ENV BOM_VERSION=v0.2.2
+ENV CRANE_VERSION=v0.8.0
+ENV YQ_VERSION=4.24.5
 
 #this needs to match the version of Hugo used in maistra.io's netlify.toml file
 ENV HUGO_VERSION="0.69.2"
@@ -72,39 +77,36 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
     dnf -y clean all
 
 # Build and install a bunch of Go tools
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
-    go install github.com/gogo/protobuf/protoc-gen-gofast@${GOGO_PROTOBUF_VERSION} && \
-    go install github.com/gogo/protobuf/protoc-gen-gogofast@${GOGO_PROTOBUF_VERSION} && \
-    go install github.com/gogo/protobuf/protoc-gen-gogofaster@${GOGO_PROTOBUF_VERSION} && \
-    go install github.com/gogo/protobuf/protoc-gen-gogoslick@${GOGO_PROTOBUF_VERSION} && \
-    \
-    go install github.com/uber/prototool/cmd/prototool@${PROTOTOOL_VERSION} && \
-    go install github.com/nilslice/protolock/cmd/protolock@${PROTOLOCK_VERSION} && \
-    go install golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION} && \
-    go install github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION} && \
-    go install github.com/go-bindata/go-bindata/go-bindata@${GO_BINDATA_VERSION} && \
-    go install github.com/envoyproxy/protoc-gen-validate@${PROTOC_GEN_VALIDATE_VERSION} && \
-    go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@${PROTOC_GEN_GRPC_GATEWAY_VERSION} && \
-    go install github.com/google/go-jsonnet/cmd/jsonnet@${JSONNET_VERSION} && \
-    go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@${JB_VERSION} && \
-    go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@${PROTOC_GEN_SWAGGER_VERSION} && \
-    go install github.com/istio/go-junit-report@${GO_JUNIT_REPORT_VERSION} && \
-    go install sigs.k8s.io/kind@${KIND_VERSION} && \
-    go install github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION} && \
-    go install github.com/imsky/junit-merger/src/junit-merger@${JUNIT_MERGER_VERSION} && \
-    go install golang.org/x/perf/cmd/benchstat@${BENCHSTAT_VERSION} && \
-    \
-    go install istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/annotations_prep@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/cue-gen@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/protoc-gen-golang-deepcopy@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/protoc-gen-golang-jsonshim@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/kubetype-gen@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} && \
-    go install istio.io/tools/cmd/gen-release-notes@${ISTIO_TOOLS_SHA} && \
-    \
+RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
+    go install -ldflags="-s -w" google.golang.org/grpc/cmd/protoc-gen-go-grpc@${GOLANG_GRPC_PROTOBUF_VERSION} && \
+    go install -ldflags="-s -w" github.com/uber/prototool/cmd/prototool@${PROTOTOOL_VERSION} && \
+    go install -ldflags="-s -w" github.com/nilslice/protolock/cmd/protolock@${PROTOLOCK_VERSION} && \
+    go install -ldflags="-s -w" golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION} && \
+    go install -ldflags="-s -w" github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION} && \
+    go install -ldflags="-s -w" github.com/go-bindata/go-bindata/go-bindata@${GO_BINDATA_VERSION} && \
+    go install -ldflags="-s -w" github.com/envoyproxy/protoc-gen-validate@${PROTOC_GEN_VALIDATE_VERSION} && \
+    go install -ldflags="-s -w" github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@${PROTOC_GEN_GRPC_GATEWAY_VERSION} && \
+    go install -ldflags="-s -w" github.com/google/go-jsonnet/cmd/jsonnet@${JSONNET_VERSION} && \
+    go install -ldflags="-s -w" github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@${JB_VERSION} && \
+    go install -ldflags="-s -w" github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@${PROTOC_GEN_SWAGGER_VERSION} && \
+    go install -ldflags="-s -w" github.com/istio/go-junit-report@${GO_JUNIT_REPORT_VERSION} && \
+    go install -ldflags="-s -w" sigs.k8s.io/bom/cmd/bom@${BOM_VERSION} && \
+    go install -ldflags="-s -w" sigs.k8s.io/kind@${KIND_VERSION} && \
+    go install -ldflags="-s -w" github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION} && \
+    go install -ldflags="-s -w" github.com/imsky/junit-merger/src/junit-merger@${JUNIT_MERGER_VERSION} && \
+    go install -ldflags="-s -w" golang.org/x/perf/cmd/benchstat@${BENCHSTAT_VERSION} && \
+    go install -ldflags="-s -w" github.com/google/go-containerregistry/cmd/crane@${CRANE_VERSION} && \
+\
+    go install -ldflags="-s -w" istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} && \
+    go install -ldflags="-s -w" istio.io/tools/cmd/annotations_prep@${ISTIO_TOOLS_SHA} && \
+    go install -ldflags="-s -w" istio.io/tools/cmd/cue-gen@${ISTIO_TOOLS_SHA} && \
+    go install -ldflags="-s -w" istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} && \
+    go install -ldflags="-s -w" istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} && \
+    go install -ldflags="-s -w" istio.io/tools/cmd/protoc-gen-golang-deepcopy@${ISTIO_TOOLS_SHA} && \
+    go install -ldflags="-s -w" istio.io/tools/cmd/protoc-gen-golang-jsonshim@${ISTIO_TOOLS_SHA} && \
+    go install -ldflags="-s -w" istio.io/tools/cmd/kubetype-gen@${ISTIO_TOOLS_SHA} && \
+    go install -ldflags="-s -w" istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} && \
+    go install -ldflags="-s -w" istio.io/tools/cmd/gen-release-notes@${ISTIO_TOOLS_SHA} && \
     go install -ldflags="-s -w" k8s.io/code-generator/cmd/applyconfiguration-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
     go install -ldflags="-s -w" k8s.io/code-generator/cmd/defaulter-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
     go install -ldflags="-s -w" k8s.io/code-generator/cmd/client-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
@@ -113,9 +115,10 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VE
     go install -ldflags="-s -w" k8s.io/code-generator/cmd/deepcopy-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
     go install -ldflags="-s -w" k8s.io/code-generator/cmd/go-to-protobuf@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
     \
-    go install github.com/mikefarah/yq/v3@latest && mv /usr/local/bin/yq /usr/local/bin/yq-go && \
-    \
     rm -rf /root/* /root/.cache /tmp/*
+
+# YQ
+RUN curl -sfL https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o /usr/local/bin/yq-go && chmod +x /usr/local/bin/yq-go
 
 # pr-creator
 RUN git clone --branch master --single-branch https://github.com/kubernetes/test-infra.git /root/test-infra && \
@@ -190,6 +193,9 @@ RUN curl -sfLO https://github.com/prometheus/promu/releases/download/v${PROMU_VE
 # Google cloud tools
 RUN curl -sfL -o /tmp/gc.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-linux-x86_64.tar.gz && \
     tar -xzf /tmp/gc.tar.gz -C /usr/local && rm -f /tmp/gc.tar.gz
+
+RUN curl -sfL -o /usr/bin/buf https://github.com/bufbuild/buf/releases/download/${BUF_VERSION}/buf-Linux-x86_64 && \
+    chmod 555 /usr/bin/buf
 
 # su-exec
 RUN mkdir /tmp/su-exec && cd /tmp/su-exec && \
