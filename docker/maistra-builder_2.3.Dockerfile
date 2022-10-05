@@ -45,7 +45,7 @@ ENV BOM_VERSION=v0.2.2
 ENV CRANE_VERSION=v0.8.0
 ENV YQ_VERSION=4.24.5
 
-#this needs to match the version of Hugo used in maistra.io's netlify.toml file
+# This needs to match the version of Hugo used in maistra.io's netlify.toml file
 ENV HUGO_VERSION="0.69.2"
 
 ENV GOPROXY="https://proxy.golang.org,direct"
