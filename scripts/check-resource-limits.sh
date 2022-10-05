@@ -16,7 +16,7 @@ if ! [ -x "$(command -v "${YQ}")" ]; then
   echo "Please install the golang yq package"
   exit 1
 else
-  s="yq version 3.*"
+  s="yq .* version 4.*"
   if ! [[ $(${YQ} --version) =~ $s ]]; then
     echo "Install the correct (golang) yq package"
     exit 1
@@ -33,7 +33,7 @@ for jobtype in presubmit postsubmit; do
             echo "Error: the ${jobtype} job ${name} does not define" \
                  "resource requests and limits. Please add them!"
         fi;
-    done <<< "$(${YQ} r -Pj prow/config.gen.yaml | jq -r ".${jobtype}s[]|.[]|  .name + \" \" + (.spec.containers[0].resources|tostring)")";
+    done <<< "$(${YQ} -o json -P prow/config.gen.yaml | jq -r ".${jobtype}s[]|.[]|  .name + \" \" + (.spec.containers[0].resources|tostring)")";
 done
 
 exit ${ret}
