@@ -76,6 +76,12 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    binaryen emsdk docker-ce rubygems npm yarn rpm-build && \
     dnf -y clean all
 
+# Install acorn (requested by emsdk, OSSM-1931)
+RUN mkdir /opt/emsdk/node_modules && \
+    npm install acorn && \
+    cp -r node_modules/acorn /opt/emsdk/node_modules/acorn
+
+
 # Build and install a bunch of Go tools
 RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
     go install -ldflags="-s -w" google.golang.org/grpc/cmd/protoc-gen-go-grpc@${GOLANG_GRPC_PROTOBUF_VERSION} && \
