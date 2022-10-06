@@ -1,49 +1,5 @@
 presubmits:
   maistra/maistra.github.io:
-  - name: maistra.github.io_lint-1.1
-    decorate: true
-    always_run: true
-    skip_report: false
-    branches:
-      - ^maistra-1.1$
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:1.1"
-        imagePullPolicy: Always
-        command:
-        - make
-        - lint
-        resources:
-          limits:
-            memory: 8Gi
-            cpu: "4"
-          requests:
-            cpu: "2"
-            memory: 4Gi
-    trigger: "(?m)^/test lint"
-    rerun_command: "/test lint"
-  - name: maistra.github.io_check-links-1.1
-    decorate: true
-    always_run: true
-    skip_report: false
-    branches:
-      - ^maistra-1.1$
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:1.1"
-        imagePullPolicy: Always
-        command:
-        - make
-        - check-links
-        resources:
-          limits:
-            memory: 8Gi
-            cpu: "4"
-          requests:
-            cpu: "2"
-            memory: 4Gi
-    trigger: "(?m)^/test check-links"
-    rerun_command: "/test check-links"
   - name: maistra.github.io_lint-2.0
     decorate: true
     always_run: true
@@ -294,61 +250,6 @@ presubmits:
             memory: 1Gi
 
   maistra/istio-operator:
-  - name: istio-operator_unittests-1.1
-    decorate: true
-    always_run: true
-    path_alias: github.com/maistra/istio-operator
-    skip_report: false
-    branches:
-      - ^maistra-1.1$
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:1.1"
-        imagePullPolicy: Always
-        command:
-        - make
-        - compile
-        - test
-        env:
-        - name: XDG_CACHE_HOME
-          value: /tmp/cache
-        - name: GOCACHE
-          value: /tmp/cache
-        - name: TEST_FLAGS
-          value: -v
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-  - name: istio-operator_gen-check-1.1
-    decorate: true
-    always_run: true
-    path_alias: github.com/maistra/istio-operator
-    skip_report: false
-    branches:
-      - ^maistra-1.1$
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:1.1"
-        imagePullPolicy: Always
-        command:
-        - make
-        - gen-check
-        env:
-        - name: XDG_CACHE_HOME
-          value: /tmp/cache
-        - name: GOCACHE
-          value: /tmp/cache
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
   - name: istio-operator_unittests-2.0
     decorate: true
     always_run: true
@@ -807,34 +708,6 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
-  - name: proxy-unit-1.1
-    trigger: (?m)^/test( | .* )unit,?($|\s.*)
-    decorate: true
-    decoration_config:
-      timeout: 8h0m0s
-    always_run: true
-    path_alias: istio.io/proxy
-    skip_report: false
-    max_concurrency: 1
-    branches:
-      - ^maistra-1.1$
-    rerun_command: /test unit
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-proxy-builder:1.1"
-        imagePullPolicy: Always
-        command:
-        - ./maistra/ci/pre-submit.sh
-        env:
-        - name: BAZEL_REMOTE_CACHE
-          value: http://bazel-cache.default/cache
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "8"
-          requests:
-            cpu: "4"
-            memory: 4Gi
   - name: proxy-unit-2.2
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -893,34 +766,6 @@ presubmits:
             memory: 4Gi
 
   maistra/envoy:
-  - name: envoy-unit-1.1
-    trigger: (?m)^/test( | .* )unit,?($|\s.*)
-    decorate: true
-    decoration_config:
-      timeout: 8h0m0s
-    always_run: true
-    path_alias: istio.io/envoy
-    skip_report: false
-    max_concurrency: 1
-    branches:
-      - ^maistra-1.1$
-    rerun_command: /test unit
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-proxy-builder:1.1"
-        imagePullPolicy: Always
-        command:
-        - ./maistra/run-ci.sh
-        env:
-        - name: BAZEL_REMOTE_CACHE
-          value: http://bazel-cache.default/cache
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "8"
-          requests:
-            cpu: "4"
-            memory: 4Gi
   - name: envoy-unit-2.0
     trigger: (?m)^/test( | .* )unit,?($|\s.*)
     decorate: true
@@ -2279,85 +2124,6 @@ presubmits:
           value: "0"
         - name: ISTIO_ENVOY_BASE_URL
           value: https://storage.googleapis.com/maistra-prow-testing/proxy
-        image: "quay.io/maistra-dev/maistra-builder:2.0"
-        imagePullPolicy: Always
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - mountPath: /lib/modules
-          name: modules
-          readOnly: true
-        - mountPath: /sys/fs/cgroup
-          name: cgroup
-          readOnly: true
-        resources:
-          limits:
-            memory: 24Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-      volumes:
-      - hostPath:
-          path: /lib/modules
-          type: Directory
-        name: modules
-      - hostPath:
-          path: /sys/fs/cgroup
-          type: Directory
-        name: cgroup
-
-  - name: istio-unit-1.1
-    decorate: true
-    always_run: true
-    path_alias: istio.io/istio
-    skip_report: false
-    branches:
-      - ^maistra-1.1$
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:1.1"
-        imagePullPolicy: Always
-        command:
-        - make
-        - -e
-        - T=-v
-        - init
-        - test
-        env:
-        - name: GOFLAGS
-          value: -mod=vendor
-        - name: XDG_CACHE_HOME
-          value: /tmp/cache
-        - name: GOCACHE
-          value: /tmp/cache
-        resources:
-          limits:
-            memory: 24Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-
-  - name: istio-integration-1.1
-    skip_report: false
-    max_concurrency: 2
-    always_run: true
-    branches:
-    - ^maistra-1.1$
-    decorate: true
-    path_alias: istio.io/istio
-    spec:
-      containers:
-      - command:
-        - entrypoint
-        - prow/integ-suite-kind.sh
-        - test.integration.kube.presubmit
-        env:
-        - name: GOFLAGS
-          value: -mod=vendor
-        - name: BUILD_WITH_CONTAINER
-          value: "0"
         image: "quay.io/maistra-dev/maistra-builder:2.0"
         imagePullPolicy: Always
         securityContext:
