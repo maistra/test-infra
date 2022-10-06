@@ -17,6 +17,9 @@ periodics:
       - ./create-images.sh
       - -tDAILY
       - -p
+      env:
+      - name: BUILD_WITH_CONTAINER
+        value: "0"
       securityContext:
         privileged: true
       volumeMounts:
@@ -51,6 +54,9 @@ periodics:
       - ./create-images.sh
       - -tDAILY
       - -p
+      env:
+      - name: BUILD_WITH_CONTAINER
+        value: "0"
       securityContext:
         privileged: true
       volumeMounts:
