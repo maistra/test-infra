@@ -20,6 +20,8 @@ periodics:
       env:
       - name: BUILD_WITH_CONTAINER
         value: "0"
+      - name: CONTAINER_CLI
+        value: "docker"
       securityContext:
         privileged: true
       volumeMounts:
