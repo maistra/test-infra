@@ -17,15 +17,15 @@ presets:
     preset-quay-pusher: "true"
   env:
   - name: DOCKER_CONFIG
-    value: /creds/
+    value: /docker-config
   - name: HUB
     value: quay.io/maistra-dev
   volumeMounts:
-  - name: creds
-    mountPath: /creds
-    readOnly: true
+  - name: docker-config
+    mountPath: /docker-config
+    readOnly: false
   volumes:
-  - name: creds
+  - name: docker-config
     secret:
       secretName: quay-pusher-dockercfg
 
