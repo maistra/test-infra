@@ -20,6 +20,8 @@ periodics:
       env:
       - name: BUILD_WITH_CONTAINER
         value: "0"
+      - name: BUILDX_CONFIG
+        value: /tmp
       securityContext:
         privileged: true
       volumeMounts:
@@ -57,6 +59,8 @@ periodics:
       env:
       - name: BUILD_WITH_CONTAINER
         value: "0"
+      - name: BUILDX_CONFIG
+        value: /tmp
       securityContext:
         privileged: true
       volumeMounts:
