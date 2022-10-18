@@ -903,6 +903,10 @@ postsubmits:
         - container.push
         securityContext:
           privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
         resources:
           limits:
             memory: 16Gi
@@ -910,3 +914,6 @@ postsubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
