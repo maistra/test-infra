@@ -213,7 +213,7 @@ RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/down
 # Rust (for WASM filters)
 ENV CARGO_HOME "/rust"
 ENV RUSTUP_HOME "/rust"
-RUN mkdir /rust && \
+RUN mkdir /rust && chmod 777 /rust && \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     /rust/bin/rustup target add wasm32-unknown-unknown
 ENV PATH=/usr/local/google-cloud-sdk/bin:/rust/bin:$PATH
