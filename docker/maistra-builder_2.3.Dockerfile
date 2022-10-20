@@ -76,6 +76,7 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    binaryen emsdk docker-ce rubygems npm yarn rpm-build && \
     dnf -y clean all
 
+
 # Build and install a bunch of Go tools
 RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
     go install -ldflags="-s -w" google.golang.org/grpc/cmd/protoc-gen-go-grpc@${GOLANG_GRPC_PROTOBUF_VERSION} && \
@@ -254,6 +255,10 @@ RUN chmod 777 /go && \
     chmod 777 /home/.cache && \
     chmod 777 /home/.helm && \
     chmod 777 /home/.gsutil
+
+# Create folder to install acorn module
+RUN mkdir -p /opt/emsdk/node_modules && \
+    chmod 777 /opt/emsdk/node_modules
 
 ADD scripts/prow-entrypoint-main.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
