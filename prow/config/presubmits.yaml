@@ -377,6 +377,39 @@ presubmits:
       - emptyDir: {}
         name: varlibdocker
 
+  - name: test-infra_build-containers-2.4
+    decorate: true
+    path_alias: github.com/maistra/test-infra
+    skip_report: false
+    run_if_changed: '^docker/maistra-builder_2\.4\.Dockerfile|^docker/scripts'
+    branches:
+      - main
+    max_concurrency: 2
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.4"
+        imagePullPolicy: Always
+        command:
+        - entrypoint
+        - make
+        - build-containers-2.4
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
+
   - name: test-infra_build-proxy-containers-2.1
     decorate: true
     path_alias: github.com/maistra/test-infra
