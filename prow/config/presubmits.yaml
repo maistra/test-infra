@@ -835,9 +835,6 @@ presubmits:
           # FIXME: Uncomment this when we have our proxy in place
           # - name: ISTIO_ENVOY_BASE_URL
           #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-
-          # FIXME: Using upstream for now, replace with our image
-          # image: "quay.io/maistra-dev/maistra-builder:2.4"
           image: "quay.io/maistra-dev/maistra-builder:2.4"
           imagePullPolicy: Always
           securityContext:
@@ -896,9 +893,6 @@ presubmits:
           # FIXME: Uncomment this when we have our proxy in place
           # - name: ISTIO_ENVOY_BASE_URL
           #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-
-          # FIXME: Using upstream for now, replace with our image
-          # image: "quay.io/maistra-dev/maistra-builder:2.4"
           image: "quay.io/maistra-dev/maistra-builder:2.4"
           imagePullPolicy: Always
           securityContext:
@@ -957,9 +951,6 @@ presubmits:
           # FIXME: Uncomment this when we have our proxy in place
           # - name: ISTIO_ENVOY_BASE_URL
           #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-
-          # FIXME: Using upstream for now, replace with our image
-          # image: "quay.io/maistra-dev/maistra-builder:2.4"
           image: "quay.io/maistra-dev/maistra-builder:2.4"
           imagePullPolicy: Always
           securityContext:
@@ -1018,9 +1009,6 @@ presubmits:
           # FIXME: Uncomment this when we have our proxy in place
           # - name: ISTIO_ENVOY_BASE_URL
           #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-
-          # FIXME: Using upstream for now, replace with our image
-          # image: "quay.io/maistra-dev/maistra-builder:2.4"
           image: "quay.io/maistra-dev/maistra-builder:2.4"
           imagePullPolicy: Always
           securityContext:
@@ -1079,8 +1067,6 @@ presubmits:
           # FIXME: Uncomment this when we have our proxy in place
           # - name: ISTIO_ENVOY_BASE_URL
           #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-          # FIXME: Using upstream for now, replace with our image
-          # image: "quay.io/maistra-dev/maistra-builder:2.4"
           image: "quay.io/maistra-dev/maistra-builder:2.4"
           imagePullPolicy: Always
           securityContext:

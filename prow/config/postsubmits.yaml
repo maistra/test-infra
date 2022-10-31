@@ -879,6 +879,7 @@ postsubmits:
           requests:
             cpu: "2"
             memory: 1Gi
+
   maistra/rpm-common:
   - name: rpm-common_update
     decorate: true
