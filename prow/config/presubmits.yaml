@@ -826,8 +826,6 @@ presubmits:
             - prow/integ-suite-kind.sh
             - test.integration.helm.kube.presubmit
           env:
-            # - name: GOFLAGS
-            #   value: -mod=vendor
             - name: BUILD_WITH_CONTAINER
               value: "0"
             - name: INTEGRATION_TEST_FLAGS
@@ -884,8 +882,6 @@ presubmits:
             - prow/integ-suite-kind.sh
             - test.integration.pilot.kube.presubmit
           env:
-            # - name: GOFLAGS
-            #   value: -mod=vendor
             - name: BUILD_WITH_CONTAINER
               value: "0"
             - name: INTEGRATION_TEST_FLAGS
@@ -942,8 +938,6 @@ presubmits:
             - prow/integ-suite-kind.sh
             - test.integration.security.kube.presubmit
           env:
-            # - name: GOFLAGS
-            #   value: -mod=vendor
             - name: BUILD_WITH_CONTAINER
               value: "0"
             - name: INTEGRATION_TEST_FLAGS
@@ -1000,8 +994,6 @@ presubmits:
             - prow/integ-suite-kind.sh
             - test.integration.servicemesh.kube.presubmit
           env:
-            # - name: GOFLAGS
-            #   value: -mod=vendor
             - name: BUILD_WITH_CONTAINER
               value: "0"
             - name: INTEGRATION_TEST_FLAGS
@@ -1058,8 +1050,6 @@ presubmits:
             - prow/integ-suite-kind.sh
             - test.integration.telemetry.kube.presubmit
           env:
-            # - name: GOFLAGS
-            #   value: -mod=vendor
             - name: BUILD_WITH_CONTAINER
               value: "0"
             - name: INTEGRATION_TEST_FLAGS
