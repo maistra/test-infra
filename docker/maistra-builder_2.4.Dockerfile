@@ -44,6 +44,7 @@ ENV BAZEL_VERSION=6.0.0-pre.20220706.4
 ENV BOM_VERSION=v0.3.0
 ENV CRANE_VERSION=v0.11.0
 ENV YQ_VERSION=4.28.1
+ENV FPM_VERSION=eb5370d16e361db3f1425f8c898bafe7f3c66869
 
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GO111MODULE=on
@@ -201,6 +202,13 @@ RUN mkdir /tmp/su-exec && cd /tmp/su-exec && \
 # Bazel
 RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-x86_64 && \
     chmod +x /usr/bin/bazel
+
+# FPM
+RUN git clone https://github.com/jordansissel/fpm /tmp/fpm && \
+    cd /tmp/fpm && \
+    git reset --hard ${FPM_VERSION} && \
+    make install && \
+    rm -rf /tmp/*
 
 # Rust (for WASM filters)
 ENV CARGO_HOME "/rust"
