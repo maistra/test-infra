@@ -2053,7 +2053,7 @@ presubmits:
 
           # FIXME: Using upstream for now, replace with our image
           # image: "quay.io/maistra-dev/maistra-builder:2.4"
-          image: "gcr.io/istio-testing/build-tools:release-1.16-034c1253b7ce447805ce0e76d39a41ab8e466fea"
+          image: "quay.io/maistra-dev/maistra-builder:2.4"
           imagePullPolicy: Always
           securityContext:
             privileged: true
@@ -2114,7 +2114,7 @@ presubmits:
 
           # FIXME: Using upstream for now, replace with our image
           # image: "quay.io/maistra-dev/maistra-builder:2.4"
-          image: "gcr.io/istio-testing/build-tools:release-1.16-034c1253b7ce447805ce0e76d39a41ab8e466fea"
+          image: "quay.io/maistra-dev/maistra-builder:2.4"
           imagePullPolicy: Always
           securityContext:
             privileged: true
@@ -2175,7 +2175,7 @@ presubmits:
 
           # FIXME: Using upstream for now, replace with our image
           # image: "quay.io/maistra-dev/maistra-builder:2.4"
-          image: "gcr.io/istio-testing/build-tools:release-1.16-034c1253b7ce447805ce0e76d39a41ab8e466fea"
+          image: "quay.io/maistra-dev/maistra-builder:2.4"
           imagePullPolicy: Always
           securityContext:
             privileged: true
@@ -2236,7 +2236,7 @@ presubmits:
 
           # FIXME: Using upstream for now, replace with our image
           # image: "quay.io/maistra-dev/maistra-builder:2.4"
-          image: "gcr.io/istio-testing/build-tools:release-1.16-034c1253b7ce447805ce0e76d39a41ab8e466fea"
+          image: "quay.io/maistra-dev/maistra-builder:2.4"
           imagePullPolicy: Always
           securityContext:
             privileged: true
@@ -2296,7 +2296,7 @@ presubmits:
           #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
           # FIXME: Using upstream for now, replace with our image
           # image: "quay.io/maistra-dev/maistra-builder:2.4"
-          image: "gcr.io/istio-testing/build-tools:release-1.16-034c1253b7ce447805ce0e76d39a41ab8e466fea"
+          image: "quay.io/maistra-dev/maistra-builder:2.4"
           imagePullPolicy: Always
           securityContext:
             privileged: true
