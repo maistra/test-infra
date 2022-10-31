@@ -45,6 +45,7 @@ ENV BOM_VERSION=v0.3.0
 ENV CRANE_VERSION=v0.11.0
 ENV YQ_VERSION=4.28.1
 ENV FPM_VERSION=eb5370d16e361db3f1425f8c898bafe7f3c66869
+ENV MDL_VERSION=0.11.0
 
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GO111MODULE=on
@@ -209,6 +210,10 @@ RUN git clone https://github.com/jordansissel/fpm /tmp/fpm && \
     git reset --hard ${FPM_VERSION} && \
     make install && \
     rm -rf /tmp/*
+
+# MDL
+RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION} && \
+    rm -rf /root/* /root/.cache /root/.gem /tmp/*
 
 # Rust (for WASM filters)
 ENV CARGO_HOME "/rust"
