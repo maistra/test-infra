@@ -36,7 +36,7 @@ ENV PROTOC_GEN_SWAGGER_VERSION=v1.8.6
 ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
 ENV BENCHSTAT_VERSION=9c9101da8316
 ENV GH_VERSION=2.17.0
-ENV K8S_TEST_INFRA_VERSION=b3a9f2479e
+ENV K8S_TEST_INFRA_VERSION=b3a9f2479edd51c1da898c2073bab8512de275ec
 ENV BUF_VERSION=v1.8.0
 ENV GCLOUD_VERSION=405.0.1
 ENV SU_EXEC_VERSION=0.2
@@ -121,8 +121,12 @@ RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${G
     go install -ldflags="-s -w" k8s.io/code-generator/cmd/go-to-protobuf@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
     \
     # pr creator
-    git clone --branch master --single-branch https://github.com/kubernetes/test-infra.git /root/test-infra && \
-    cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
+    mkdir -p /root/test-infra && \
+    cd /root/test-infra && \
+    git init && \
+    git remote add origin https://github.com/kubernetes/test-infra.git && \
+    git fetch --depth 1 origin ${K8S_TEST_INFRA_VERSION} && \
+    git checkout FETCH_HEAD && \
     go install ./robots/pr-creator && \
     go install ./prow/cmd/peribolos && \
     go install ./prow/cmd/checkconfig && \
@@ -132,15 +136,6 @@ RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${G
 
 # YQ
 RUN curl -sfL https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o /usr/local/bin/yq-go && chmod +x /usr/local/bin/yq-go
-
-# pr-creator
-RUN git clone --branch master --single-branch https://github.com/kubernetes/test-infra.git /root/test-infra && \
-    cd /root/test-infra && git checkout ${K8S_TEST_INFRA_VERSION} && \
-    go install ./robots/pr-creator && \
-    go install ./prow/cmd/peribolos && \
-    go install ./prow/cmd/checkconfig && \
-    go install ./pkg/benchmarkjunit && \
-    rm -rf /root/* /root/.cache /tmp/* /gocache/* /go/pkg
 
 # GH CLI
 RUN curl -sfLO https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz && \

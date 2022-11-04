@@ -64,7 +64,9 @@ function run_sed() {
 
   local sha
   sha=$(echo "${VERSION}" | cut -d- -f2)
-  local filter_dockerfile="s|ENV K8S_TEST_INFRA_VERSION=.*|ENV K8S_TEST_INFRA_VERSION=${sha}|"
+  local longSha
+  longSha=$(curl -sLf https://api.github.com/repos/kubernetes/test-infra/commits/"${sha}" | grep -Po '(?<="sha": ")[^"]*' | head -n 1)
+  local filter_dockerfile="s|ENV K8S_TEST_INFRA_VERSION=.*|ENV K8S_TEST_INFRA_VERSION=${longSha}|"
   find docker -name '*Dockerfile' -print0 | xargs -0 -r sed -i "${filter_dockerfile}"
 }
 
