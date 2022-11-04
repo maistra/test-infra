@@ -1331,6 +1331,8 @@ presubmits:
     always_run: true
     branches:
       - ^maistra-2.3$
+    labels:
+      preset-quay-pusher: "true"
     decorate: true
     path_alias: github.com/maistra/istio-operator
     spec:
