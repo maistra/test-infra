@@ -19,7 +19,6 @@ ENV K8S_CODE_GENERATOR_VERSION=1.25.0
 ENV LICENSEE_VERSION=9.15.1
 ENV GOLANG_PROTOBUF_VERSION=v1.28.1
 ENV GOLANG_GRPC_PROTOBUF_VERSION=v1.2.0
-ENV FPM_VERSION=1.12.0
 ENV SHELLCHECK_VERSION=v0.8.0
 ENV JUNIT_MERGER_VERSION=adf1545b49509db1f83c49d1de90bbcb235642a8
 ENV PROMU_VERSION=0.7.0
@@ -205,9 +204,12 @@ RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/down
     chmod +x /usr/bin/bazel
 
 # FPM
-RUN git clone https://github.com/jordansissel/fpm /tmp/fpm && \
+RUN mkdir -p /tmp/fpm && \
     cd /tmp/fpm && \
-    git reset --hard ${FPM_VERSION} && \
+    git init && \ 
+    git remote add origin https://github.com/jordansissel/fpm && \
+    git fetch --depth 1 origin ${FPM_VERSION} && \
+    git checkout FETCH_HEAD && \
     make install && \
     rm -rf /tmp/*
 
