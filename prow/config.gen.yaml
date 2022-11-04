@@ -1323,6 +1323,59 @@ presubmits:
           requests:
             cpu: "4"
             memory: 4Gi
+  - name: istio-operator_integ-kind-2.3
+    trigger: (?m)^/test( | .* )integration\-kind,?($|\s.*)
+    rerun_command: /test integration-kind
+    skip_report: false
+    max_concurrency: 2
+    always_run: true
+    branches:
+      - ^maistra-2.3$
+    decorate: true
+    path_alias: github.com/maistra/istio-operator
+    spec:
+      containers:
+        - command:
+            - entrypoint
+            - make
+            - test.integration.kind
+          env:
+            - name: XDG_CACHE_HOME
+              value: /tmp/cache
+            - name: GOCACHE
+              value: /tmp/cache
+          image: "quay.io/maistra-dev/maistra-builder:2.3"
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: modules
+              readOnly: true
+            - mountPath: /sys/fs/cgroup
+              name: cgroup
+              readOnly: true
+            - mountPath: /var/lib/docker
+              name: varlibdocker
+              readOnly: false
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: "4"
+            requests:
+              cpu: "4"
+              memory: 2Gi
+      volumes:
+        - hostPath:
+            path: /lib/modules
+            type: Directory
+          name: modules
+        - hostPath:
+            path: /sys/fs/cgroup
+            type: Directory
+          name: cgroup
+        - emptyDir: {}
+          name: varlibdocker
 
   maistra/test-infra:
   - name: test-infra_lint
