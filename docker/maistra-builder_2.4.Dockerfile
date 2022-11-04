@@ -78,7 +78,7 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
 
 # Install go 1.19
 # FIXME: Replace with go from centos dnf repo when 1.19 is available
-RUN curl -sfL https://go.dev/dl/go1.19.2.linux-amd64.tar.gz | tar zx -C /usr/local
+RUN curl -sfL https://go.dev/dl/go1.19.3.linux-amd64.tar.gz | tar zx -C /usr/local
 
 # Build and install a bunch of Go tools
 RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
