@@ -1871,12 +1871,13 @@ presubmits:
     skip_report: false
     always_run: true
     branches:
+      - ^maistra-2.4$
       - ^maistra-2.3$
       - ^maistra-2.2$
     max_concurrency: 2
     spec:
       containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.3"
+      - image: "quay.io/maistra-dev/maistra-builder:2.4"
         imagePullPolicy: Always
         command:
         - entrypoint
@@ -1893,8 +1894,8 @@ presubmits:
             memory: 16Gi
             cpu: "4"
           requests:
-            cpu: "4"
-            memory: 4Gi
+            cpu: "2"
+            memory: 2Gi
       volumes:
       - emptyDir: {}
         name: varlibdocker
