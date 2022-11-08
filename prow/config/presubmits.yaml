@@ -1900,31 +1900,6 @@ presubmits:
       - emptyDir: {}
         name: varlibdocker
 
-  maistra/istio-must-gather:
-  - name: istio-must-gather_lint
-    decorate: true
-    always_run: true
-    skip_report: false
-    branches:
-      - ^maistra-2.1$
-      - ^maistra-2.2$
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.2"
-        imagePullPolicy: Always
-        command:
-        - make
-        - lint
-        resources:
-          limits:
-            memory: 4Gi
-            cpu: "2"
-          requests:
-            cpu: "1"
-            memory: 2Gi
-    trigger: "(?m)^/test lint"
-    rerun_command: "/test lint"
-
   maistra/istio-images-centos:
   - name: istio-images_validate-2.2
     decorate: true
