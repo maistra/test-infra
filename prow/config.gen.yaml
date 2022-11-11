@@ -2496,9 +2496,7 @@ presubmits:
         # - name: ISTIO_ENVOY_BASE_URL
         #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
 
-        # FIXME: Using upstream for now, replace with our image
-        # image: "quay.io/maistra-dev/maistra-builder:2.3"
-        image: "gcr.io/istio-testing/build-tools:release-1.14-0c4413d13921234efc115a6acc7097c47de0e815"
+        image: "quay.io/maistra-dev/maistra-builder:2.3"
         imagePullPolicy: Always
         securityContext:
           privileged: true
