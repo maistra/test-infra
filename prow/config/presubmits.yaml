@@ -1250,7 +1250,7 @@ presubmits:
     rerun_command: /push-images
     skip_report: false
     max_concurrency: 2
-    always_run: true
+    always_run: false
     branches:
     - ^maistra-2.3$
     decorate: true
