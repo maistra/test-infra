@@ -2468,6 +2468,49 @@ presubmits:
       - emptyDir: {}
         name: varlibdocker
 
+  - name: istio-push-images-2.3
+    trigger: (?m)^/push\-images,?($|\s.*)
+    rerun_command: /push-images
+    skip_report: false
+    max_concurrency: 2
+    always_run: false
+    branches:
+    - ^maistra-2.3$
+    decorate: true
+    path_alias: istio.io/istio
+    labels:
+      preset-quay-pusher: "true"
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - sh
+        - -c
+        - HUB=quay.io/maistra-dev TAG=PR-${PULL_NUMBER} make maistra-image.push
+        env:
+        - name: GOFLAGS
+          value: -mod=vendor
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        image: "quay.io/maistra-dev/maistra-builder:2.3"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
+        resources:
+          limits:
+            cpu: "2"
+            memory: 24Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
+      volumes:
+      - emptyDir: {}
+        name: varlibdocker
+
   - name: istio-integration-helm-2.3
     trigger: (?m)^/test( | .* )integration\-helm,?($|\s.*)
     rerun_command: /test integration-helm
