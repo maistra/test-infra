@@ -1269,10 +1269,6 @@ presubmits:
           value: -mod=vendor
         - name: BUILD_WITH_CONTAINER
           value: "0"
-        # FIXME: Uncomment this when we have our proxy in place
-        # - name: ISTIO_ENVOY_BASE_URL
-        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
-
         image: "quay.io/maistra-dev/maistra-builder:2.3"
         imagePullPolicy: Always
         securityContext:
