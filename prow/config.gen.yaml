@@ -2469,8 +2469,8 @@ presubmits:
         name: varlibdocker
 
   - name: istio-push-images-2.3
-    trigger: (?m)^/test( | .* )push\-images,?($|\s.*)
-    rerun_command: /test push-images
+    trigger: (?m)^/push\-images,?($|\s.*)
+    rerun_command: /push-images
     skip_report: false
     max_concurrency: 2
     always_run: true
