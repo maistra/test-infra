@@ -2492,6 +2492,8 @@ presubmits:
           value: -mod=vendor
         - name: BUILD_WITH_CONTAINER
           value: "0"
+        - name: BUILDX_CONFIG
+          value: /tmp
         image: "quay.io/maistra-dev/maistra-builder:2.3"
         imagePullPolicy: Always
         securityContext:
