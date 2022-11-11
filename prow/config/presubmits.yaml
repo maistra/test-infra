@@ -1285,11 +1285,11 @@ presubmits:
           readOnly: false
         resources:
           limits:
+            cpu: "2"
             memory: 24Gi
-            cpu: "4"
           requests:
-            cpu: "4"
-            memory: 4Gi
+            cpu: "2"
+            memory: 2Gi
       volumes:
       - emptyDir: {}
         name: varlibdocker
