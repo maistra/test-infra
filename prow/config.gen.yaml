@@ -2486,7 +2486,7 @@ presubmits:
         - entrypoint
         - sh
         - -c
-        - HUB=quay.io/maistra-dev TAG=PR-${PULL_NUMBER} make init maistra-image.push
+        - HUB=quay.io/maistra-dev TAG=PR-${PULL_NUMBER} make maistra-image.push
         env:
         - name: GOFLAGS
           value: -mod=vendor
