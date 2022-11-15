@@ -775,11 +775,11 @@ presubmits:
               readOnly: false
           resources:
             limits:
-              memory: 24Gi
+              memory: 16Gi
               cpu: "4"
             requests:
-              cpu: "4"
-              memory: 4Gi
+              cpu: "2"
+              memory: 2Gi
       volumes:
         - hostPath:
             path: /lib/modules
@@ -831,11 +831,11 @@ presubmits:
               readOnly: false
           resources:
             limits:
-              memory: 24Gi
+              memory: 16Gi
               cpu: "4"
             requests:
-              cpu: "4"
-              memory: 4Gi
+              cpu: "2"
+              memory: 2Gi
       volumes:
         - hostPath:
             path: /lib/modules
@@ -887,11 +887,11 @@ presubmits:
               readOnly: false
           resources:
             limits:
-              memory: 24Gi
+              memory: 16Gi
               cpu: "4"
             requests:
-              cpu: "4"
-              memory: 4Gi
+              cpu: "2"
+              memory: 2Gi
       volumes:
         - hostPath:
             path: /lib/modules
@@ -943,11 +943,11 @@ presubmits:
               readOnly: false
           resources:
             limits:
-              memory: 24Gi
+              memory: 16Gi
               cpu: "4"
             requests:
-              cpu: "4"
-              memory: 4Gi
+              cpu: "2"
+              memory: 2Gi
       volumes:
         - hostPath:
             path: /lib/modules
@@ -999,11 +999,11 @@ presubmits:
               readOnly: false
           resources:
             limits:
-              memory: 24Gi
+              memory: 16Gi
               cpu: "4"
             requests:
-              cpu: "4"
-              memory: 4Gi
+              cpu: "2"
+              memory: 2Gi
       volumes:
         - hostPath:
             path: /lib/modules
