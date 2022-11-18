@@ -166,7 +166,7 @@ postsubmits:
     - main
     spec:
       containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.0"
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
         imagePullPolicy: Always
         command:
         - make
@@ -179,41 +179,6 @@ postsubmits:
           requests:
             cpu: "2"
             memory: 1Gi
-
-  - name: test-infra_push-containers-2.0
-    decorate: true
-    path_alias: github.com/maistra/test-infra
-    skip_report: false
-    run_if_changed: '^docker/maistra-builder_2\.0\.Dockerfile|^docker/scripts'
-    branches:
-      - main
-    labels:
-      preset-quay-pusher: "true"
-    max_concurrency: 1
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.0"
-        imagePullPolicy: Always
-        command:
-        - entrypoint
-        - make
-        - maistra-builder_2.0.push
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - mountPath: /var/lib/docker
-          name: varlibdocker
-          readOnly: false
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-      volumes:
-      - emptyDir: {}
-        name: varlibdocker
 
   - name: test-infra_push-containers-2.1
     decorate: true
@@ -338,41 +303,6 @@ postsubmits:
         - entrypoint
         - make
         - maistra-builder_2.4.push
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - mountPath: /var/lib/docker
-          name: varlibdocker
-          readOnly: false
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-      volumes:
-      - emptyDir: {}
-        name: varlibdocker
-
-  - name: test-infra_push-proxy-containers-2.0
-    decorate: true
-    path_alias: github.com/maistra/test-infra
-    skip_report: false
-    run_if_changed: '^docker/maistra-proxy-builder_2\.0\.Dockerfile'
-    branches:
-      - main
-    labels:
-      preset-quay-pusher: "true"
-    max_concurrency: 1
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.0"
-        imagePullPolicy: Always
-        command:
-        - entrypoint
-        - make
-        - maistra-proxy-builder_2.0.push
         securityContext:
           privileged: true
         volumeMounts:
@@ -938,59 +868,11 @@ postsubmits:
             memory: 1Gi
 
   maistra/istio-operator:
-  - name: update-charts-in-2.1
-    decorate: true
-    path_alias: maistra.io/istio-operator
-    skip_report: false
-    branches:
-    - ^maistra-1.0$
-    - ^maistra-1.1$
-    - ^maistra-2.0$
-    labels:
-      preset-github: "true"
-    extra_refs:
-    - base_ref: main
-      org: maistra
-      path_alias: maistra.io/test-infra
-      repo: test-infra
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.1"
-        imagePullPolicy: Always
-        command:
-        - ../test-infra/tools/automator.sh
-        - -o maistra
-        - -r istio-operator
-        - -b maistra-2.1
-        - -f /creds-github/github-token
-        - -c make clean update-1.0-charts update-1.1-charts update-2.0-charts
-        - '-t Automator: Update charts from previous versions'
-        - -m update_charts_from_previous_versions
-        - -l auto-merge
-        env:
-        - name: BUILD_WITH_CONTAINER
-          value: "0"
-        - name: GOFLAGS
-          value: -mod=vendor
-        - name: XDG_CACHE_HOME
-          value: /tmp/cache
-        - name: GOCACHE
-          value: /tmp/cache
-        resources:
-          limits:
-            memory: 4Gi
-            cpu: "4"
-          requests:
-            cpu: "2"
-            memory: 1Gi
-
   - name: update-charts-in-2.2
     decorate: true
     path_alias: maistra.io/istio-operator
     skip_report: false
     branches:
-    - ^maistra-1.1$
-    - ^maistra-2.0$
     - ^maistra-2.1$
     labels:
       preset-github: "true"
@@ -1009,7 +891,7 @@ postsubmits:
         - -r istio-operator
         - -b maistra-2.2
         - -f /creds-github/github-token
-        - -c make clean update-1.1-charts update-2.0-charts update-2.1-charts
+        - -c make clean update-2.1-charts
         - '-t Automator: Update charts from previous versions'
         - -m update_charts_from_previous_versions
         - -l auto-merge
@@ -1035,11 +917,8 @@ postsubmits:
     path_alias: maistra.io/istio-operator
     skip_report: false
     branches:
-    - ^maistra-2.0$
     - ^maistra-2.1$
     - ^maistra-2.2$
-    # Allow for testing
-    - playground
     labels:
       preset-github: "true"
     extra_refs:
@@ -1057,7 +936,7 @@ postsubmits:
         - -r istio-operator
         - -b maistra-2.3
         - -f /creds-github/github-token
-        - -c make clean update-2.0-charts update-2.1-charts update-2.2-charts
+        - -c make clean update-2.1-charts update-2.2-charts
         - '-t Automator: Update charts from previous versions'
         - -m update_charts_from_previous_versions
         - -l auto-merge
@@ -1422,39 +1301,6 @@ presubmits:
             cpu: "2"
             memory: 2Gi
 
-  - name: test-infra_build-containers-2.0
-    decorate: true
-    path_alias: github.com/maistra/test-infra
-    skip_report: false
-    run_if_changed: '^docker/maistra-builder_2\.0\.Dockerfile|^docker/scripts'
-    branches:
-      - main
-    max_concurrency: 2
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.0"
-        imagePullPolicy: Always
-        command:
-        - entrypoint
-        - make
-        - build-containers-2.0
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - mountPath: /var/lib/docker
-          name: varlibdocker
-          readOnly: false
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-      volumes:
-      - emptyDir: {}
-        name: varlibdocker
-
   - name: test-infra_build-containers-2.1
     decorate: true
     path_alias: github.com/maistra/test-infra
@@ -1603,39 +1449,6 @@ presubmits:
         - entrypoint
         - make
         - maistra-proxy-builder_2.1
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - mountPath: /var/lib/docker
-          name: varlibdocker
-          readOnly: false
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "4"
-          requests:
-            cpu: "4"
-            memory: 4Gi
-      volumes:
-      - emptyDir: {}
-        name: varlibdocker
-
-  - name: test-infra_build-proxy-containers-2.0
-    decorate: true
-    path_alias: github.com/maistra/test-infra
-    skip_report: false
-    run_if_changed: '^docker/maistra-proxy-builder_2\.0\.Dockerfile'
-    branches:
-      - main
-    max_concurrency: 2
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.0"
-        imagePullPolicy: Always
-        command:
-        - entrypoint
-        - make
-        - maistra-proxy-builder_2.0
         securityContext:
           privileged: true
         volumeMounts:
@@ -3290,7 +3103,7 @@ presubmits:
     max_concurrency: 1
     spec:
       containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.0"
+      - image: "quay.io/maistra-dev/maistra-builder:2.3"
         imagePullPolicy: Always
         command:
         - entrypoint
