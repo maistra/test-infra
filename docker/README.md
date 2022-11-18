@@ -19,7 +19,7 @@ This is usually done by keeping the tools - and its versions - aligned to those 
 
 When developing a new builder image, it's a good practice to test it locally to make sure it builds correctly from the Dockerfile, and that it is able to actually run the jobs.
 
-To build the `maistra-builder` container image locally, run `make maistra-builder` in this repository, in the main directory. It will build all available versions of the container; generally, one per maistra minor version: 2.0, 2.1, etc. If you want to build only one specific version, append `_VERSION` to the make target, e.g.: `make maistra_builder_2.2`. Take a kook at the [Makefile](../Makefile) for other targets.
+To build the `maistra-builder` container image locally, run `make maistra-builder` in this repository, in the main directory. It will build all available versions of the container; generally, one per maistra minor version: 2.3, 2.4, etc. If you want to build only one specific version, append `_VERSION` to the make target, e.g.: `make maistra_builder_2.4`. Take a kook at the [Makefile](../Makefile) for other targets.
 
 
 ## Workflow
