@@ -56,7 +56,7 @@ deck:
         slug: envoy
 
 periodics:
-- name: daily-images-2.2
+- name: daily-images-2.4
   decorate: true
   cron: "00 03 * * *"  # Run at 3:00 UTC everyday
   labels:
@@ -64,10 +64,10 @@ periodics:
   extra_refs:
   - org: maistra
     repo: istio-images-centos
-    base_ref: maistra-2.2
+    base_ref: maistra-2.4
   spec:
     containers:
-    - image: "quay.io/maistra-dev/maistra-builder:2.2"
+    - image: "quay.io/maistra-dev/maistra-builder:2.4"
       imagePullPolicy: Always
       command:
       - entrypoint
