@@ -58,7 +58,7 @@ ENV GOCACHE=/gocache
 WORKDIR /root
 
 # Install all dependencies available in RPM repos
-# Stick with clang 14.0.0 which depends on gcc 11 which has the package gcc-toolset-11-libatomic-devel (latest clang depends on gcc 12 which does not have this package yet)
+# Stick with clang 14.0.6
 RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo && \
     curl -sfL https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
     dnf -y upgrade --refresh && \
@@ -71,8 +71,8 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    git make libtool patch which ninja-build golang xz redhat-rpm-config \
                    autoconf automake libtool cmake python2 libstdc++-static \
                    java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
-                   ruby-devel zlib-devel openssl-devel python2-setuptools gcc-toolset-11-libatomic-devel \
-                   clang-0:14.0.0-1.module_el8.7.0+1142+5343df54 llvm-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 lld-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 compiler-rt-0:14.0.0-3.module_el8.7.0+1149+a59781f0 \
+                   ruby-devel zlib-devel openssl-devel python2-setuptools gcc-toolset-12-libatomic-devel \
+                   clang-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 llvm-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 lld-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 compiler-rt-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 \
                    binaryen emsdk docker-ce rubygems npm yarn rpm-build && \
     dnf -y clean all
 
