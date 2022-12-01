@@ -949,6 +949,68 @@ presubmits:
           name: cgroup
         - emptyDir: {}
           name: varlibdocker
+  - name: istio-integration-servicemesh-2.4-mc
+    trigger: (?m)^/test( | .* )integration\-maistra\-servicemesh\-mc,?($|\s.*)
+    rerun_command: /test integration-maistra-servicemesh-mc
+    skip_report: false
+    max_concurrency: 2
+    always_run: true
+    branches:
+    - ^maistra-2.4$
+    decorate: true
+    path_alias: istio.io/istio
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - prow/integ-suite-kind.sh
+        - --topology
+        - MULTICLUSTER
+        - test.integration.servicemesh.kube
+        env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: INTEGRATION_TEST_FLAGS
+          value: ' --istio.test.retries=1 '
+        # FIXME: Uncomment this when we have our proxy in place
+        # - name: ISTIO_ENVOY_BASE_URL
+        #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
+        - name: TEST_SELECT
+          value: -postsubmit,-flaky,+multicluster
+
+        image: "quay.io/maistra-dev/maistra-builder:2.4"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
+        resources:
+          limits:
+            memory: 24Gi
+            cpu: "4"
+          requests:
+            cpu: "2"
+            memory: 2Gi
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
+      - emptyDir: {}
+        name: varlibdocker
+  
   - name: istio-integration-2.1
     trigger: (?m)^/test( | .* )integration,?($|\s.*)
     rerun_command: /test integration
