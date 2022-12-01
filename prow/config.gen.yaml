@@ -2070,8 +2070,6 @@ presubmits:
         - MULTICLUSTER
         - test.integration.servicemesh.kube
         env:
-        - name: GOFLAGS
-          value: -mod=vendor
         - name: BUILD_WITH_CONTAINER
           value: "0"
         - name: INTEGRATION_TEST_FLAGS
