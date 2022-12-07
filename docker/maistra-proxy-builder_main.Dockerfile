@@ -7,7 +7,7 @@ FROM quay.io/centos/centos:stream8
 #   source /opt/rh/gcc-toolset-11/enable
 
 # Versions
-ENV K8S_TEST_INFRA_VERSION=5b1d25764f
+ENV K8S_TEST_INFRA_VERSION=a1b0b85d88d615a623641ae6b01a3a9b6d2aa265
 ENV GCLOUD_VERSION=360.0.0
 ENV BAZEL_VERSION=4.2.1
 
