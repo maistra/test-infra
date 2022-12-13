@@ -472,7 +472,7 @@ postsubmits:
       repo: test-infra
     spec:
       containers:
-      - image: "quay.io/maistra-dev/maistra-proxy-builder:2.4"
+      - image: "quay.io/maistra-dev/maistra-builder:2.4"
         imagePullPolicy: Always
         command:
         - ../test-infra/tools/automator.sh
