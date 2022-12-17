@@ -155,6 +155,62 @@ presubmits:
         - emptyDir: {}
           name: varlibdocker
 
+  - name: istio-operator-push-image-2.3
+    trigger: (?m)^/push\-image,?($|\s.*)
+    rerun_command: /push-image
+    skip_report: true
+    max_concurrency: 2
+    always_run: false
+    branches:
+    - ^maistra-2.3$
+    decorate: true
+    path_alias: github.com/maistra/istio-operator
+    labels:
+      preset-quay-pusher: "true"
+    spec:
+      containers:
+      - command:
+        - entrypoint
+        - sh
+        - -c
+        - IMAGE="quay.io/maistra-dev/istio-ubi8-operator:PR-${PULL_NUMBER}" make push
+        env:
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        image: "quay.io/maistra-dev/maistra-builder:2.3"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /lib/modules
+          name: modules
+          readOnly: true
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+          readOnly: true
+        - mountPath: /var/lib/docker
+          name: varlibdocker
+          readOnly: false
+        resources:
+          limits:
+            memory: 2Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
+      volumes:
+      - hostPath:
+          path: /lib/modules
+          type: Directory
+        name: modules
+      - hostPath:
+          path: /sys/fs/cgroup
+          type: Directory
+        name: cgroup
+      - emptyDir: {}
+        name: varlibdocker
+
   maistra/test-infra:
   - name: test-infra_lint
     decorate: true
