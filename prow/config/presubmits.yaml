@@ -1032,7 +1032,7 @@ presubmits:
         # - name: ISTIO_ENVOY_BASE_URL
         #   value: https://storage.googleapis.com/maistra-prow-testing/proxy
         - name: TEST_SELECT
-          value: -postsubmit,-flaky,+multicluster
+          value: -postsubmit,-flaky
 
         image: "quay.io/maistra-dev/maistra-builder:2.4"
         imagePullPolicy: Always
