@@ -39,7 +39,7 @@ ENV K8S_TEST_INFRA_VERSION=a1b0b85d88d615a623641ae6b01a3a9b6d2aa265
 ENV BUF_VERSION=v1.8.0
 ENV GCLOUD_VERSION=405.0.1
 ENV SU_EXEC_VERSION=0.2
-ENV BAZEL_VERSION=6.0.0-pre.20220706.4
+ENV BAZEL_VERSION=6.0.0
 ENV BOM_VERSION=v0.3.0
 ENV CRANE_VERSION=v0.11.0
 ENV YQ_VERSION=4.28.1
@@ -68,17 +68,13 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
     dnf -y copr enable @maistra/istio-2.3 centos-stream-8-x86_64 && \
     dnf -y module reset ruby nodejs python38 && dnf -y module enable ruby:2.7 nodejs:16 python38 && dnf -y module install ruby nodejs python38 && \
     dnf -y install --nodocs --setopt=install_weak_deps=False \
-                   git make libtool patch which ninja-build xz redhat-rpm-config \
+                   git make libtool patch which ninja-build golang xz redhat-rpm-config \
                    autoconf automake libtool cmake python2 libstdc++-static \
                    java-11-openjdk-devel jq file diffutils lbzip2 \
                    ruby-devel zlib-devel openssl-devel python2-setuptools gcc-toolset-12-libatomic-devel \
                    clang-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 llvm-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 lld-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 compiler-rt-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 \
                    binaryen emsdk docker-ce npm yarn rpm-build && \
     dnf -y clean all
-
-# Install go 1.19
-# FIXME: Replace with go from centos dnf repo when 1.19 is available
-RUN curl -sfL https://go.dev/dl/go1.19.3.linux-amd64.tar.gz | tar zx -C /usr/local
 
 # Build and install a bunch of Go tools
 RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
