@@ -785,8 +785,6 @@ postsubmits:
     skip_report: false
     branches:
       - ^maistra-2.2$
-      # Allow for testing
-      - playground
     labels:
       preset-github: "true"
     extra_refs:
@@ -829,8 +827,6 @@ postsubmits:
     skip_report: false
     branches:
       - ^maistra-2.3$
-      # Allow for testing
-      - playground
     labels:
       preset-github: "true"
     extra_refs:
@@ -847,7 +843,7 @@ postsubmits:
         - -o maistra
         - -r istio-operator
         - -f /creds-github/github-token
-        - -c make clean update-2.3-charts
+        - -c make clean update-charts-2.3
         - '-t Automator: Update charts from maistra/istio'
         - -m update_charts_istio
         env:
@@ -865,6 +861,46 @@ postsubmits:
             cpu: "4"
           requests:
             cpu: "2"
+            memory: 1Gi
+
+  - name: istio-update-operator-2.4
+    decorate: true
+    path_alias: maistra.io/istio
+    skip_report: false
+    branches:
+      - ^maistra-2.4$
+    labels:
+      preset-github: "true"
+    extra_refs:
+    - base_ref: main
+      org: maistra
+      path_alias: maistra.io/test-infra
+      repo: test-infra
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.4"
+        imagePullPolicy: Always
+        command:
+        - ../test-infra/tools/automator.sh
+        - -o maistra
+        - -r istio-operator
+        - -f /creds-github/github-token
+        - -c make clean update-charts-2.4
+        - '-t Automator: Update charts from maistra/istio'
+        - -m update_charts_istio
+        env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: "4"
+          requests:
+            cpu: "1"
             memory: 1Gi
 
   maistra/istio-operator:
@@ -955,6 +991,50 @@ postsubmits:
             cpu: "4"
           requests:
             cpu: "2"
+            memory: 1Gi
+
+  - name: update-charts-in-2.4
+    decorate: true
+    path_alias: maistra.io/istio-operator
+    skip_report: false
+    branches:
+    - ^maistra-2.1$
+    - ^maistra-2.2$
+    - ^maistra-2.3$
+    labels:
+      preset-github: "true"
+    extra_refs:
+    - base_ref: main
+      org: maistra
+      path_alias: maistra.io/test-infra
+      repo: test-infra
+    spec:
+      containers:
+      - image: "quay.io/maistra-dev/maistra-builder:2.4"
+        imagePullPolicy: Always
+        command:
+        - ../test-infra/tools/automator.sh
+        - -o maistra
+        - -r istio-operator
+        - -b maistra-2.4
+        - -f /creds-github/github-token
+        - -c make clean update-charts-2.1 update-charts-2.2 update-charts-2.3
+        - '-t Automator: Update charts from previous versions'
+        - -m update_charts_from_previous_versions
+        - -l auto-merge
+        env:
+        - name: BUILD_WITH_CONTAINER
+          value: "0"
+        - name: XDG_CACHE_HOME
+          value: /tmp/cache
+        - name: GOCACHE
+          value: /tmp/cache
+        resources:
+          limits:
+            memory: 4Gi
+            cpu: "4"
+          requests:
+            cpu: "1"
             memory: 1Gi
 
   maistra/header-append-filter:
