@@ -5,126 +5,147 @@ plugins:
     - trigger
     - hold
     - wip
+    - override
   maistra-prow-testing:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/api:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/istio-operator:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/test-infra:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/istio:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/xns-informer:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/ior:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/rpm-common:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/rpm-ior:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/rpm-istio-operator:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/proxy:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/envoy:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/header-append-filter:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/istio-must-gather:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/olm-metadata:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/istio-images-centos:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/istio-cni:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/prometheus:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/rpms:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
   maistra/jwt_verify_lib:
     plugins:
     - size
     - trigger
     - hold
     - wip
+    - override
 
   dgn/oidc-filter:
     plugins:
@@ -132,6 +153,7 @@ plugins:
     - trigger
     - hold
     - wip
+    - override
 
 external_plugins:
   maistra:
