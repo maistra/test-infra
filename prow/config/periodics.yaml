@@ -77,3 +77,37 @@ periodics:
     volumes:
     - emptyDir: {}
       name: varlibdocker
+
+- name: merge-upstream-istio-2.4
+  decorate: true
+  cron: "00 05 * * 1-5"  # Run at 5:00 UTC every M-F
+  labels:
+    preset-github: "true"
+  extra_refs:
+  - org: maistra
+    repo: test-infra
+    base_ref: main
+  spec:
+    containers:
+    - image: "quay.io/maistra-dev/maistra-builder:2.4"
+      imagePullPolicy: Always
+      command:
+      - ./tools/automator-main.sh
+      - --org=maistra
+      - --repo=istio
+      - --branch=maistra-2.4
+      - --token-path=/creds-github/github-token
+      - "--title=Automator: merge upstream changes to $AUTOMATOR_ORG/$AUTOMATOR_REPO@$AUTOMATOR_BRANCH"
+      - "--labels=merge strategy"
+      - --modifier=merge_upstream_istio_1_16
+      - --merge-repository=https://github.com/istio/istio.git
+      - --merge-branch=release-1.16
+      - --merge-failure-notify=@maistra/release-managers-2-4
+      - --merge-strategy=merge
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: "2"
+        requests:
+          cpu: "1"
+          memory: 1Gi
