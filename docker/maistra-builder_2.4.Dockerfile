@@ -59,6 +59,7 @@ WORKDIR /root
 
 # Install all dependencies available in RPM repos
 # Stick with clang 14.0.6
+# Stick with golang 1.19
 RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo && \
     curl -sfL https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
     dnf -y upgrade --refresh && \
@@ -67,8 +68,8 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
     dnf -y install epel-release epel-next-release && \
     dnf -y copr enable @maistra/istio-2.3 centos-stream-8-x86_64 && \
     dnf -y module reset ruby nodejs python38 && dnf -y module enable ruby:2.7 nodejs:16 python38 && dnf -y module install ruby nodejs python38 && \
-    dnf -y install --nodocs --setopt=install_weak_deps=False \
-                   git make libtool patch which ninja-build golang xz redhat-rpm-config \
+    dnf -y install --setopt=install_weak_deps=False \
+                   git make libtool patch which ninja-build go-toolset-0:1.19.4 xz redhat-rpm-config \
                    autoconf automake libtool cmake python2 libstdc++-static \
                    java-11-openjdk-devel jq file diffutils lbzip2 \
                    ruby-devel zlib-devel openssl-devel python2-setuptools gcc-toolset-12-libatomic-devel \
