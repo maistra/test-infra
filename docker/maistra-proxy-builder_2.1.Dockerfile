@@ -27,6 +27,11 @@ RUN dnf -y copr enable jwendell/clang11 && \
                    binaryen-97.0.0-1.el8 && \
     dnf -y clean all
 
+# Workaround git issues on OpenShift Prow CI
+RUN ifeq ($(CI),true) \
+    git config --global --add safe.directory '*' \
+    endif
+
 # Bazel
 RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/3.7.2/bazel-3.7.2-linux-x86_64 && \
     chmod +x /usr/bin/bazel

@@ -71,6 +71,11 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    binaryen emsdk docker-ce python3-pip rubygems npm rpm-build && \
     dnf -y clean all
 
+# Workaround git issues on OpenShift Prow CI
+RUN ifeq ($(CI),true) \
+    git config --global --add safe.directory '*' \
+    endif
+
 # Build and install a bunch of Go tools
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
     go install github.com/gogo/protobuf/protoc-gen-gofast@${GOGO_PROTOBUF_VERSION} && \

@@ -49,6 +49,11 @@ RUN curl -sfL https://download.docker.com/linux/fedora/docker-ce.repo -o /etc/yu
                    openssl-devel && \
     dnf -y clean all
 
+# Workaround git issues on OpenShift Prow CI
+RUN ifeq ($(CI),true) \
+    git config --global --add safe.directory '*' \
+    endif
+
 # Go tools
 ENV GOBIN=/usr/local/bin
 RUN GO111MODULE=off go get github.com/myitcv/gobin && \

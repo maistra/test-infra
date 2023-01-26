@@ -24,6 +24,11 @@ RUN dnf -y upgrade --refresh && \
                    binaryen && \
     dnf -y clean all
 
+# Workaround git issues on OpenShift Prow CI
+RUN ifeq ($(CI),true) \
+    git config --global --add safe.directory '*' \
+    endif
+
 # Bazel
 RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-x86_64 && \
     chmod +x /usr/bin/bazel
