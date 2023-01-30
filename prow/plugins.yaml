@@ -41,6 +41,13 @@ plugins:
     - hold
     - wip
     - override
+  maistra/maistra-test-tool:
+    plugins:
+    - size
+    - trigger
+    - hold
+    - wip
+    - override
   maistra/xns-informer:
     plugins:
     - size
@@ -163,6 +170,12 @@ external_plugins:
       - pull_request
       
   maistra-prow-testing:
+  - name: cherrypicker
+    events:
+      - issue_comment
+      - pull_request
+
+  maistra-test-tool:
   - name: cherrypicker
     events:
       - issue_comment
