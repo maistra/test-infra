@@ -12,11 +12,6 @@ branch-protection:
       required_pull_request_reviews:
         required_approving_review_count: 1
         require_code_owner_reviews: false
-    maistra:
-      required_pull_request_reviews:
-        required_approving_review_count: 2
-        require_code_owner_reviews: false
-
 deck:
   spyglass:
     size_limit: 500000000  # 500 MB
@@ -2308,21 +2303,11 @@ tide:
 
   - repos:
     - maistra/test-infra
-    - maistra/proxy
-    - maistra/envoy
-    - maistra/istio
-    - maistra/istio-operator
-    - maistra/istio-must-gather
     - maistra/olm-metadata
     - maistra/maistra.github.io
-    - maistra/istio-images-centos
     - maistra/istio-cni
-    - maistra/prometheus
     - maistra/rpms
     - maistra/ior
-    - maistra/header-append-filter
-    - maistra/api
-    - maistra/xns-informer
     - maistra/jwt_verify_lib
     - dgn/oidc-filter
     labels:

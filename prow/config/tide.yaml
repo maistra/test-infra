@@ -20,21 +20,11 @@ tide:
 
   - repos:
     - maistra/test-infra
-    - maistra/proxy
-    - maistra/envoy
-    - maistra/istio
-    - maistra/istio-operator
-    - maistra/istio-must-gather
     - maistra/olm-metadata
     - maistra/maistra.github.io
-    - maistra/istio-images-centos
     - maistra/istio-cni
-    - maistra/prometheus
     - maistra/rpms
     - maistra/ior
-    - maistra/header-append-filter
-    - maistra/api
-    - maistra/xns-informer
     - maistra/jwt_verify_lib
     - dgn/oidc-filter
     labels:
