@@ -34,16 +34,3 @@ tide:
     - do-not-merge/hold
     - do-not-merge/work-in-progress
     reviewApprovedRequired: true
-
-  - repos:
-    - maistra/proxy
-    - maistra/istio
-    - maistra/istio-operator
-    author: maistra-bot
-    missingLabels:
-    - do-not-merge
-    - do-not-merge/hold
-    - do-not-merge/work-in-progress
-    labels:
-    - auto-merge
-    reviewApprovedRequired: false
