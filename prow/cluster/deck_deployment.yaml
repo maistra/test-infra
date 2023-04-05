@@ -41,7 +41,6 @@ spec:
           - name: http
             containerPort: 8080
         args:
-        - --tide-url=http://tide/
         - --hook-url=http://hook:8888/plugin-help
         - --config-path=/etc/config/config.yaml
         - --github-token-path=/etc/github/oauth
