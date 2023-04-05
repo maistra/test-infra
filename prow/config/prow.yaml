@@ -1,2 +1,7 @@
 prowjob_namespace: ${NAMESPACE}
 pod_namespace: ${WORKER_NS}
+
+github_reporter:
+  job_types_to_report:
+  - presubmit
+  - postsubmit
