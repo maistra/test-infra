@@ -125,13 +125,6 @@ plugins:
     - hold
     - wip
     - override
-  maistra/prometheus:
-    plugins:
-    - size
-    - trigger
-    - hold
-    - wip
-    - override
   maistra/rpms:
     plugins:
     - size
