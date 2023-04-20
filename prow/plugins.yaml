@@ -5,56 +5,48 @@ plugins:
     - trigger
     - hold
     - wip
-    - override
   maistra/test-infra:
     plugins:
     - size
     - trigger
     - hold
     - wip
-    - override
   maistra/istio:
     plugins:
     - size
     - trigger
     - hold
     - wip
-    - override
   maistra/istio-operator:
     plugins:
     - size
     - trigger
     - hold
     - wip
-    - override
   maistra/proxy:
     plugins:
     - size
     - trigger
     - hold
     - wip
-    - override
   maistra/envoy:
     plugins:
     - size
     - trigger
     - hold
     - wip
-    - override
   maistra/header-append-filter:
     plugins:
     - size
     - trigger
     - hold
     - wip
-    - override
   maistra/istio-images-centos:
     plugins:
     - size
     - trigger
     - hold
     - wip
-    - override
 
 external_plugins:
   maistra:
