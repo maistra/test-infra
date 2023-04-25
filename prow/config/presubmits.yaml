@@ -208,39 +208,3 @@ presubmits:
           path: /sys/fs/cgroup
           type: Directory
         name: cgroup
-
-  maistra/header-append-filter:
-  - name: header-append-filter_build-containers
-    decorate: true
-    path_alias: github.com/maistra/header-append-filter
-    skip_report: false
-    always_run: true
-    branches:
-      - ^maistra-2.4$
-      - ^maistra-2.3$
-      - ^maistra-2.2$
-    max_concurrency: 2
-    spec:
-      containers:
-      - image: "quay.io/maistra-dev/maistra-builder:2.4"
-        imagePullPolicy: Always
-        command:
-        - entrypoint
-        - make
-        - container
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - mountPath: /var/lib/docker
-          name: varlibdocker
-          readOnly: false
-        resources:
-          limits:
-            memory: 16Gi
-            cpu: "4"
-          requests:
-            cpu: "2"
-            memory: 2Gi
-      volumes:
-      - emptyDir: {}
-        name: varlibdocker
