@@ -44,3 +44,74 @@ These are the steps when developing a container image for a newer Maistra versio
 
 It's worth to mention that the steps above are not final. During the developing of a new Maistra version, as people are doing rebases, building, testing, etc it might be necessary to make adjustements to the Dockerfile, adding new tools, fixing variables, paths, etc. This is normal behavior.
 
+
+## How to develop multi arch builder image locally
+
+References:
+- https://github.com/multiarch/qemu-user-static
+- https://gist.github.com/tnk4on/93e87652cd50972899bfa2f3949a010b
+
+1. Run qemu-user-static
+
+```
+sudo podman run \
+    --rm \
+    --privileged \
+    multiarch/qemu-user-static \
+    --reset -p yes
+```
+
+2. Run a container with --arch . For example, run a container with base image ubi8
+
+```
+sudo podman run -d -t \
+    --rm \
+    --name test-x86 \
+    --arch amd64 \
+    --privileged \
+    -v /var/lib/docker \
+    registry.access.redhat.com/ubi8/ubi:8.8-854 \
+    tail -f /dev/null
+
+sudo podman exec -it test-x86 /bin/bash
+```
+
+```
+sudo podman run -d -t \
+    --rm \
+    --name test-arm \
+    --arch aarch64 \
+    --privileged \
+    -v /var/lib/docker \
+    registry.access.redhat.com/ubi8/ubi:8.8-854 \
+    tail -f /dev/null
+
+sudo podman exec -it test-arm /bin/bash
+```
+
+```
+sudo podman run -d -t \
+    --rm \
+    --name test-p \
+    --arch ppc64le \
+    --privileged \
+    -v /var/lib/docker \
+    registry.access.redhat.com/ubi8/ubi:8.8-854 \
+    tail -f /dev/null
+
+sudo podman exec -it test-p /bin/bash
+```
+
+```
+sudo podman run -d -t \
+    --rm \
+    --name test-z \
+    --arch s390x \
+    --privileged \
+    -v /var/lib/docker \
+    registry.access.redhat.com/ubi8/ubi:8.8-854 \
+    tail -f /dev/null
+
+sudo podman exec -it test-z /bin/bash
+```
+
