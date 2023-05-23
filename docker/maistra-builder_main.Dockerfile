@@ -58,7 +58,7 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    gcc-toolset-11 gcc-toolset-11-libatomic-devel gcc-toolset-11-annobin-plugin-gcc \
                    java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
                    clang llvm lld ruby-devel zlib-devel openssl-devel \
-                   binaryen docker-ce python3-pip rubygems npm && \
+                   binaryen docker-ce docker-buildx-plugin python3-pip rubygems npm && \
     dnf -y clean all
 
 # Build and install a bunch of Go tools
