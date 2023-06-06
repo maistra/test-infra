@@ -86,8 +86,8 @@ RUN case $(arch) in \
 # Stick with clang 13
 # Stick with golang 1.19
 # Replace dnf install ninja-build with pip3 install ninja in the section Python tools
-RUN dnf -y config-manager --set-enabled rhel-8-for-$(arch)-appstream-rpms && \
-    dnf -y config-manager --set-enabled CSB_repo-rhel-8-csb_Extra_Packages_for_Enterprise_Linux_8_-_$(arch) && \
+RUN dnf repolist && \
+    dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm && \
     dnf -y install dnf-plugins-core && \
     dnf -y install epel-release && \
     dnf -y module reset ruby nodejs python38 && dnf -y module enable ruby:2.7 nodejs:16 python38 && dnf -y module install ruby nodejs python38 && \
