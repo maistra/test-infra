@@ -1,4 +1,4 @@
-FROM quay.io/centos/centos:stream8
+FROM registry.access.redhat.com/ubi8/ubi:8.8-854
 
 # Versions
 ENV ISTIO_TOOLS_SHA=release-1.16
@@ -53,28 +53,49 @@ ENV GOSUMDB=sum.golang.org
 ENV GOPATH=/go
 ENV GOCACHE=/gocache
 
+ENV CARGO_HOME="/rust"
+ENV RUSTUP_HOME="/rust"
+
 ENV PATH=/usr/local/go/bin:/rust/bin:/usr/local/google-cloud-sdk/bin:$PATH
 
 WORKDIR /root
 
+# Install docker and maistra copr related RPM 
+RUN case $(arch) in \
+        x86_64) \
+            ARCH="amd64"; \
+            DOCKER_PLATFORM="centos"; \
+            dnf -y copr enable @maistra/istio-2.3 centos-stream-8-x86_64; \
+            dnf -y install --setopt=install_weak_deps=False binaryen emsdk; \
+            ;; \
+        s390x) \
+            ARCH="$(arch)"; \
+            DOCKER_PLATFORM="rhel"; \
+            ;; \
+        *) \
+            ARCH="$(arch)"; \
+            DOCKER_PLATFORM="centos"; \
+            ;; \
+    esac; \
+    \
+    curl -sfL "https://download.docker.com/linux/${DOCKER_PLATFORM}/docker-ce.repo" -o /etc/yum.repos.d/docker-ce.repo && \
+    curl -sfL https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
+    dnf -y upgrade --refresh --nobest
+
 # Install all dependencies available in RPM repos
 # Stick with clang 13
 # Stick with golang 1.19
-RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo && \
-    curl -sfL https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
-    dnf -y upgrade --refresh && \
-    dnf -y install dnf-plugins-core && \
-    dnf -y config-manager --set-enabled powertools && \
-    dnf -y install epel-release epel-next-release && \
-    dnf -y copr enable @maistra/istio-2.3 centos-stream-8-x86_64 && \
+# Replace dnf install ninja-build with pip3 install ninja in the section Python tools
+RUN dnf -y install dnf-plugins-core && \
+    dnf -y install epel-release && \
     dnf -y module reset ruby nodejs python38 && dnf -y module enable ruby:2.7 nodejs:16 python38 && dnf -y module install ruby nodejs python38 && \
     dnf -y install --setopt=install_weak_deps=False \
-                   git make libtool patch which ninja-build go-toolset-0:1.19.4 xz redhat-rpm-config \
+                   git make libtool patch which go-toolset-0:1.19.9-1.module+el8.8.0+18857+fca43658 xz redhat-rpm-config \
                    autoconf automake libtool cmake python2 libstdc++-static \
                    java-11-openjdk-devel jq file diffutils lbzip2 \
-                   ruby-devel zlib-devel openssl-devel python2-setuptools gcc-toolset-12-libatomic-devel \
-                   clang-0:13.0.0-3.module_el8.6.0+1074+380cef3f llvm-0:13.0.0-3.module_el8.6.0+1029+6594c364 lld-0:13.0.0-2.module_el8.6.0+1064+393664b9 compiler-rt-0:13.0.0-1.module_el8.6.0+1029+6594c364 \
-                   binaryen emsdk docker-ce docker-buildx-plugin npm yarn rpm-build && \
+                   ruby-devel zlib-devel openssl-devel python2-setuptools gcc-toolset-12-gcc-0:12.2.1-7.4.el8 \
+                   llvm-toolset-0:13.0.1-1.module+el8.6.0+14118+d530a951 \
+                   docker-ce docker-buildx-plugin npm yarn rpm-build && \
     dnf -y clean all
 
 # Build and install a bunch of Go tools
@@ -126,25 +147,32 @@ RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${G
     go install ./robots/pr-creator && \
     go install ./prow/cmd/peribolos && \
     go install ./prow/cmd/checkconfig && \
-    go install ./pkg/benchmarkjunit && \
-    \
-    rm -rf /root/* /root/.cache /tmp/* /gocache/* /go/pkg
+    go install ./pkg/benchmarkjunit
 
-# YQ
-RUN curl -sfL https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 -o /usr/local/bin/yq-go && chmod +x /usr/local/bin/yq-go
+# Replace curl install yq with pip3 install yq in the section Python tools
 
 # GH CLI
-RUN curl -sfLO https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz && \
-    tar zxf gh_${GH_VERSION}_linux_amd64.tar.gz && \
-    mv gh_${GH_VERSION}_linux_amd64/bin/gh /usr/local/bin && chown root.root /usr/local/bin/gh && \
-    rm -rf /root/* /root/.cache /tmp/*
+RUN case $(arch) in \
+        x86_64) \
+            ARCH="amd64"; \
+            ;; \
+        *) \
+            ARCH="$(arch)"; \
+            ;; \
+    esac; \
+    \
+    curl -sfLO https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${ARCH}.tar.gz && \
+    tar zxf gh_${GH_VERSION}_linux_${ARCH}.tar.gz && \
+    mv gh_${GH_VERSION}_linux_${ARCH}/bin/gh /usr/local/bin && chown root.root /usr/local/bin/gh
 
 # Python tools
 RUN pip3 install --no-binary :all: autopep8==${AUTOPEP8_VERSION} && \
     pip3 install yamllint==${YAMLLINT_VERSION} && \
-    pip3 install yq && mv /usr/local/bin/yq /usr/local/bin/yq-python && \
-    ln -s /usr/local/bin/yq-go /usr/local/bin/yq && \
-    rm -rf /root/* /root/.cache /tmp/*
+    pip3 install ninja && \
+    pip3 install yq && \
+    ln -s /usr/local/bin/yq /usr/local/bin/yq-python && \
+    ln -s /usr/local/bin/yq /usr/local/bin/yq-go && \
+    chmod +x /usr/local/bin/yq
 
 # ShellCheck linter
 RUN curl -sfL https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz | tar -xJ shellcheck-${SHELLCHECK_VERSION}/shellcheck --strip=1 && \
@@ -154,25 +182,52 @@ RUN curl -sfL https://github.com/koalaman/shellcheck/releases/download/${SHELLCH
 RUN curl -sfL https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64 -o /usr/bin/hadolint && \
     chmod +x /usr/bin/hadolint
 
-# Helm
-RUN curl -sfL https://get.helm.sh/helm-${HELM3_VERSION}-linux-amd64.tar.gz | tar -xz linux-amd64/helm --strip=1 && \
-    mv helm /usr/local/bin/helm && chown root.root /usr/local/bin/helm && ln -s /usr/local/bin/helm /usr/local/bin/helm3
-
-# Kubectl
-RUN curl -sfL https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && \
+# Helm and Kubectl
+RUN case $(arch) in \
+        x86_64) \
+            ARCH="amd64"; \
+            ;; \
+        *) \
+            ARCH="$(arch)"; \
+            ;; \
+    esac; \
+    \
+    curl -sfL https://get.helm.sh/helm-${HELM3_VERSION}-linux-${ARCH}.tar.gz | tar -xz linux-${ARCH}/helm --strip=1 && \
+    mv helm /usr/local/bin/helm && chown root.root /usr/local/bin/helm && ln -s /usr/local/bin/helm /usr/local/bin/helm3 && \
+    curl -sfL https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl -o /usr/local/bin/kubectl && \
     chmod +x /usr/local/bin/kubectl
 
 # Protoc
-RUN curl -sfLO https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
-    unzip protoc-${PROTOC_VERSION}-linux-x86_64.zip && \
-    mv bin/protoc /usr/local/bin && \
-    rm -rf /root/* /root/.cache /tmp/*
+RUN case $(arch) in \
+        x86_64) \
+            PROTOC_ARCH="x86_64";; \
+        ppc64le) \
+            PROTOC_ARCH="ppcle_64";; \
+        s390x) \
+            PROTOC_ARCH="s390_64";; \
+        aarch64) \
+            PROTOC_ARCH="aarch_64";; \
+        *) \
+             PROTOC_ARCH="x86_64";; \
+        esac; \
+        \
+    curl -sfLO https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip && \
+    unzip protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip && \
+    mv bin/protoc /usr/local/bin
 
 # Promu
-RUN curl -sfLO https://github.com/prometheus/promu/releases/download/v${PROMU_VERSION}/promu-${PROMU_VERSION}.linux-amd64.tar.gz && \
-    tar -zxvf promu-${PROMU_VERSION}.linux-amd64.tar.gz && \
-    mv promu-${PROMU_VERSION}.linux-amd64/promu /usr/local/bin && chown root.root /usr/local/bin/promu && \
-    rm -rf /root/* /root/.cache /tmp/*
+RUN case $(arch) in \
+        x86_64) \
+            ARCH="amd64"; \
+            ;; \
+        *) \
+            ARCH="$(arch)"; \
+            ;; \
+    esac; \
+    \
+    curl -sfLO https://github.com/prometheus/promu/releases/download/v${PROMU_VERSION}/promu-${PROMU_VERSION}.linux-${ARCH}.tar.gz && \
+    tar -zxvf promu-${PROMU_VERSION}.linux-${ARCH}.tar.gz && \
+    mv promu-${PROMU_VERSION}.linux-${ARCH}/promu /usr/local/bin && chown root.root /usr/local/bin/promu
 
 # Google cloud tools
 RUN curl -sfL -o /tmp/gc.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-linux-x86_64.tar.gz && \
@@ -202,19 +257,19 @@ RUN mkdir -p /tmp/fpm && \
     git remote add origin https://github.com/jordansissel/fpm && \
     git fetch --depth 1 origin ${FPM_VERSION} && \
     git checkout FETCH_HEAD && \
-    make install && \
-    rm -rf /tmp/*
+    make install
 
 # MDL
-RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION} && \
-    rm -rf /root/* /root/.cache /root/.gem /tmp/*
+RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION}
 
 # Rust (for WASM filters)
-ENV CARGO_HOME "/rust"
-ENV RUSTUP_HOME "/rust"
-RUN mkdir /rust && chmod 777 /rust && \
+RUN mkdir -p /rust && chmod 777 /rust && \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
     /rust/bin/rustup target add wasm32-unknown-unknown
+
+# Clean cache
+RUN dnf -y clean all && \
+    rm -rf /root/.cache /tmp/* /gocache/* /go/pkg
 
 RUN mkdir -p /work && chmod 777 /work
 WORKDIR /work
