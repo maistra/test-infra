@@ -68,7 +68,7 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
                    ruby-devel zlib-devel openssl-devel python2-setuptools gcc-toolset-12-libatomic-devel \
                    clang-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 llvm-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 lld-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 compiler-rt-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 \
-                   binaryen emsdk docker-ce python3-pip rubygems npm rpm-build && \
+                   binaryen emsdk docker-ce docker-buildx-plugin python3-pip rubygems npm rpm-build && \
     dnf -y clean all
 
 # Build and install a bunch of Go tools

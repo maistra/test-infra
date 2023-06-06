@@ -58,7 +58,7 @@ ENV PATH=/usr/local/go/bin:/rust/bin:/usr/local/google-cloud-sdk/bin:$PATH
 WORKDIR /root
 
 # Install all dependencies available in RPM repos
-# Stick with clang 14.0.6
+# Stick with clang 13
 # Stick with golang 1.19
 RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo && \
     curl -sfL https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo && \
@@ -73,8 +73,8 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
                    autoconf automake libtool cmake python2 libstdc++-static \
                    java-11-openjdk-devel jq file diffutils lbzip2 \
                    ruby-devel zlib-devel openssl-devel python2-setuptools gcc-toolset-12-libatomic-devel \
-                   clang-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 llvm-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 lld-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 compiler-rt-0:14.0.6-1.module_el8.7.0+1198+0c3eb6e2 \
-                   binaryen emsdk docker-ce npm yarn rpm-build && \
+                   clang-0:13.0.0-3.module_el8.6.0+1074+380cef3f llvm-0:13.0.0-3.module_el8.6.0+1029+6594c364 lld-0:13.0.0-2.module_el8.6.0+1064+393664b9 compiler-rt-0:13.0.0-1.module_el8.6.0+1029+6594c364 \
+                   binaryen emsdk docker-ce docker-buildx-plugin npm yarn rpm-build && \
     dnf -y clean all
 
 # Build and install a bunch of Go tools
