@@ -27,7 +27,7 @@ cleanup() {
 }
 
 get_opts() {
-  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-strategy:,git-exclude:,strict,dry-run,verbose -n "$(basename "$0")" -- "$@")"; then
+  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-strategy:,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
     eval set -- "$opt"
   else
     print_error_and_exit "unable to parse options"
@@ -133,6 +133,10 @@ get_opts() {
       git_exclude="$2"
       shift 2
       ;;
+    --fetch-tags)
+      fetch_tags=true
+      shift
+      ;;
     --)
       shift
       script_args=("$@")
@@ -150,6 +154,10 @@ validate_opts() {
   sha_short="$(current_sha --short)"
   commit_date="$(commit_date)"
   merge=false
+
+  if [ -z "${fetch_tags:-}" ]; then
+    fetch_tags=false
+  fi
 
   if [ -z "${strict:-}" ]; then
     strict=false
@@ -226,6 +234,7 @@ validate_opts() {
   if [ -z "${git_exclude:-}" ]; then
     git_exclude=""
   fi
+
 }
 
 evaluate_opts() {
@@ -281,7 +290,16 @@ commit() {
 merge() {
   local src_branch="${AUTOMATOR_SRC_BRANCH:-none}"
   fork_name="$src_branch-$branch-$modifier-$(hash "$title")"
-  git remote add -f -t "$merge_branch" upstream "$merge_repository"
+
+  if $fetch_tags; then
+    merge_branch="$(git describe --tags --abbrev=0 "$merge_branch")"
+    git remote add upstream "$merge_repository"
+    git fetch upstream tag "$merge_branch"
+    echo "Using tag $merge_branch"
+  else
+    git remote add -f -t "$merge_branch" upstream "$merge_repository"
+    echo "Using branch $merge_branch"
+  fi
 
   set +e # git return a non-zero exit code on merge failure, which fails the script
   if [ "${merge_strategy}" == "merge" ]; then
