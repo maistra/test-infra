@@ -259,3 +259,4 @@ RUN chmod +x /usr/local/bin/entrypoint
 # Run config setup in local environments
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
+
