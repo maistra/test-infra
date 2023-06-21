@@ -1,8 +1,0 @@
-branch-protection:
-  allow_disabled_policies: true
-  protect: true
-  orgs:
-    maistra-prow-testing:
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-        require_code_owner_reviews: false
