@@ -37,21 +37,8 @@ ${BUILD_PROXY_IMAGE}.push: ${BUILD_PROXY_IMAGE}
 ${BUILD_PROXY_IMAGE}_%.push: ${BUILD_PROXY_IMAGE}_%
 	$(CONTAINER_CLI) push ${HUB}/${BUILD_PROXY_IMAGE}:$*
 
-gen-check: gen check-clean-repo
-
-gen:
-	(cd prow; sh gen-config.sh)
-
-check-clean-repo:
-	@if [[ -n $$(git status --porcelain) ]]; then git status; git diff; echo "ERROR: Some files need to be updated, please run 'make gen' and include any changed files in your PR"; exit 1;	fi
-
-update-prow:
-	(cd prow; sh update.sh)
-
 lint:
 	find . -name '*.sh' -print0 | xargs -0 -r shellcheck
-	checkconfig -strict -config-path prow/config.gen.yaml -plugin-config prow/plugins.yaml
-	@scripts/check-resource-limits.sh
 
 # these will build the containers and then try to use them to build themselves again, making sure we didn't break docker support
 build-containers-%: ${BUILD_IMAGE}_%
