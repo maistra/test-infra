@@ -292,9 +292,8 @@ merge() {
   fork_name="$src_branch-$branch-$modifier-$(hash "$title")"
 
   if $fetch_tags; then
-    merge_branch="$(git describe --tags --abbrev=0 "$merge_branch")"
-    git remote add upstream "$merge_repository"
-    git fetch upstream tag "$merge_branch"
+    git remote add -f upstream "$merge_repository"
+    merge_branch="$(git describe --tags --abbrev=0 "upstream/$merge_branch")"
     echo "Using tag $merge_branch"
   else
     git remote add -f -t "$merge_branch" upstream "$merge_repository"
@@ -316,7 +315,7 @@ merge() {
     issue_exists=$(gh issue list -S "Automatic merge of $merge_branch into $branch failed." -R "$org/$repo" | wc -l)
     if [ "$issue_exists" -eq 0 ]; then
       # shellcheck disable=SC2086
-      gh issue create -b "Automatic merge of upstream ($merge_branch branch) into $org/$repo ($branch branch) failed. ${merge_failure_notify:-}" -t "Automatic merge of upstream failed" ${merge_failure_label:-} -R "$org/$repo"
+      gh issue create -b "Automatic merge of upstream ($merge_branch) into $org/$repo ($branch branch) failed. ${merge_failure_notify:-}" -t "Automatic merge of upstream failed" ${merge_failure_label:-} -R "$org/$repo"
       print_error "Conflicts detected, manual merge is required. An issue in $org/$repo has been created." 0
     else
       print_error "Conflicts detected, manual merge is required. An issue in $org/$repo already exists." 0
