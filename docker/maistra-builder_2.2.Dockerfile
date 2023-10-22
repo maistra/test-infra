@@ -62,7 +62,7 @@ RUN curl -sfL https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yu
     dnf -y copr enable jwendell/emsdk && \
     dnf -y module reset ruby nodejs && dnf -y module enable ruby:2.7 nodejs:12 && dnf -y module install ruby nodejs && \
     dnf -y install --nodocs --setopt=install_weak_deps=False \
-                   git make libtool patch which ninja-build xz redhat-rpm-config \
+                   git make libtool patch which ninja-build xz redhat-rpm-config httpd-tools \
                    go-toolset-0:1.17.5-1.module_el8.6.0+1052+72a6db00 \
                    autoconf automake libtool cmake python2 python3 libstdc++-static \
                    java-11-openjdk-devel jq file diffutils lbzip2 annobin-annocheck \
