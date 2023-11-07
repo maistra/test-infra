@@ -51,8 +51,8 @@ RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False 
     gcc-0:11.3.1-4.3.el9 \
     openssh libtool libtool-ltdl glibc \
     make pkgconf-pkg-config \
-    python3-0:3.9.16-1.el9_2.1 \
-    python3-devel-0:3.9.16-1.el9_2.1 \
+    python3-0:3.9.16-1.el9_2.2 \
+    python3-devel-0:3.9.16-1.el9_2.2 \
     python3-pip python3-setuptools \
     wget jq rsync \
     compat-openssl11-1:1.1.1k-4.el9_0 \
