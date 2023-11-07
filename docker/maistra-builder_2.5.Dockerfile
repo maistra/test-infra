@@ -48,15 +48,15 @@ WORKDIR /tmp
 # hadolint ignore=DL3008, DL3009
 RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False --allowerasing \
     ca-certificates curl gnupg2 \
-    gcc-0:11.3.1-4.3.el9 \
+    gcc \
     openssh libtool libtool-ltdl glibc \
     make pkgconf-pkg-config \
-    python3-0:3.9.16-1.el9_2.2 \
-    python3-devel-0:3.9.16-1.el9_2.2 \
+    python3 \
+    python3-devel \
     python3-pip python3-setuptools \
     wget jq rsync \
     compat-openssl11-1:1.1.1k-4.el9_0 \
-    libstdc++-static-0:11.3.1-4.3.el9 \
+    libstdc++-static \
     libxcrypt-compat-0:4.4.18-3.el9 \
     iptables-nft libcurl-devel \
     git less rpm gettext file \
