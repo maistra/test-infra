@@ -11,6 +11,12 @@ ${BUILD_IMAGE}_%:
 	$(CONTAINER_CLI) build -t ${HUB}/${BUILD_IMAGE}:$* \
 				 -f docker/$@.Dockerfile docker
 
+# Build a specific arm64 maistra image. Example of usage: make maistra-builder_2.4_arm64
+${BUILD_IMAGE}_%_arm64:
+	$(CONTAINER_CLI) build -t ${HUB}/${BUILD_IMAGE}:$* \
+				 --build-arg TARGETARCH=arm64 \
+				 -f docker/$@.Dockerfile docker
+
 # Build and push all maistra images. Example of usage: make maistra-builder.push
 ${BUILD_IMAGE}.push: ${BUILD_IMAGE}
 	$(CONTAINER_CLI) push --all-tags ${HUB}/${BUILD_IMAGE}
