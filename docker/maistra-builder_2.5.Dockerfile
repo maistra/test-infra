@@ -400,8 +400,9 @@ ENV MDL_VERSION=0.12.0
 # Ruby tools
 # hadolint ignore=DL3008
 RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False \
-    ruby-0:3.0.4-160.el9_0 \
-    ruby-devel-0:3.0.4-160.el9_0
+    ruby \
+    ruby-devel \
+    rubygem-json
 
 # MDL
 RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION}
