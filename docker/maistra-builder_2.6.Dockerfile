@@ -39,7 +39,7 @@ WORKDIR /tmp
 # Stick with clang 14
 # Stick with golang 1.19
 # required for binary tools: ca-certificates, gcc, glibc, git, iptables-nft, libtool-ltdl
-# required for general build: make, wget, curl, openssh, rpm
+# required for general build: make, wget, curl, openssh, rpm, procps (pkill)
 # required for ruby: libcurl-devel
 # required for python: python3, pkg-config
 # required for ebpf build: clang,llvm,libbpf
@@ -62,7 +62,7 @@ RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False 
     git less rpm gettext file \
     iproute ipset rsync libbpf net-tools \
     ninja-build \
-    sudo autoconf automake cmake unzip wget xz
+    sudo autoconf automake cmake unzip wget xz procps
 
 # Binary tools Versions
 ENV BENCHSTAT_VERSION=9c9101da8316
