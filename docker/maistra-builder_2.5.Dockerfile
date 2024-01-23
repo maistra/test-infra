@@ -62,7 +62,9 @@ RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False 
     git less rpm gettext file \
     iproute ipset rsync libbpf net-tools \
     ninja-build \
-    sudo autoconf automake cmake unzip wget xz
+    sudo autoconf automake cmake unzip wget xz patch \
+    java-11-openjdk-devel \
+    npm perl-core
 
 # Binary tools Versions
 ENV BENCHSTAT_VERSION=9c9101da8316
@@ -485,6 +487,8 @@ RUN rm -fr /usr/share/dh-python
 RUN rm -fr /usr/share/locale
 RUN rm -fr /usr/share/man
 RUN rm -fr /tmp/*
+RUN rm -fr /gocache/*
+RUN rm -fr /go/pkg
 
 RUN mkdir -p /work && chmod 777 /work
 RUN git config --global --add safe.directory /work
