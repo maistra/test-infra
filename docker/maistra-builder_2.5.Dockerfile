@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # hadolint ignore=DL3006
-FROM registry.access.redhat.com/ubi9/ubi:9.2-696
+FROM registry.access.redhat.com/ubi8/ubi:8.9
 
 ARG TARGETARCH
 
@@ -25,46 +25,36 @@ RUN set -eux; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac;
 
-# Istio tools SHA that we use for this image
-ENV ISTIO_TOOLS_SHA=release-1.18
-
-# General
-ENV HOME=/home
-ENV LANG=C.UTF-8
-
 WORKDIR /tmp
 
-# Base OS
-# Install all dependencies available in RPM repos
+ENV DOCKER_VERSION=20.10.24
+
 # Stick with clang 14
-# Stick with golang 1.19
-# required for binary tools: ca-certificates, gcc, glibc, git, iptables-nft, libtool-ltdl
-# required for general build: make, wget, curl, openssh, rpm
-# required for ruby: libcurl-devel
-# required for python: python3, pkg-config
-# required for ebpf build: clang,llvm,libbpf
-# required for building maistra-2.4 envoy proxy: compat-openssl11
-# required for building envoy proxy: libtool, libstdc++-static, libxcrypt-compat
 # hadolint ignore=DL3008, DL3009
-RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False --allowerasing \
+RUN dnf -y upgrade --refresh && \
+    dnf -y module enable ruby:3.0 && \
+    dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
+    dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+    dnf -y install --setopt=install_weak_deps=False --allowerasing \
     ca-certificates curl gnupg2 \
     gcc \
     openssh libtool libtool-ltdl glibc \
     make pkgconf-pkg-config \
-    python3 \
-    python3-devel \
-    python3-pip python3-setuptools \
+    python3.11 python3.11-devel python3.11-pip python3.11-setuptools \
     wget jq rsync \
-    compat-openssl11-1:1.1.1k-4.el9_0 \
+    openssl-devel compat-openssl10 \
     libstdc++-static \
-    libxcrypt-compat-0:4.4.18-3.el9 \
-    iptables-nft libcurl-devel \
+    libcurl-devel \
     git less rpm gettext file \
     iproute ipset rsync libbpf net-tools \
-    ninja-build \
-    sudo autoconf automake cmake unzip wget xz
+    ninja-build gh \
+    sudo autoconf automake cmake unzip xz \
+    ruby ruby-devel rubygem-json \
+    docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_VERSION}" && \
+    dnf -y clean all
 
 # Binary tools Versions
+ENV ISTIO_TOOLS_SHA=release-1.18
 ENV BENCHSTAT_VERSION=9c9101da8316
 ENV BOM_VERSION=v0.5.1
 ENV BUF_VERSION=v1.13.1
@@ -101,8 +91,7 @@ ENV SHELLCHECK_VERSION=v0.9.0
 ENV SU_EXEC_VERSION=0.2
 ENV TRIVY_VERSION=0.43.1
 ENV YQ_VERSION=4.33.2
-
-ENV GOLANG_VERSION=1.20.7
+ENV GOLANG_VERSION=1.20.13
 ENV GO111MODULE=on
 ENV GOBIN=/usr/local/bin
 ENV GOCACHE=/gocache
@@ -113,8 +102,7 @@ ENV GOPROXY="https://proxy.golang.org,direct"
 ENV PATH=/usr/local/go/bin:/gobin:/usr/local/google-cloud-sdk/bin:$PATH
 
 ENV OUTDIR=/
-RUN mkdir -p ${OUTDIR}/usr/bin
-RUN mkdir -p ${OUTDIR}/usr/local
+RUN mkdir -p ${OUTDIR}/usr/bin ${OUTDIR}/usr/local
 
 # Install golang from go.dev/dl
 # hadolint ignore=DL3008
@@ -126,10 +114,11 @@ RUN set -eux; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     \
-    wget -nv -O "/tmp/${GOLANG_GZ}" "https://go.dev/dl/${GOLANG_GZ}"; \
+    wget -q -O "/tmp/${GOLANG_GZ}" "https://go.dev/dl/${GOLANG_GZ}"; \
     tar -xzvf "/tmp/${GOLANG_GZ}" -C /tmp; \
     mv /tmp/go /usr/lib/golang; \
-    ln -s /usr/lib/golang/bin/go /usr/local/bin/go;
+    ln -s /usr/lib/golang/bin/go /usr/local/bin/go; \
+    rm -rf /usr/lib/golang/doc /usr/lib/golang/test /usr/lib/golang/bin/godoc
 
 # Install protoc
 RUN set -eux; \
@@ -140,15 +129,10 @@ RUN set -eux; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     \
-    wget -nv -O "/tmp/${PROTOC_ZIP}" "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/${PROTOC_ZIP}"; \
+    wget -q -O "/tmp/${PROTOC_ZIP}" "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/${PROTOC_ZIP}"; \
     unzip "/tmp/${PROTOC_ZIP}"; \
     mv /tmp/bin/protoc ${OUTDIR}/usr/bin; \
     chmod +x ${OUTDIR}/usr/bin/protoc
-
-# Install gh
-RUN dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
-RUN dnf -y install --setopt=install_weak_deps=False \
-    gh
 
 # Build and install a bunch of Go tools
 RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION}
@@ -210,7 +194,7 @@ RUN mkdir -p test-infra && \
   cd .. && rm -rf test-infra
 
 # ShellCheck linter
-RUN wget -nv -O "/tmp/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz" "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz"
+RUN wget -q -O "/tmp/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz" "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz"
 RUN tar -xJf "/tmp/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz" -C /tmp
 RUN mv /tmp/shellcheck-${SHELLCHECK_VERSION}/shellcheck ${OUTDIR}/usr/bin
 
@@ -223,7 +207,7 @@ RUN set -eux; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     \
-    wget -nv -O ${OUTDIR}/usr/bin/hadolint https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/${HADOLINT_BINARY}; \
+    wget -q -O ${OUTDIR}/usr/bin/hadolint https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/${HADOLINT_BINARY}; \
     chmod 555 ${OUTDIR}/usr/bin/hadolint
 
 # Hugo static site generator
@@ -235,28 +219,46 @@ RUN set -eux; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     \
-    wget -nv -O /tmp/${HUGO_TAR} https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/${HUGO_TAR}; \
+    wget -q -O /tmp/${HUGO_TAR} https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/${HUGO_TAR}; \
     tar -xzvf /tmp/${HUGO_TAR} -C /tmp; \
     mv /tmp/hugo ${OUTDIR}/usr/bin
 
 # Helm version 3
-ADD https://get.helm.sh/helm-${HELM3_VERSION}-linux-${TARGETARCH}.tar.gz /tmp
-RUN mkdir /tmp/helm3
-RUN tar -xf /tmp/helm-${HELM3_VERSION}-linux-${TARGETARCH}.tar.gz -C /tmp/helm3
-RUN mv /tmp/helm3/linux-${TARGETARCH}/helm ${OUTDIR}/usr/bin/helm3
-RUN ln ${OUTDIR}/usr/bin/helm3 ${OUTDIR}/usr/bin/helm
+RUN set -eux; \
+    \
+    case $(uname -m) in \
+        x86_64) TARGETARCH=amd64;; \
+        aarch64) TARGETARCH=arm64;; \
+        *) echo "unsupported architecture"; exit 1 ;; \
+    esac; \
+    \
+    curl -sfL https://get.helm.sh/helm-${HELM3_VERSION}-linux-${TARGETARCH}.tar.gz | tar -xz linux-${TARGETARCH}/helm --strip=1 && \
+    mv helm /usr/local/bin/helm && chown root.root /usr/local/bin/helm && ln -s /usr/local/bin/helm /usr/local/bin/helm3
 
 # yq doesn't support go modules, so install the binary instead
-ADD https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_${TARGETARCH} /tmp
-RUN mv /tmp/yq_linux_${TARGETARCH} ${OUTDIR}/usr/bin/yq
-RUN chmod 555 ${OUTDIR}/usr/bin/yq
+RUN set -eux; \
+    \
+    case $(uname -m) in \
+        x86_64) TARGETARCH=amd64;; \
+        aarch64) TARGETARCH=arm64;; \
+        *) echo "unsupported architecture"; exit 1 ;; \
+    esac; \
+    \
+    curl -sfL https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_${TARGETARCH} -o /usr/bin/yq && chmod 555 /usr/bin/yq
 
 # Kubectl
-ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl ${OUTDIR}/usr/bin/kubectl
-RUN chmod 555 ${OUTDIR}/usr/bin/kubectl
+RUN set -eux; \
+    \
+    case $(uname -m) in \
+        x86_64) TARGETARCH=amd64;; \
+        aarch64) TARGETARCH=arm64;; \
+        *) echo "unsupported architecture"; exit 1 ;; \
+    esac; \
+    \
+    curl -sfL https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl -o /usr/bin/kubectl && chmod 555 /usr/bin/kubectl
 
 # Buf
-RUN wget -nv -O "${OUTDIR}/usr/bin/buf" "https://github.com/bufbuild/buf/releases/download/${BUF_VERSION}/buf-Linux-$(uname -m)" && \
+RUN wget -q -O "${OUTDIR}/usr/bin/buf" "https://github.com/bufbuild/buf/releases/download/${BUF_VERSION}/buf-Linux-$(uname -m)" && \
     chmod 555 "${OUTDIR}/usr/bin/buf"
 
 # Install su-exec which is a tool that operates like sudo without the overhead
@@ -265,9 +267,6 @@ RUN tar -xzvf v${SU_EXEC_VERSION}.tar.gz
 WORKDIR /tmp/su-exec-${SU_EXEC_VERSION}
 RUN make
 RUN cp -a su-exec ${OUTDIR}/usr/bin
-
-ADD https://github.com/GoogleContainerTools/kpt/releases/download/${KPT_VERSION}/kpt_linux_${TARGETARCH} ${OUTDIR}/usr/bin/kpt
-RUN chmod 555 ${OUTDIR}/usr/bin/kpt
 
 # Install gcloud command line tool
 # Install gcloud beta component
@@ -280,7 +279,7 @@ RUN set -eux; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     \
-    wget -nv "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${GCLOUD_TAR_FILE}"; \
+    wget -q "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${GCLOUD_TAR_FILE}"; \
     tar -xzvf ."/${GCLOUD_TAR_FILE}" -C "${OUTDIR}/usr/local" && rm "${GCLOUD_TAR_FILE}"; \
     ${OUTDIR}/usr/local/google-cloud-sdk/bin/gcloud components install beta --quiet; \
     ${OUTDIR}/usr/local/google-cloud-sdk/bin/gcloud components install alpha --quiet; \
@@ -300,23 +299,9 @@ RUN set -eux; \
     ;; \
     *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
-    wget -nv -O "/tmp/${TRVIY_DEB_NAME}" "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/${TRVIY_DEB_NAME}"; \
-    dnf install -y --setopt=install_weak_deps=False "/tmp/${TRVIY_DEB_NAME}"; \
+    wget -q -O "/tmp/${TRVIY_DEB_NAME}" "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/${TRVIY_DEB_NAME}"; \
+    rpm -ivh "/tmp/${TRVIY_DEB_NAME}"; \
     rm "/tmp/${TRVIY_DEB_NAME}";
-
-# Install kubectx and kubens
-ADD https://github.com/ahmetb/kubectx/releases/download/v${KUBECTX_VERSION}/kubectx /tmp
-RUN mv /tmp/kubectx ${OUTDIR}/usr/bin/kubectx
-RUN chmod 555 ${OUTDIR}/usr/bin/kubectx
-ADD https://github.com/ahmetb/kubectx/releases/download/v${KUBECTX_VERSION}/kubens /tmp
-RUN mv /tmp/kubens ${OUTDIR}/usr/bin/kubens
-RUN chmod 555 ${OUTDIR}/usr/bin/kubens
-
-# Cleanup stuff we don't need in the final image
-RUN rm -fr /usr/lib/golang/doc
-RUN rm -fr /usr/lib/golang/test
-RUN rm -fr /usr/lib/golang/bin/godoc
-
 
 # Clang+LLVM versions
 ENV LLVM_VERSION=14.0.6
@@ -336,7 +321,7 @@ RUN set -eux; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     \
-    wget -nv ${LLVM_BASE_URL}/${LLVM_ARTIFACT}.tar.xz; \
+    wget -q ${LLVM_BASE_URL}/${LLVM_ARTIFACT}.tar.xz; \
     tar -xJf ${LLVM_ARTIFACT}.tar.xz -C /tmp; \
     mkdir -p ${LLVM_DIRECTORY}; \
     mv /tmp/${LLVM_ARCHIVE}/* ${LLVM_DIRECTORY}/
@@ -345,7 +330,7 @@ RUN echo "${LLVM_DIRECTORY}/lib" | tee /etc/ld.so.conf.d/llvm.conf
 RUN ldconfig
 
 # Bazel
-ENV BAZEL_VERSION=6.0.0
+ENV BAZEL_VERSION=6.3.2
 RUN set -eux; \
     \
     case $(uname -m) in \
@@ -358,17 +343,6 @@ RUN set -eux; \
     \
     curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${BAZEL_ARTIFACT} && \
     chmod +x /usr/bin/bazel
-
-# Docker versions
-ENV DOCKER_VERSION=3:24.0.5-1.el9
-ENV DOCKER_CLI_VERSION=1:24.0.5-1.el9
-ENV CONTAINERD_VERSION=1.6.21-3.1.el9
-ENV DOCKER_BUILDX_VERSION=0.11.2-1.el9
-
-# Docker including docker-ce, docker-ce-cli, docker-buildx-plugin and containerd.io
-RUN dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-RUN dnf -y upgrade --refresh
-RUN dnf -y install --setopt=install_weak_deps=False docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_CLI_VERSION}" containerd.io-"${CONTAINERD_VERSION}" docker-buildx-plugin-"${DOCKER_BUILDX_VERSION}"
 
 # Python tools
 # Pinned versions of stuff we pull in
@@ -397,13 +371,6 @@ RUN python3 -m pip install --user virtualenv
 ENV FPM_VERSION=v1.15.1
 ENV MDL_VERSION=0.12.0
 
-# Ruby tools
-# hadolint ignore=DL3008
-RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False \
-    ruby \
-    ruby-devel \
-    rubygem-json
-
 # MDL
 RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION}
 
@@ -424,7 +391,7 @@ ENV CARGO_HOME=/home/.cargo
 ENV RUSTUP_HOME=/home/.rustup
 ENV PATH=/rust/bin:$PATH
 # hadolint ignore=DL4006
-RUN curl --proto '=https' -v --tlsv1.2 -sSf https://sh.rustup.rs | \
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
     sh -s -- -y -v --default-toolchain ${RUST_VERSION} --profile minimal --component rustfmt clippy &&\
     /home/.cargo/bin/rustup default ${RUST_VERSION} &&\
     mv /home/.cargo/bin/* /usr/bin
@@ -436,7 +403,7 @@ COPY scripts/bashrc /home/.bashrc
 
 # Workarounds for proxy and bazel
 RUN useradd user && chmod 777 /home/user
-ENV USER=user HOME=/home/user
+ENV USER=user HOME=/home/user LANG=C.UTF-8
 
 # Starting in Go 1.20, the standard library is not installed. https://go.dev/blog/go1.20
 # Workarounds for fixing bazel build envoy error: '@go_sdk//:libs' does not produce any go_sdk libs files (expected .a)
@@ -475,16 +442,14 @@ RUN chmod 777 /go && \
     chmod 777 /home/.gsutil
 
 # Clean up stuff we don't need in the final image
-RUN dnf -y clean all
-RUN rm -rf /var/lib/apt/lists/*
-RUN rm -fr /usr/share/python
-RUN rm -fr /usr/share/bash-completion
-RUN rm -fr /usr/share/bug
-RUN rm -fr /usr/share/doc
-RUN rm -fr /usr/share/dh-python
-RUN rm -fr /usr/share/locale
-RUN rm -fr /usr/share/man
-RUN rm -fr /tmp/*
+RUN rm -rf /usr/share/python \
+           /usr/share/bash-completion \
+           /usr/share/bug \
+           /usr/share/doc \
+           /usr/share/dh-python \
+           /usr/share/locale \
+           /usr/share/man \
+           /tmp/*
 
 RUN mkdir -p /work && chmod 777 /work
 RUN git config --global --add safe.directory /work
