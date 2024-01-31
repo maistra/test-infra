@@ -37,7 +37,7 @@ RUN dnf -y upgrade --refresh && \
     dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
     dnf -y install --setopt=install_weak_deps=False --allowerasing \
     ca-certificates curl gnupg2 \
-    gcc \
+    gcc java-11-openjdk-devel \
     openssh libtool libtool-ltdl glibc \
     make pkgconf-pkg-config \
     python3.11 python3.11-devel python3.11-pip python3.11-setuptools \
