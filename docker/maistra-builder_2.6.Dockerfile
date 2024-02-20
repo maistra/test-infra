@@ -59,7 +59,7 @@ RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False 
     libstdc++-static \
     libxcrypt-compat-0:4.4.18-3.el9 \
     iptables-nft libcurl-devel \
-    git less rpm gettext file \
+    git less rpm rpm-build gettext file \
     iproute ipset rsync libbpf net-tools \
     ninja-build \
     sudo autoconf automake cmake unzip wget xz procps

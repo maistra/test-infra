@@ -45,7 +45,7 @@ RUN dnf -y upgrade --refresh && \
     openssl-devel compat-openssl10 \
     libstdc++-static \
     libcurl-devel \
-    git less rpm gettext file \
+    git less rpm rpm-build gettext file \
     iproute ipset rsync libbpf net-tools \
     ninja-build gh \
     sudo autoconf automake cmake unzip xz \
