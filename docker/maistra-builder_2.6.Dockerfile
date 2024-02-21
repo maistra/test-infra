@@ -42,7 +42,7 @@ WORKDIR /tmp
 # required for general build: make, wget, curl, openssh, rpm, procps (pkill)
 # required for ruby: libcurl-devel
 # required for python: python3, pkg-config
-# required for ebpf build: clang,llvm,libbpf
+# required for ebpf build: clang,llvm
 # required for building maistra-2.4 envoy proxy: compat-openssl11
 # required for building envoy proxy: libtool, libstdc++-static, libxcrypt-compat
 # hadolint ignore=DL3008, DL3009
@@ -60,9 +60,16 @@ RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False 
     libxcrypt-compat-0:4.4.18-3.el9 \
     iptables-nft libcurl-devel \
     git less rpm rpm-build gettext file \
-    iproute ipset rsync libbpf net-tools \
+    iproute ipset rsync net-tools \
     ninja-build \
     sudo autoconf automake cmake unzip wget xz procps
+
+# Install libbpf-devel from centos stream
+RUN dnf -y install --setopt=install_weak_deps=False \
+    https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libzstd-1.5.0-2.el9.x86_64.rpm \
+    https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/libzstd-devel-1.5.0-2.el9.x86_64.rpm \
+    https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/elfutils-libelf-devel-0.189-3.el9.x86_64.rpm \
+    https://mirror.stream.centos.org/9-stream/CRB/x86_64/os/Packages/libbpf-devel-1.2.0-1.el9.x86_64.rpm
 
 # Binary tools Versions
 ENV BENCHSTAT_VERSION=9c9101da8316
