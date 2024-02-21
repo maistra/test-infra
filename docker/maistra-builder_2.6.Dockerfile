@@ -65,6 +65,7 @@ RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False 
     sudo autoconf automake cmake unzip wget xz procps
 
 # Install libbpf-devel from centos stream
+# Do not run "dnf -y upgrade --refresh" again. Avoid conflicts between ubi and centos dnf upgrade.
 RUN set -eux; \
     dnf -y install --setopt=install_weak_deps=False \
     "https://mirror.stream.centos.org/9-stream/BaseOS/$(uname -m)/os/Packages/libzstd-1.5.0-2.el9.$(uname -m).rpm" \
@@ -416,8 +417,7 @@ ENV DOCKER_BUILDX_VERSION=0.11.2-1.el9
 
 # Docker including docker-ce, docker-ce-cli, docker-buildx-plugin and containerd.io
 RUN dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-RUN dnf -y upgrade --refresh
-RUN dnf -y install --setopt=install_weak_deps=False --allowerasing docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_CLI_VERSION}" containerd.io-"${CONTAINERD_VERSION}" docker-buildx-plugin-"${DOCKER_BUILDX_VERSION}"
+RUN dnf -y install --setopt=install_weak_deps=False docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_CLI_VERSION}" containerd.io-"${CONTAINERD_VERSION}" docker-buildx-plugin-"${DOCKER_BUILDX_VERSION}"
 
 ##############
 # Python
@@ -453,7 +453,7 @@ ENV FPM_VERSION=v1.15.1
 ENV MDL_VERSION=0.12.0
 
 # hadolint ignore=DL3008
-RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False \
+RUN dnf -y install --setopt=install_weak_deps=False \
     ruby \
     ruby-devel \
     rubygem-json
