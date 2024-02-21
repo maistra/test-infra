@@ -65,11 +65,12 @@ RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False 
     sudo autoconf automake cmake unzip wget xz procps
 
 # Install libbpf-devel from centos stream
-RUN dnf -y install --setopt=install_weak_deps=False \
-    https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libzstd-1.5.0-2.el9.x86_64.rpm \
-    https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/libzstd-devel-1.5.0-2.el9.x86_64.rpm \
-    https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/elfutils-libelf-devel-0.189-3.el9.x86_64.rpm \
-    https://mirror.stream.centos.org/9-stream/CRB/x86_64/os/Packages/libbpf-devel-1.2.0-1.el9.x86_64.rpm
+RUN set -eux; \
+    dnf -y install --setopt=install_weak_deps=False \
+    "https://mirror.stream.centos.org/9-stream/BaseOS/$(uname -m)/os/Packages/libzstd-1.5.0-2.el9.$(uname -m).rpm" \
+    "https://mirror.stream.centos.org/9-stream/AppStream/$(uname -m)/os/Packages/libzstd-devel-1.5.0-2.el9.$(uname -m).rpm" \
+    "https://mirror.stream.centos.org/9-stream/AppStream/$(uname -m)/os/Packages/elfutils-libelf-devel-0.189-3.el9.$(uname -m).rpm" \
+    "https://mirror.stream.centos.org/9-stream/CRB/$(uname -m)/os/Packages/libbpf-devel-1.2.0-1.el9.$(uname -m).rpm"
 
 # Binary tools Versions
 ENV BENCHSTAT_VERSION=9c9101da8316
@@ -416,7 +417,7 @@ ENV DOCKER_BUILDX_VERSION=0.11.2-1.el9
 # Docker including docker-ce, docker-ce-cli, docker-buildx-plugin and containerd.io
 RUN dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 RUN dnf -y upgrade --refresh
-RUN dnf -y install --setopt=install_weak_deps=False docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_CLI_VERSION}" containerd.io-"${CONTAINERD_VERSION}" docker-buildx-plugin-"${DOCKER_BUILDX_VERSION}"
+RUN dnf -y install --setopt=install_weak_deps=False --allowerasing docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_CLI_VERSION}" containerd.io-"${CONTAINERD_VERSION}" docker-buildx-plugin-"${DOCKER_BUILDX_VERSION}"
 
 ##############
 # Python
