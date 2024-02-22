@@ -64,7 +64,7 @@ RUN dnf -y upgrade --refresh && dnf --enablerepo=crb -y install --setopt=install
     iproute ipset rsync net-tools \
     ninja-build \
     sudo autoconf automake cmake unzip wget xz procps dnf-plugins-core \
-    libbpf-devel-2:1.1.0-2.el9
+    libbpf-devel
 
 # Binary tools Versions
 ENV BENCHSTAT_VERSION=9c9101da8316
