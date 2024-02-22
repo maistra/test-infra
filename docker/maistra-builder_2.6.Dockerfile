@@ -63,13 +63,8 @@ RUN dnf -y upgrade --refresh && dnf --enablerepo=crb -y install --setopt=install
     git less rpm rpm-build gettext file \
     iproute ipset rsync net-tools \
     ninja-build \
-    sudo autoconf automake cmake unzip wget xz procps dnf-plugins-core
-
-# Install libbpf-devel from centos stream
-# Do not run "dnf -y upgrade --refresh" again. Avoid conflicts between dnf upgrades.
-RUN set -eux; \
-    dnf -y install --setopt=install_weak_deps=False \
-    "https://mirror.stream.centos.org/9-stream/CRB/$(uname -m)/os/Packages/libbpf-devel-1.1.0-2.el9.$(uname -m).rpm"
+    sudo autoconf automake cmake unzip wget xz procps dnf-plugins-core \
+    libbpf-devel-2:1.1.0-2.el9
 
 # Binary tools Versions
 ENV BENCHSTAT_VERSION=9c9101da8316
