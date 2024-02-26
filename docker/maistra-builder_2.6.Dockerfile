@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # hadolint ignore=DL3006
-FROM registry.access.redhat.com/ubi9/ubi:9.3-1476
+FROM quay.io/centos/centos:stream9
 
 ARG TARGETARCH
 
@@ -45,8 +45,9 @@ WORKDIR /tmp
 # required for ebpf build: clang,llvm
 # required for building maistra-2.4 envoy proxy: compat-openssl11
 # required for building envoy proxy: libtool, libstdc++-static, libxcrypt-compat
+# required for centos dnf config-manager: dnf-plugins-core
 # hadolint ignore=DL3008, DL3009
-RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False --allowerasing \
+RUN dnf -y upgrade --refresh && dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
     ca-certificates curl gnupg2 \
     gcc \
     openssh libtool libtool-ltdl glibc \
@@ -55,23 +56,15 @@ RUN dnf -y upgrade --refresh && dnf -y install --setopt=install_weak_deps=False 
     python3-devel \
     python3-pip python3-setuptools \
     wget jq rsync \
-    compat-openssl11-1:1.1.1k-4.el9_0 \
+    compat-openssl11 \
     libstdc++-static \
     libxcrypt-compat-0:4.4.18-3.el9 \
     iptables-nft libcurl-devel \
     git less rpm rpm-build gettext file \
     iproute ipset rsync net-tools \
     ninja-build \
-    sudo autoconf automake cmake unzip wget xz procps
-
-# Install libbpf-devel from centos stream
-# Do not run "dnf -y upgrade --refresh" again. Avoid conflicts between ubi and centos dnf upgrade.
-RUN set -eux; \
-    dnf -y install --setopt=install_weak_deps=False \
-    "https://mirror.stream.centos.org/9-stream/BaseOS/$(uname -m)/os/Packages/libzstd-1.5.0-2.el9.$(uname -m).rpm" \
-    "https://mirror.stream.centos.org/9-stream/AppStream/$(uname -m)/os/Packages/libzstd-devel-1.5.0-2.el9.$(uname -m).rpm" \
-    "https://mirror.stream.centos.org/9-stream/AppStream/$(uname -m)/os/Packages/elfutils-libelf-devel-0.189-3.el9.$(uname -m).rpm" \
-    "https://mirror.stream.centos.org/9-stream/CRB/$(uname -m)/os/Packages/libbpf-devel-1.2.0-1.el9.$(uname -m).rpm"
+    sudo autoconf automake cmake unzip wget xz procps dnf-plugins-core \
+    libbpf-devel
 
 # Binary tools Versions
 ENV BENCHSTAT_VERSION=9c9101da8316
