@@ -428,8 +428,8 @@ RUN mkdir -p /go && \
 # They are created as root 755.  As a result they are not writeable, which fails in
 # the developer environment as a volume or bind mount inherits the permissions of
 # the directory mounted rather then overriding with the permission of the volume file.
-RUN chmod 777 /go && \
-    chmod 777 /gocache && \
+RUN chmod -R 777 /go && \
+    chmod -R 777 /gocache && \
     chmod 777 /gobin && \
     chmod 777 /config && \
     chmod 777 /config/.docker && \
