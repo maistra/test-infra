@@ -32,7 +32,7 @@ ${BUILD_IMAGE}_%:
 		echo "Building multi-platform image"; \
 		$(MAKE) $@_multi; \
 	else \
-		echo "Building single-platform image"; \
+		echo "Building single-platform image with $(CONTAINER_CLI)"; \
 		$(CONTAINER_CLI) build -t ${HUB}/${BUILD_IMAGE}:$* \
 				 -f docker/$@.Dockerfile docker; \
 	fi
@@ -43,7 +43,8 @@ ${BUILD_IMAGE}_%:
 ${BUILD_IMAGE}_%_multi:
 	if [ $(CONTAINER_CLI) = "podman" ]; then \
 		echo "Building multi-platform image with podman"; \
-		$(CONTAINER_CLI) build --platform $(PLATFORMS) --tag ${HUB}/${BUILD_IMAGE}:$* -f docker/$(@:%_multi=%).Dockerfile docker; \
+		$(CONTAINER_CLI) manifest create ${HUB}/${BUILD_IMAGE}:$*; \
+		$(CONTAINER_CLI) build --platform $(PLATFORMS) --manifest ${HUB}/${BUILD_IMAGE}:$* -f docker/$(@:%_multi=%).Dockerfile docker; \
 	else \
 		echo "Building multi-platform image with docker buildx"; \
 		$(CONTAINER_CLI) buildx create --name project-v4-builder; \
@@ -58,12 +59,18 @@ ${BUILD_IMAGE}.push: ${BUILD_IMAGE}
 
 # Build and push a specific maistra image. Example of usage: make maistra-builder_2.3.push
 ${BUILD_IMAGE}_%.push:
-	if [ $(firstword $(subst ., ,$*)) -ge 2 -a $(word 2, $(subst ., ,$*)) -ge 5 -a $(CONTAINER_CLI) = "podman" ]; then \
-		make ${BUILD_IMAGE}_$*; \
-		$(CONTAINER_CLI) manifest create ${HUB}/${BUILD_IMAGE}:$* ${HUB}/${BUILD_IMAGE}:$*_arm64 ${HUB}/${BUILD_IMAGE}:$*_amd64; \
-		$(CONTAINER_CLI) manifest push --all ${HUB}/${BUILD_IMAGE}:$*; \
+	if [ $(firstword $(subst ., ,$*)) -ge 2 -a $(word 2, $(subst ., ,$*)) -ge 5 ]; then \
+		echo "Building and pushing multi-platform image"; \
+		if [ $(CONTAINER_CLI) = "podman" ]; then \
+			$(MAKE) ${BUILD_IMAGE}_$*; \
+			$(CONTAINER_CLI) manifest push ${HUB}/${BUILD_IMAGE}:$*; \
+		else \
+			BUILDX_OUTPUT="--push" make ${BUILD_IMAGE}_$*; \
+	        fi \
 	else \
-		BUILDX_OUTPUT="--push" make ${BUILD_IMAGE}_$*; \
+		echo "Building and pushing single-platform image"; \
+		$(MAKE) ${BUILD_IMAGE}_$*; \
+		$(CONTAINER_CLI) push ${HUB}/${BUILD_IMAGE}:$*; \
 	fi
 
 lint:
