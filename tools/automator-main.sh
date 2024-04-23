@@ -27,7 +27,7 @@ cleanup() {
 }
 
 get_opts() {
-  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-strategy:,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
+  if opt="$(getopt -o '' -l branch:,org:,repo:,automator-repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-strategy:,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
     eval set -- "$opt"
   else
     print_error_and_exit "unable to parse options"
@@ -45,6 +45,10 @@ get_opts() {
       ;;
     --repo)
       repos="$(split_on_commas "$2")"
+      shift 2
+      ;;
+    --automator-repo)
+      automator_repo="$2"
       shift 2
       ;;
     --title)
@@ -241,7 +245,12 @@ evaluate_opts() {
   AUTOMATOR_SRC_ORG="${REPO_OWNER:-}" AUTOMATOR_SRC_REPO="${REPO_NAME:-}" AUTOMATOR_SRC_BRANCH="${PULL_BASE_REF:-}"
   AUTOMATOR_SHA="$sha" AUTOMATOR_SHA_SHORT="$sha_short"
   AUTOMATOR_SHA_COMMIT_DATE="$commit_date"
-  AUTOMATOR_ORG="$org" AUTOMATOR_REPO="$repo" AUTOMATOR_BRANCH="$branch" AUTOMATOR_MODIFIER="$modifier"
+  # Check if automator_repo is set, if not, use the current repo var
+  if [ -z "${automator_repo:-}" ]; then
+    AUTOMATOR_ORG="$org" AUTOMATOR_REPO="$repo" AUTOMATOR_BRANCH="$branch" AUTOMATOR_MODIFIER="$modifier"
+  else
+    AUTOMATOR_ORG="$org" AUTOMATOR_REPO="$automator_repo" AUTOMATOR_BRANCH="$branch" AUTOMATOR_MODIFIER="$modifier"
+  fi
 
   title="$(evaluate_tmpl "$title_tmpl")"
   match_title="$(evaluate_tmpl "$match_title_tmpl")"
