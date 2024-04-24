@@ -280,7 +280,11 @@ commit() {
 
   local src_branch="${AUTOMATOR_SRC_BRANCH:-none}"
   fork_name="$src_branch-$branch-$modifier-$(hash "$title")"
-  git -c "user.name=$user" -c "user.email=$email" commit --message "$title" --author="$user <$email>"
+  if ! git diff --cached --quiet --exit-code; then
+    git -c "user.name=$user" -c "user.email=$email" commit --message "$title" --author="$user <$email>"
+  else
+    echo "No changes to commit. Assuming the commit was already made"
+  fi
   git show --shortstat
   git push --force "https://$user:$token@github.com/$user/$repo.git" "HEAD:$fork_name"
   pull_request="$(create_pr)"
