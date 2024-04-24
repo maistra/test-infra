@@ -362,6 +362,9 @@ work() { (
   gopath=${PWD}
   pushd src/istio.io/"$repo"
 
+  local initialSHA
+  initialSHA=$(git rev-parse HEAD)
+
   AUTOMATOR_REPO_DIR="$(pwd)"
 
   if $merge; then
@@ -371,7 +374,9 @@ work() { (
 
     git add --all
 
-    if ! git diff --cached --quiet --exit-code; then
+    local currentSHA
+    currentSHA=$(git rev-parse HEAD)
+    if ! git diff --cached --quiet --exit-code || [ "${initialSHA}" != "${currentSHA}" ]; then
       commit
     elif $strict; then
       print_error "no diff for $repo" 1
