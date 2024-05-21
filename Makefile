@@ -26,16 +26,10 @@ TARGET_OS ?= linux
 BUILDX_BUILD_ARGS = --build-arg TARGETOS=$(TARGET_OS)
 
 # Build a specific maistra image. Example of usage: make maistra-builder_2.3
-# This target calls the multi target if the version is >= 2.5
+# Only build single arch image by using the build command
 ${BUILD_IMAGE}_%:
-	if [ $(firstword $(subst ., ,$*)) -ge 2 -a $(word 2, $(subst ., ,$*)) -ge 5 ]; then \
-		echo "Building multi-platform image"; \
-		$(MAKE) $@_multi; \
-	else \
-		echo "Building single-platform image with $(CONTAINER_CLI)"; \
-		$(CONTAINER_CLI) build -t ${HUB}/${BUILD_IMAGE}:$* \
-				 -f docker/$@.Dockerfile docker; \
-	fi
+	echo "Building single-platform image with $(CONTAINER_CLI)"; \
+	$(CONTAINER_CLI) build -t ${HUB}/${BUILD_IMAGE}:$* -f docker/$@.Dockerfile docker; \
 
 # Build a maistra version for the platforms described in the PLATFORMS var. 
 # Example of usage: make maistra-builder_2.5_multi
