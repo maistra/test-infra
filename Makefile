@@ -29,7 +29,7 @@ BUILDX_BUILD_ARGS = --build-arg TARGETOS=$(TARGET_OS)
 # Only build single arch image by using the build command
 ${BUILD_IMAGE}_%:
 	echo "Building single-platform image with $(CONTAINER_CLI)"; \
-	$(CONTAINER_CLI) build -t ${HUB}/${BUILD_IMAGE}:$* -f docker/$@.Dockerfile docker; \
+	$(CONTAINER_CLI) build -t ${HUB}/${BUILD_IMAGE}:$* -f docker/$@.Dockerfile docker;
 
 # Build a maistra version for the platforms described in the PLATFORMS var. 
 # Example of usage: make maistra-builder_2.5_multi
@@ -56,11 +56,11 @@ ${BUILD_IMAGE}_%.push:
 	if [ $(firstword $(subst ., ,$*)) -ge 2 -a $(word 2, $(subst ., ,$*)) -ge 5 ]; then \
 		echo "Building and pushing multi-platform image"; \
 		if [ $(CONTAINER_CLI) = "podman" ]; then \
-			$(MAKE) ${BUILD_IMAGE}_$*; \
+			$(MAKE) ${BUILD_IMAGE}_$*_multi; \
 			$(CONTAINER_CLI) manifest push ${HUB}/${BUILD_IMAGE}:$*; \
 		else \
 			BUILDX_OUTPUT="--push" make ${BUILD_IMAGE}_$*_multi; \
-	        fi \
+		fi \
 	else \
 		echo "Building and pushing single-platform image"; \
 		$(MAKE) ${BUILD_IMAGE}_$*; \
