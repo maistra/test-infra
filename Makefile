@@ -59,7 +59,7 @@ ${BUILD_IMAGE}_%.push:
 			$(MAKE) ${BUILD_IMAGE}_$*; \
 			$(CONTAINER_CLI) manifest push ${HUB}/${BUILD_IMAGE}:$*; \
 		else \
-			BUILDX_OUTPUT="--push" make ${BUILD_IMAGE}_$*; \
+			BUILDX_OUTPUT="--push" make ${BUILD_IMAGE}_$*_multi; \
 	        fi \
 	else \
 		echo "Building and pushing single-platform image"; \
