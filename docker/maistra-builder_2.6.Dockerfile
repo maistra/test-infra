@@ -37,7 +37,7 @@ WORKDIR /tmp
 # Base OS
 # Install all dependencies available in RPM repos
 # Stick with clang 14
-# Stick with golang 1.19
+# Stick with golang 1.21
 # required for binary tools: ca-certificates, gcc, glibc, git, iptables-nft, libtool-ltdl
 # required for general build: make, wget, curl, openssh, rpm, procps (pkill)
 # required for ruby: libcurl-devel
@@ -108,7 +108,7 @@ ENV TRIVY_VERSION=0.45.1
 ENV YQ_VERSION=4.35.2
 
 # Go support
-ENV GOLANG_VERSION=1.21.6
+ENV GOLANG_VERSION=1.21.10
 ENV GO111MODULE=on
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GOSUMDB=sum.golang.org
@@ -136,7 +136,7 @@ RUN set -eux; \
     esac; \
     \
     wget -nv -O "/tmp/${GOLANG_GZ}" "https://go.dev/dl/${GOLANG_GZ}"; \
-    tar -xzvf "/tmp/${GOLANG_GZ}" -C /tmp; \
+    tar -xzf "/tmp/${GOLANG_GZ}" -C /tmp; \
     mv /tmp/go /usr/lib/golang; \
     ln -s /usr/lib/golang/bin/go /usr/local/bin/go;
 
@@ -169,7 +169,7 @@ RUN set -eux; \
     esac; \
     \
     wget -nv -O "/tmp/${PROTOC_GEN_VALIDATE_GZ}" "https://github.com/bufbuild/protoc-gen-validate/releases/download/v${PROTOC_GEN_VALIDATE_VERSION}/${PROTOC_GEN_VALIDATE_GZ}"; \
-    tar -xzvf "/tmp/${PROTOC_GEN_VALIDATE_GZ}" -C /tmp; \
+    tar -xzf "/tmp/${PROTOC_GEN_VALIDATE_GZ}" -C /tmp; \
     mv /tmp/protoc-gen-validate ${OUTDIR}/usr/bin; \
     mv /tmp/protoc-gen-validate-go ${OUTDIR}/usr/bin; \
     chmod +x ${OUTDIR}/usr/bin/protoc-gen-validate; \
@@ -266,7 +266,7 @@ RUN set -eux; \
     esac; \
     \
     wget -nv -O /tmp/${HUGO_TAR} https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/${HUGO_TAR}; \
-    tar -xzvf /tmp/${HUGO_TAR} -C /tmp; \
+    tar -xzf /tmp/${HUGO_TAR} -C /tmp; \
     mv /tmp/hugo ${OUTDIR}/usr/bin
 
 # Helm version 3
@@ -291,7 +291,7 @@ RUN wget -nv -O "${OUTDIR}/usr/bin/buf" "https://github.com/bufbuild/buf/release
 
 # Install su-exec which is a tool that operates like sudo without the overhead
 ADD https://github.com/NobodyXu/su-exec/archive/refs/tags/v${SU_EXEC_VERSION}.tar.gz /tmp
-RUN tar -xzvf v${SU_EXEC_VERSION}.tar.gz
+RUN tar -xzf v${SU_EXEC_VERSION}.tar.gz
 WORKDIR /tmp/su-exec-${SU_EXEC_VERSION}
 # Setting LDFLAGS is needed here, upstream uses '--icf=all' which our linker  doesn't have
 RUN LDFLAGS="-fvisibility=hidden -Wl,-O2 -Wl,--discard-all -Wl,--strip-all -Wl,--as-needed -Wl,--gc-sections" make
@@ -312,7 +312,7 @@ RUN set -eux; \
     esac; \
     \
     wget -nv "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${GCLOUD_TAR_FILE}"; \
-    tar -xzvf ."/${GCLOUD_TAR_FILE}" -C "${OUTDIR}/usr/local" && rm "${GCLOUD_TAR_FILE}"; \
+    tar -xzf ."/${GCLOUD_TAR_FILE}" -C "${OUTDIR}/usr/local" && rm "${GCLOUD_TAR_FILE}"; \
     ${OUTDIR}/usr/local/google-cloud-sdk/bin/gcloud components install beta --quiet; \
     ${OUTDIR}/usr/local/google-cloud-sdk/bin/gcloud components install alpha --quiet; \
     ${OUTDIR}/usr/local/google-cloud-sdk/bin/gcloud components install gke-gcloud-auth-plugin --quiet; \
