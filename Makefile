@@ -26,16 +26,10 @@ TARGET_OS ?= linux
 BUILDX_BUILD_ARGS = --build-arg TARGETOS=$(TARGET_OS)
 
 # Build a specific maistra image. Example of usage: make maistra-builder_2.3
-# This target calls the multi target if the version is >= 2.5
+# Only build single arch image by using the build command
 ${BUILD_IMAGE}_%:
-	if [ $(firstword $(subst ., ,$*)) -ge 2 -a $(word 2, $(subst ., ,$*)) -ge 5 ]; then \
-		echo "Building multi-platform image"; \
-		$(MAKE) $@_multi; \
-	else \
-		echo "Building single-platform image with $(CONTAINER_CLI)"; \
-		$(CONTAINER_CLI) build -t ${HUB}/${BUILD_IMAGE}:$* \
-				 -f docker/$@.Dockerfile docker; \
-	fi
+	echo "Building single-platform image with $(CONTAINER_CLI)"; \
+	$(CONTAINER_CLI) build -t ${HUB}/${BUILD_IMAGE}:$* -f docker/$@.Dockerfile docker;
 
 # Build a maistra version for the platforms described in the PLATFORMS var. 
 # Example of usage: make maistra-builder_2.5_multi
@@ -57,21 +51,22 @@ ${BUILD_IMAGE}_%_multi:
 ${BUILD_IMAGE}.push: ${BUILD_IMAGE}
 	$(CONTAINER_CLI) push --all-tags ${HUB}/${BUILD_IMAGE}
 
-# Build and push a specific maistra image. Example of usage: make maistra-builder_2.3.push
+# Build and push a specific single arch maistra image. Example of usage: make maistra-builder_2.3.push
 ${BUILD_IMAGE}_%.push:
-	if [ $(firstword $(subst ., ,$*)) -ge 2 -a $(word 2, $(subst ., ,$*)) -ge 5 ]; then \
-		echo "Building and pushing multi-platform image"; \
-		if [ $(CONTAINER_CLI) = "podman" ]; then \
-			$(MAKE) ${BUILD_IMAGE}_$*; \
-			$(CONTAINER_CLI) manifest push ${HUB}/${BUILD_IMAGE}:$*; \
-		else \
-			BUILDX_OUTPUT="--push" make ${BUILD_IMAGE}_$*; \
-	        fi \
+	@echo "Building and pushing single-platform image"; \
+	$(MAKE) ${BUILD_IMAGE}_$*; \
+	$(CONTAINER_CLI) push ${HUB}/${BUILD_IMAGE}:$*; \
+
+# Build and push multi image. Example of usage: make maistra-builder_2.5.push_multi
+${BUILD_IMAGE}_%.push_multi:
+	@echo "Building and pushing multi-platform image"; \
+	if [ $(CONTAINER_CLI) = "podman" ]; then \
+		$(MAKE) ${BUILD_IMAGE}_$*_multi; \
+		$(CONTAINER_CLI) manifest push ${HUB}/${BUILD_IMAGE}:$*; \
 	else \
-		echo "Building and pushing single-platform image"; \
-		$(MAKE) ${BUILD_IMAGE}_$*; \
-		$(CONTAINER_CLI) push ${HUB}/${BUILD_IMAGE}:$*; \
-	fi
+		BUILDX_OUTPUT="--push" $(MAKE) ${BUILD_IMAGE}_$*_multi; \
+	fi \
+
 
 lint:
 	find . -name '*.sh' -print0 | xargs -0 -r shellcheck
