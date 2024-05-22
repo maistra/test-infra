@@ -51,21 +51,22 @@ ${BUILD_IMAGE}_%_multi:
 ${BUILD_IMAGE}.push: ${BUILD_IMAGE}
 	$(CONTAINER_CLI) push --all-tags ${HUB}/${BUILD_IMAGE}
 
-# Build and push a specific maistra image. Example of usage: make maistra-builder_2.3.push
+# Build and push a specific single arch maistra image. Example of usage: make maistra-builder_2.3.push
 ${BUILD_IMAGE}_%.push:
-	if [ $(firstword $(subst ., ,$*)) -ge 2 -a $(word 2, $(subst ., ,$*)) -ge 5 ]; then \
-		echo "Building and pushing multi-platform image"; \
-		if [ $(CONTAINER_CLI) = "podman" ]; then \
-			$(MAKE) ${BUILD_IMAGE}_$*_multi; \
-			$(CONTAINER_CLI) manifest push ${HUB}/${BUILD_IMAGE}:$*; \
-		else \
-			BUILDX_OUTPUT="--push" make ${BUILD_IMAGE}_$*_multi; \
-		fi \
+	@echo "Building and pushing single-platform image"; \
+	$(MAKE) ${BUILD_IMAGE}_$*; \
+	$(CONTAINER_CLI) push ${HUB}/${BUILD_IMAGE}:$*; \
+
+# Build and push multi image. Example of usage: make maistra-builder_2.5.push_multi
+${BUILD_IMAGE}_%.push_multi:
+	@echo "Building and pushing multi-platform image"; \
+	if [ $(CONTAINER_CLI) = "podman" ]; then \
+		$(MAKE) ${BUILD_IMAGE}_$*_multi; \
+		$(CONTAINER_CLI) manifest push ${HUB}/${BUILD_IMAGE}:$*; \
 	else \
-		echo "Building and pushing single-platform image"; \
-		$(MAKE) ${BUILD_IMAGE}_$*; \
-		$(CONTAINER_CLI) push ${HUB}/${BUILD_IMAGE}:$*; \
-	fi
+		BUILDX_OUTPUT="--push" $(MAKE) ${BUILD_IMAGE}_$*_multi; \
+	fi \
+
 
 lint:
 	find . -name '*.sh' -print0 | xargs -0 -r shellcheck
