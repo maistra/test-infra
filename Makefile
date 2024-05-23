@@ -44,7 +44,7 @@ ${BUILD_IMAGE}_%_multi:
 		$(CONTAINER_CLI) buildx create --name project-v4-builder && \
 		$(CONTAINER_CLI) buildx use project-v4-builder && \
 		$(CONTAINER_CLI) buildx build $(BUILDX_OUTPUT_FLAG) --platform=$(PLATFORMS) --tag ${HUB}/${BUILD_IMAGE}:$* $(BUILDX_BUILD_ARGS) -f docker/$(@:%_multi=%).Dockerfile docker && \
-		$(CONTAINER_CLI) buildx rm project-v4-builder \
+		$(CONTAINER_CLI) buildx rm project-v4-builder ;\
 	fi
 
 # Build and push all maistra images. Example of usage: make maistra-builder.push
