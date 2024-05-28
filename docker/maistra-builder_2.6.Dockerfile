@@ -38,13 +38,13 @@ WORKDIR /tmp
 # Install all dependencies available in RPM repos
 # Stick with clang 14
 # Stick with golang 1.21
+# Stick with OpenSSL 3.0.7, used in RHEL 9.4, which is the base for OSSM 2.6
 # required for binary tools: ca-certificates, gcc, glibc, git, iptables-nft, libtool-ltdl
 # required for general build: make, wget, curl, openssh, rpm, procps (pkill)
 # required for ruby: libcurl-devel
 # required for python: python3, pkg-config
 # required for ebpf build: clang,llvm
-# required for building maistra-2.4 envoy proxy: compat-openssl11
-# required for building envoy proxy: libtool, libstdc++-static, libxcrypt-compat
+# required for building proxy: compat-openssl11, libtool, libstdc++-static, libxcrypt-compat
 # required for centos dnf config-manager: dnf-plugins-core
 # hadolint ignore=DL3008, DL3009
 RUN dnf -y upgrade --refresh && dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
@@ -56,7 +56,7 @@ RUN dnf -y upgrade --refresh && dnf --enablerepo=crb -y install --setopt=install
     python3-devel \
     python3-pip python3-setuptools \
     wget jq rsync \
-    compat-openssl11 \
+    compat-openssl11 openssl-3.0.7 openssl-devel-3.0.7 \
     libstdc++-static \
     libxcrypt-compat-0:4.4.18-3.el9 \
     iptables-nft libcurl-devel \
