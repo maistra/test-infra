@@ -34,6 +34,12 @@ ENV LANG=C.UTF-8
 
 WORKDIR /tmp
 
+# Docker versions
+ENV DOCKER_VERSION=3:24.0.5-1.el9
+ENV DOCKER_CLI_VERSION=1:24.0.5-1.el9
+ENV CONTAINERD_VERSION=1.6.21-3.1.el9
+ENV DOCKER_BUILDX_VERSION=0.11.2-1.el9
+
 # Base OS
 # Install all dependencies available in RPM repos
 # Stick with clang 14
@@ -47,25 +53,34 @@ WORKDIR /tmp
 # required for building proxy: compat-openssl11, libtool, libstdc++-static, libxcrypt-compat
 # required for centos dnf config-manager: dnf-plugins-core
 # hadolint ignore=DL3008, DL3009
-RUN dnf -y upgrade --refresh && dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
-    ca-certificates curl gnupg2 \
-    gcc \
-    openssh libtool libtool-ltdl glibc \
-    make pkgconf-pkg-config \
-    python3 \
-    python3-devel \
-    python3-pip python3-setuptools \
-    wget jq rsync \
-    compat-openssl11 openssl-3.0.7 openssl-devel-3.0.7 \
-    libstdc++-static \
-    libxcrypt-compat-0:4.4.18-3.el9 \
-    iptables-nft libcurl-devel \
-    git less rpm rpm-build gettext file \
-    iproute ipset rsync net-tools \
-    ninja-build \
-    sudo autoconf automake cmake unzip wget xz procps dnf-plugins-core \
-    libbpf-devel \
-    java-11-openjdk-devel
+RUN dnf -y upgrade --refresh && \
+    dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
+        dnf-plugins-core && \
+    dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+    dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
+    dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
+        gh \
+        docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_CLI_VERSION}" containerd.io-"${CONTAINERD_VERSION}" docker-buildx-plugin-"${DOCKER_BUILDX_VERSION}" \
+        ca-certificates curl gnupg2 \
+        gcc \
+        openssh libtool libtool-ltdl glibc \
+        make pkgconf-pkg-config \
+        python3 \
+        python3-devel \
+        python3-pip python3-setuptools \
+        wget jq rsync \
+        compat-openssl11 openssl-3.0.7 openssl-devel-3.0.7 \
+        libstdc++-static \
+        libxcrypt-compat-0:4.4.18-3.el9 \
+        iptables-nft libcurl-devel \
+        git less rpm rpm-build gettext file \
+        iproute ipset rsync net-tools \
+        ninja-build \
+        sudo autoconf automake cmake unzip wget xz procps \
+        libbpf-devel \
+        java-11-openjdk-devel \
+        ruby ruby-devel rubygem-json && \
+    dnf clean all -y
 
 # Binary tools Versions
 ENV BENCHSTAT_VERSION=9c9101da8316
@@ -108,7 +123,7 @@ ENV TRIVY_VERSION=0.45.1
 ENV YQ_VERSION=4.35.2
 
 # Go support
-ENV GOLANG_VERSION=1.21.10
+ENV GOLANG_VERSION=1.21.11
 ENV GO111MODULE=on
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GOSUMDB=sum.golang.org
@@ -135,10 +150,11 @@ RUN set -eux; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     \
-    wget -nv -O "/tmp/${GOLANG_GZ}" "https://go.dev/dl/${GOLANG_GZ}"; \
-    tar -xzf "/tmp/${GOLANG_GZ}" -C /tmp; \
-    mv /tmp/go /usr/lib/golang; \
-    ln -s /usr/lib/golang/bin/go /usr/local/bin/go;
+    wget -nv -O "/tmp/${GOLANG_GZ}" "https://go.dev/dl/${GOLANG_GZ}" && \
+    tar -xzf "/tmp/${GOLANG_GZ}" -C /tmp && \
+    mv /tmp/go /usr/lib/golang && \
+    ln -s /usr/lib/golang/bin/go /usr/local/bin/go && \
+    rm -rf "/tmp/${GOLANG_GZ}" /usr/lib/golang/doc /usr/lib/golang/test /usr/lib/golang/api /usr/lib/golang/bin/godoc /usr/lib/golang/bin/gofmt
 
 # Install protoc
 RUN set -eux; \
@@ -152,12 +168,8 @@ RUN set -eux; \
     wget -nv -O "/tmp/${PROTOC_ZIP}" "https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/${PROTOC_ZIP}"; \
     unzip "/tmp/${PROTOC_ZIP}"; \
     mv /tmp/bin/protoc ${OUTDIR}/usr/bin; \
-    chmod +x ${OUTDIR}/usr/bin/protoc
-
-# Install gh
-RUN dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
-RUN dnf -y install --setopt=install_weak_deps=False \
-    gh
+    chmod +x ${OUTDIR}/usr/bin/protoc && \
+    rm -rf /tmp/*
 
 # Install protoc-gen-validate
 RUN set -eux; \
@@ -173,57 +185,55 @@ RUN set -eux; \
     mv /tmp/protoc-gen-validate ${OUTDIR}/usr/bin; \
     mv /tmp/protoc-gen-validate-go ${OUTDIR}/usr/bin; \
     chmod +x ${OUTDIR}/usr/bin/protoc-gen-validate; \
-    chmod +x ${OUTDIR}/usr/bin/protoc-gen-validate-go
+    chmod +x ${OUTDIR}/usr/bin/protoc-gen-validate-go && \
+    rm -rf /tmp/*
 
 # Build and install a bunch of Go tools
-RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION}
-RUN go install -ldflags="-s -w" google.golang.org/grpc/cmd/protoc-gen-go-grpc@${GOLANG_GRPC_PROTOBUF_VERSION}
-RUN go install -ldflags="-s -w" github.com/uber/prototool/cmd/prototool@${PROTOTOOL_VERSION}
-RUN go install -ldflags="-s -w" github.com/nilslice/protolock/cmd/protolock@${PROTOLOCK_VERSION}
-RUN go install -ldflags="-s -w" golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION}
-RUN go install -ldflags="-s -w" github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
-RUN go install -ldflags="-s -w" github.com/go-bindata/go-bindata/go-bindata@${GO_BINDATA_VERSION}
-RUN go install -ldflags="-s -w" github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@${PROTOC_GEN_GRPC_GATEWAY_VERSION}
-RUN go install -ldflags="-s -w" github.com/google/go-jsonnet/cmd/jsonnet@${JSONNET_VERSION}
-RUN go install -ldflags="-s -w" github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@${JB_VERSION}
-RUN go install -ldflags="-s -w" github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@${PROTOC_GEN_SWAGGER_VERSION}
-RUN go install -ldflags="-s -w" github.com/istio/go-junit-report@${GO_JUNIT_REPORT_VERSION}
-RUN go install -ldflags="-s -w" sigs.k8s.io/bom/cmd/bom@${BOM_VERSION}
-RUN go install -ldflags="-s -w" sigs.k8s.io/kind@${KIND_VERSION}
-RUN go install -ldflags="-s -w" github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION}
-RUN go install -ldflags="-s -w" github.com/imsky/junit-merger/src/junit-merger@${JUNIT_MERGER_VERSION}
-RUN go install -ldflags="-s -w" golang.org/x/perf/cmd/benchstat@${BENCHSTAT_VERSION}
-RUN go install -ldflags="-s -w" github.com/google/go-containerregistry/cmd/crane@${CRANE_VERSION}
-RUN go install -ldflags="-s -w" github.com/equinix-labs/otel-cli@${OTEL_CLI_VERSION}
-
-# Install latest version of Istio-owned tools in this release
-RUN go install -ldflags="-s -w" \
-    istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/annotations_prep@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/cue-gen@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/protoc-gen-golang-deepcopy@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/protoc-gen-golang-jsonshim@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/kubetype-gen@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/gen-release-notes@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/org-gen@${ISTIO_TOOLS_SHA} \
-    istio.io/tools/cmd/protoc-gen-crd@${ISTIO_TOOLS_SHA}
-RUN go install -ldflags="-s -w" \
-    k8s.io/code-generator/cmd/applyconfiguration-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
-    k8s.io/code-generator/cmd/defaulter-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
-    k8s.io/code-generator/cmd/client-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
-    k8s.io/code-generator/cmd/lister-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
-    k8s.io/code-generator/cmd/informer-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
-    k8s.io/code-generator/cmd/deepcopy-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
-    k8s.io/code-generator/cmd/go-to-protobuf@kubernetes-${K8S_CODE_GENERATOR_VERSION}
-
-# Install istio/test-infra tools
-RUN go install -ldflags="-s -w" \
-    sigs.k8s.io/kubetest2@${KUBETEST2_VERSION} \
-    sigs.k8s.io/kubetest2/kubetest2-gke@${KUBETEST2_VERSION} \
-    sigs.k8s.io/kubetest2/kubetest2-tester-exec@${KUBETEST2_VERSION}
+RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${GOLANG_PROTOBUF_VERSION} && \
+    go install -ldflags="-s -w" google.golang.org/grpc/cmd/protoc-gen-go-grpc@${GOLANG_GRPC_PROTOBUF_VERSION} && \
+    go install -ldflags="-s -w" github.com/uber/prototool/cmd/prototool@${PROTOTOOL_VERSION} && \
+    go install -ldflags="-s -w" github.com/nilslice/protolock/cmd/protolock@${PROTOLOCK_VERSION} && \
+    go install -ldflags="-s -w" golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION} && \
+    go install -ldflags="-s -w" github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION} && \
+    go install -ldflags="-s -w" github.com/go-bindata/go-bindata/go-bindata@${GO_BINDATA_VERSION} && \
+    go install -ldflags="-s -w" github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@${PROTOC_GEN_GRPC_GATEWAY_VERSION} && \
+    go install -ldflags="-s -w" github.com/google/go-jsonnet/cmd/jsonnet@${JSONNET_VERSION} && \
+    go install -ldflags="-s -w" github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@${JB_VERSION} && \
+    go install -ldflags="-s -w" github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@${PROTOC_GEN_SWAGGER_VERSION} && \
+    go install -ldflags="-s -w" github.com/istio/go-junit-report@${GO_JUNIT_REPORT_VERSION} && \
+    go install -ldflags="-s -w" sigs.k8s.io/bom/cmd/bom@${BOM_VERSION} && \
+    go install -ldflags="-s -w" sigs.k8s.io/kind@${KIND_VERSION} && \
+    go install -ldflags="-s -w" github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION} && \
+    go install -ldflags="-s -w" github.com/imsky/junit-merger/src/junit-merger@${JUNIT_MERGER_VERSION} && \
+    go install -ldflags="-s -w" golang.org/x/perf/cmd/benchstat@${BENCHSTAT_VERSION} && \
+    go install -ldflags="-s -w" github.com/google/go-containerregistry/cmd/crane@${CRANE_VERSION} && \
+    go install -ldflags="-s -w" github.com/equinix-labs/otel-cli@${OTEL_CLI_VERSION} && \
+    go install -ldflags="-s -w" \
+        istio.io/tools/cmd/protoc-gen-docs@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/annotations_prep@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/cue-gen@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/envvarlinter@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/testlinter@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/protoc-gen-golang-deepcopy@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/protoc-gen-golang-jsonshim@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/kubetype-gen@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/license-lint@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/gen-release-notes@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/org-gen@${ISTIO_TOOLS_SHA} \
+        istio.io/tools/cmd/protoc-gen-crd@${ISTIO_TOOLS_SHA} && \
+    go install -ldflags="-s -w" \
+        k8s.io/code-generator/cmd/applyconfiguration-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
+        k8s.io/code-generator/cmd/defaulter-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
+        k8s.io/code-generator/cmd/client-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
+        k8s.io/code-generator/cmd/lister-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
+        k8s.io/code-generator/cmd/informer-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
+        k8s.io/code-generator/cmd/deepcopy-gen@kubernetes-${K8S_CODE_GENERATOR_VERSION} \
+        k8s.io/code-generator/cmd/go-to-protobuf@kubernetes-${K8S_CODE_GENERATOR_VERSION} && \
+    go install -ldflags="-s -w" \
+        sigs.k8s.io/kubetest2@${KUBETEST2_VERSION} \
+        sigs.k8s.io/kubetest2/kubetest2-gke@${KUBETEST2_VERSION} \
+        sigs.k8s.io/kubetest2/kubetest2-tester-exec@${KUBETEST2_VERSION} && \
+    go clean -cache -modcache -testcache -fuzzcache
 
 # Go doesn't like the `replace` directives; need to do manual cloning now.
 # Should be fixed by https://github.com/kubernetes/test-infra/issues/20421
@@ -237,12 +247,14 @@ RUN mkdir -p test-infra && \
   go install ./robots/pr-creator && \
   go install ./prow/cmd/peribolos && \
   go install ./pkg/benchmarkjunit && \
-  cd .. && rm -rf test-infra
+  cd .. && rm -rf test-infra && \
+  go clean -cache -modcache -testcache -fuzzcache
 
 # ShellCheck linter
-RUN wget -nv -O "/tmp/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz" "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz"
-RUN tar -xJf "/tmp/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz" -C /tmp
-RUN mv /tmp/shellcheck-${SHELLCHECK_VERSION}/shellcheck ${OUTDIR}/usr/bin
+RUN wget -nv -O "/tmp/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz" "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz" && \
+    tar -xJf "/tmp/shellcheck-${SHELLCHECK_VERSION}.linux.$(uname -m).tar.xz" -C /tmp && \
+    mv /tmp/shellcheck-${SHELLCHECK_VERSION}/shellcheck ${OUTDIR}/usr/bin && \
+    rm -rf /tmp/*
 
 # Hadolint linter
 RUN set -eux; \
@@ -267,14 +279,14 @@ RUN set -eux; \
     \
     wget -nv -O /tmp/${HUGO_TAR} https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/${HUGO_TAR}; \
     tar -xzf /tmp/${HUGO_TAR} -C /tmp; \
-    mv /tmp/hugo ${OUTDIR}/usr/bin
+    mv /tmp/hugo ${OUTDIR}/usr/bin && rm -rf /tmp/*
 
 # Helm version 3
-ADD https://get.helm.sh/helm-${HELM3_VERSION}-linux-${TARGETARCH}.tar.gz /tmp
-RUN mkdir /tmp/helm3
-RUN tar -xf /tmp/helm-${HELM3_VERSION}-linux-${TARGETARCH}.tar.gz -C /tmp/helm3
-RUN mv /tmp/helm3/linux-${TARGETARCH}/helm ${OUTDIR}/usr/bin/helm3
-RUN ln ${OUTDIR}/usr/bin/helm3 ${OUTDIR}/usr/bin/helm
+RUN wget -nv https://get.helm.sh/helm-${HELM3_VERSION}-linux-${TARGETARCH}.tar.gz && \
+    mkdir /tmp/helm3 && \
+    tar -xf helm-${HELM3_VERSION}-linux-${TARGETARCH}.tar.gz -C /tmp/helm3 && \
+    mv /tmp/helm3/linux-${TARGETARCH}/helm ${OUTDIR}/usr/bin/helm3 && \
+    ln ${OUTDIR}/usr/bin/helm3 ${OUTDIR}/usr/bin/helm && rm -rf helm-${HELM3_VERSION}-linux-${TARGETARCH}.tar.gz /tmp/*
 
 # yq doesn't support go modules, so install the binary instead
 ADD https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_${TARGETARCH} /tmp
@@ -290,12 +302,12 @@ RUN wget -nv -O "${OUTDIR}/usr/bin/buf" "https://github.com/bufbuild/buf/release
     chmod 555 "${OUTDIR}/usr/bin/buf"
 
 # Install su-exec which is a tool that operates like sudo without the overhead
-ADD https://github.com/NobodyXu/su-exec/archive/refs/tags/v${SU_EXEC_VERSION}.tar.gz /tmp
-RUN tar -xzf v${SU_EXEC_VERSION}.tar.gz
-WORKDIR /tmp/su-exec-${SU_EXEC_VERSION}
-# Setting LDFLAGS is needed here, upstream uses '--icf=all' which our linker  doesn't have
-RUN LDFLAGS="-fvisibility=hidden -Wl,-O2 -Wl,--discard-all -Wl,--strip-all -Wl,--as-needed -Wl,--gc-sections" make
-RUN cp -a su-exec ${OUTDIR}/usr/bin
+RUN wget -nv https://github.com/NobodyXu/su-exec/archive/refs/tags/v${SU_EXEC_VERSION}.tar.gz && \
+    tar zxf v${SU_EXEC_VERSION}.tar.gz && \
+    cd su-exec-${SU_EXEC_VERSION} && \
+    make LDFLAGS="-fvisibility=hidden -Wl,-O2 -Wl,--discard-all -Wl,--strip-all -Wl,--as-needed -Wl,--gc-sections" && \
+    cp -a su-exec ${OUTDIR}/usr/bin && \
+    cd .. && rm -rf su-exec-${SU_EXEC_VERSION} v${SU_EXEC_VERSION}.tar.gz
 
 ADD https://github.com/GoogleContainerTools/kpt/releases/download/${KPT_VERSION}/kpt_linux_${TARGETARCH} ${OUTDIR}/usr/bin/kpt
 RUN chmod 555 ${OUTDIR}/usr/bin/kpt
@@ -340,7 +352,7 @@ RUN set -eux; \
     *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     wget -nv -O "/tmp/${TRVIY_DEB_NAME}" "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/${TRVIY_DEB_NAME}"; \
-    dnf install -y --setopt=install_weak_deps=False "/tmp/${TRVIY_DEB_NAME}"; \
+    rpm -i "/tmp/${TRVIY_DEB_NAME}"; \
     rm "/tmp/${TRVIY_DEB_NAME}";
 
 # Install kubectx and kubens
@@ -350,13 +362,6 @@ RUN chmod 555 ${OUTDIR}/usr/bin/kubectx
 ADD https://github.com/ahmetb/kubectx/releases/download/v${KUBECTX_VERSION}/kubens /tmp
 RUN mv /tmp/kubens ${OUTDIR}/usr/bin/kubens
 RUN chmod 555 ${OUTDIR}/usr/bin/kubens
-
-# Cleanup stuff we don't need in the final image
-RUN rm -fr /usr/lib/golang/doc
-RUN rm -fr /usr/lib/golang/test
-RUN rm -fr /usr/lib/golang/api
-RUN rm -fr /usr/lib/golang/bin/godoc
-RUN rm -fr /usr/lib/golang/bin/gofmt
 
 # Clang+LLVM versions
 ENV LLVM_VERSION=14.0.6
@@ -376,16 +381,16 @@ RUN set -eux; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     \
-    wget -nv ${LLVM_BASE_URL}/${LLVM_ARTIFACT}.tar.xz; \
-    tar -xJf ${LLVM_ARTIFACT}.tar.xz -C /tmp; \
-    mkdir -p ${LLVM_DIRECTORY}; \
-    mv /tmp/${LLVM_ARCHIVE}/* ${LLVM_DIRECTORY}/
-
-RUN echo "${LLVM_DIRECTORY}/lib" | tee /etc/ld.so.conf.d/llvm.conf
-RUN ldconfig
+    wget -nv ${LLVM_BASE_URL}/${LLVM_ARTIFACT}.tar.xz && \
+    tar -xJf ${LLVM_ARTIFACT}.tar.xz -C /tmp && \
+    mkdir -p ${LLVM_DIRECTORY} && \
+    mv /tmp/${LLVM_ARCHIVE}/* ${LLVM_DIRECTORY}/ && \
+    echo "${LLVM_DIRECTORY}/lib" | tee /etc/ld.so.conf.d/llvm.conf && \
+    ldconfig && \
+    rm -rf ${LLVM_ARTIFACT}.tar.xz /tmp/${LLVM_ARCHIVE}
 
 # Bazel
-ENV BAZEL_VERSION=6.0.0
+ENV BAZEL_VERSION=6.3.2
 RUN set -eux; \
     \
     case $(uname -m) in \
@@ -398,20 +403,6 @@ RUN set -eux; \
     \
     curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${BAZEL_ARTIFACT} && \
     chmod +x /usr/bin/bazel
-
-##############
-# Docker
-##############
-
-# Docker versions
-ENV DOCKER_VERSION=3:24.0.5-1.el9
-ENV DOCKER_CLI_VERSION=1:24.0.5-1.el9
-ENV CONTAINERD_VERSION=1.6.21-3.1.el9
-ENV DOCKER_BUILDX_VERSION=0.11.2-1.el9
-
-# Docker including docker-ce, docker-ce-cli, docker-buildx-plugin and containerd.io
-RUN dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-RUN dnf -y install --setopt=install_weak_deps=False docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_CLI_VERSION}" containerd.io-"${CONTAINERD_VERSION}" docker-buildx-plugin-"${DOCKER_BUILDX_VERSION}"
 
 ##############
 # Python
@@ -429,14 +420,14 @@ ENV REQUESTS_VERSION=2.31.0
 ENV YAMLLINT_VERSION=1.32.0
 
 # Install Python stuff
-RUN python3 -m pip install --no-cache-dir --upgrade pip==${PIP_INSTALL_VERSION}
-RUN python3 -m pip install --no-cache-dir --no-binary :all: autopep8==${AUTOPEP8_VERSION}
-RUN python3 -m pip install --no-cache-dir yamllint==${YAMLLINT_VERSION}
-RUN python3 -m pip install --no-cache-dir --ignore-installed requests==${REQUESTS_VERSION}
-RUN python3 -m pip install --no-cache-dir protobuf==${PYTHON_PROTOBUF_VERSION}
-RUN python3 -m pip install --no-cache-dir PyYAML==${PYYAML_VERSION}
-RUN python3 -m pip install --no-cache-dir jwcrypto==${JWCRYPTO_VERSION}
-RUN python3 -m pip install --no-cache-dir PyGithub==${PYGITHUB_VERSION}
+RUN python3 -m pip install --no-cache-dir --upgrade pip==${PIP_INSTALL_VERSION} && \
+    python3 -m pip install --no-cache-dir --no-binary :all: autopep8==${AUTOPEP8_VERSION} && \
+    python3 -m pip install --no-cache-dir yamllint==${YAMLLINT_VERSION} && \
+    python3 -m pip install --no-cache-dir --ignore-installed requests==${REQUESTS_VERSION} && \
+    python3 -m pip install --no-cache-dir protobuf==${PYTHON_PROTOBUF_VERSION} && \
+    python3 -m pip install --no-cache-dir PyYAML==${PYYAML_VERSION} && \
+    python3 -m pip install --no-cache-dir jwcrypto==${JWCRYPTO_VERSION} && \
+    python3 -m pip install --no-cache-dir PyGithub==${PYGITHUB_VERSION}
 
 #############
 # Ruby
@@ -445,12 +436,6 @@ RUN python3 -m pip install --no-cache-dir PyGithub==${PYGITHUB_VERSION}
 # Pinned versions of stuff we pull in
 ENV FPM_VERSION=v1.15.1
 ENV MDL_VERSION=0.12.0
-
-# hadolint ignore=DL3008
-RUN dnf -y install --setopt=install_weak_deps=False \
-    ruby \
-    ruby-devel \
-    rubygem-json
 
 # MDL
 RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION}
@@ -512,8 +497,8 @@ RUN mkdir -p /go && \
 # They are created as root 755.  As a result they are not writeable, which fails in
 # the developer environment as a volume or bind mount inherits the permissions of
 # the directory mounted rather then overriding with the permission of the volume file.
-RUN chmod 777 /go && \
-    chmod 777 /gocache && \
+RUN chmod -R 777 /go && \
+    chmod -R 777 /gocache && \
     chmod 777 /gobin && \
     chmod 777 /config && \
     chmod 777 /config/.docker && \
@@ -524,18 +509,6 @@ RUN chmod 777 /go && \
     chmod 777 /home/.cargo/registry && \
     chmod 777 /home/.helm && \
     chmod 777 /home/.gsutil
-
-# Clean up stuff we don't need in the final image
-RUN dnf -y clean all
-RUN rm -rf /var/lib/apt/lists/*
-RUN rm -fr /usr/share/python
-RUN rm -fr /usr/share/bash-completion
-RUN rm -fr /usr/share/bug
-RUN rm -fr /usr/share/doc
-RUN rm -fr /usr/share/dh-python
-RUN rm -fr /usr/share/locale
-RUN rm -fr /usr/share/man
-RUN rm -fr /tmp/*
 
 RUN mkdir -p /work && chmod 777 /work
 RUN git config --global --add safe.directory /work
