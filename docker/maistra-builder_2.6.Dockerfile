@@ -50,7 +50,7 @@ ENV DOCKER_BUILDX_VERSION=0.11.2-1.el9
 # required for ruby: libcurl-devel
 # required for python: python3, pkg-config
 # required for ebpf build: clang,llvm
-# required for building proxy: compat-openssl11, libtool, libstdc++-static, libxcrypt-compat
+# required for building proxy: compat-openssl11, libtool, libstdc++-static, libxcrypt-compat libatomic
 # required for centos dnf config-manager: dnf-plugins-core
 # hadolint ignore=DL3008, DL3009
 RUN dnf -y upgrade --refresh && \
@@ -72,6 +72,7 @@ RUN dnf -y upgrade --refresh && \
         compat-openssl11 openssl-3.0.7 openssl-devel-3.0.7 \
         libstdc++-static \
         libxcrypt-compat-0:4.4.18-3.el9 \
+        libatomic \
         iptables-nft libcurl-devel \
         git less rpm rpm-build gettext file \
         iproute ipset rsync net-tools \
