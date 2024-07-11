@@ -45,10 +45,10 @@ ENV DOCKER_BUILDX_VERSION=0.11.2-1.el9
 # Stick with clang 14
 # Stick with golang 1.21
 # Stick with OpenSSL 3.0.7, used in RHEL 9.4, which is the base for OSSM 2.6
+# Stick with python 3.11
 # required for binary tools: ca-certificates, gcc, glibc, git, iptables-nft, libtool-ltdl
 # required for general build: make, wget, curl, openssh, rpm, procps (pkill)
 # required for ruby: libcurl-devel
-# required for python: python3, pkg-config
 # required for ebpf build: clang,llvm
 # required for building proxy: compat-openssl11, libtool, libstdc++-static, libxcrypt-compat libatomic
 # required for centos dnf config-manager: dnf-plugins-core
@@ -65,9 +65,7 @@ RUN dnf -y upgrade --refresh && \
         gcc \
         openssh libtool libtool-ltdl glibc \
         make pkgconf-pkg-config \
-        python3 \
-        python3-devel \
-        python3-pip python3-setuptools \
+        python3.11 python3.11-devel python3.11-pip python3.11-setuptools \
         wget jq rsync \
         compat-openssl11 openssl-3.0.7 openssl-devel-3.0.7 \
         libstdc++-static \
@@ -81,7 +79,8 @@ RUN dnf -y upgrade --refresh && \
         libbpf-devel \
         java-11-openjdk-devel \
         ruby ruby-devel rubygem-json && \
-    dnf clean all -y
+    dnf clean all -y && \
+    rm -f /usr/bin/python3 && ln -s /usr/bin/python3.11 /usr/bin/python3
 
 # Binary tools Versions
 ENV BENCHSTAT_VERSION=9c9101da8316
