@@ -1,5 +1,6 @@
-FROM quay.io/centos/centos:stream9
+FROM rockylinux:9
 
+ENV GOLANG_VERSION=1.22.8
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GO111MODULE=on
 ENV GOSUMDB=sum.golang.org
@@ -26,13 +27,12 @@ RUN dnf -y upgrade --refresh && \
         gh \
         docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_CLI_VERSION}" containerd.io-"${CONTAINERD_VERSION}" docker-buildx-plugin-"${DOCKER_BUILDX_VERSION}" \
         ca-certificates curl gnupg2 \
-        gcc go-toolset-1.22.5 \
         openssh libtool libtool-ltdl glibc \
         make pkgconf-pkg-config \
         python3.11 python3.11-devel python3.11-pip python3.11-setuptools \
         wget jq rsync \
         compat-openssl11 openssl-3.0.7 openssl-devel-3.0.7 \
-        libstdc++-static \
+        gcc libstdc++-static \
         libxcrypt-compat-0:4.4.18-3.el9 \
         libatomic \
         iptables-nft libcurl-devel \
@@ -44,6 +44,22 @@ RUN dnf -y upgrade --refresh && \
         java-11-openjdk-devel \
         ruby ruby-devel rubygem-json && \
     dnf clean all -y
+
+# Install golang from go.dev/dl
+# hadolint ignore=DL3008
+RUN set -eux; \
+    \
+    case $(uname -m) in \
+        x86_64) GOLANG_GZ=go${GOLANG_VERSION}.linux-amd64.tar.gz;; \
+        aarch64) GOLANG_GZ=go${GOLANG_VERSION}.linux-arm64.tar.gz;; \
+        *) echo "unsupported architecture"; exit 1 ;; \
+    esac; \
+    \
+    wget -nv -O "/tmp/${GOLANG_GZ}" "https://go.dev/dl/${GOLANG_GZ}" && \
+    tar -xzf "/tmp/${GOLANG_GZ}" -C /tmp && \
+    mv /tmp/go /usr/lib/golang && \
+    ln -s /usr/lib/golang/bin/go /usr/local/bin/go && \
+    rm -rf "/tmp/${GOLANG_GZ}" /usr/lib/golang/doc /usr/lib/golang/test /usr/lib/golang/api /usr/lib/golang/bin/godoc /usr/lib/golang/bin/gofmt
 
 # Clang+LLVM versions
 ENV LLVM_VERSION=14.0.6
