@@ -110,6 +110,9 @@ RUN useradd user && chmod 777 /home/user
 ENV USER=user HOME=/home/user
 RUN alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
 
+# Mimic Ubuntu path for this file, required by Envoy tests
+RUN ln -s /etc/ssl/certs/ca-bundle.crt /etc/ssl/certs/ca-certificates.crt
+
 # mountpoints are mandatory for any host mounts.
 # mountpoints in /config are special.
 RUN mkdir -p /go && \
