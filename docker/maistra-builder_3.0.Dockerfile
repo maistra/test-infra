@@ -1,6 +1,6 @@
-FROM rockylinux:9
+FROM quay.io/rockylinux/rockylinux:9.4
 
-ENV GOLANG_VERSION=1.22.8
+ENV GOLANG_VERSION=1.23.4
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GO111MODULE=on
 ENV GOSUMDB=sum.golang.org
@@ -8,18 +8,14 @@ ENV GOCACHE=/gocache
 
 WORKDIR /root
 
-ENV DOCKER_VERSION=3:26.0.1
-ENV DOCKER_CLI_VERSION=1:26.0.1
-ENV CONTAINERD_VERSION=1.6.31
-ENV DOCKER_BUILDX_VERSION=0.13.1
+ENV DOCKER_VERSION=3:27.3.1
+ENV DOCKER_CLI_VERSION=1:27.3.1
+ENV CONTAINERD_VERSION=1.7.22
+ENV DOCKER_BUILDX_VERSION=0.17.1
 
 # Install all dependencies available in RPM repos
-# Stick with golang 1.22
-# Stick with OpenSSL 3.0.7, used in RHEL 9, which is the base for OSSM 3.0
-# Stick with python 3.11
 # hadolint ignore=DL3008, DL3009
-RUN dnf -y upgrade --refresh && \
-    dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
+RUN dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
         dnf-plugins-core && \
     dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
     dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
@@ -29,9 +25,9 @@ RUN dnf -y upgrade --refresh && \
         ca-certificates curl gnupg2 \
         openssh libtool libtool-ltdl glibc \
         make pkgconf-pkg-config \
-        python3.11 python3.11-devel python3.11-pip python3.11-setuptools \
+        python3.12 python3.12-devel python3.12-pip python3.12-setuptools \
         wget jq rsync \
-        compat-openssl11 openssl-3.0.7 openssl-devel-3.0.7 \
+        perl-IPC-Cmd perl-FindBin \
         gcc libstdc++-static \
         libxcrypt-compat-0:4.4.18-3.el9 \
         libatomic \
@@ -86,6 +82,16 @@ RUN set -eux; \
     ldconfig && \
     rm -rf ${LLVM_ARTIFACT}.tar.xz /tmp/${LLVM_ARCHIVE}
 
+# OpenSSL 3.0.x
+ENV OPENSSL_VERSION=3.0.15
+ENV OPENSSL_ROOT_DIR=/opt/openssl
+RUN curl -sfL https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz | tar xz -C /tmp && \
+    cd /tmp/openssl-${OPENSSL_VERSION} && \
+    ./Configure --prefix=${OPENSSL_ROOT_DIR} --openssldir=${OPENSSL_ROOT_DIR}/conf && \
+    make -j4 && make install_sw && \
+    echo "${OPENSSL_ROOT_DIR}/lib64" > /etc/ld.so.conf.d/openssl.conf && ldconfig && \
+    cd /tmp && rm -rf /tmp/openssl-${OPENSSL_VERSION}
+
 # Google cloud tools
 ENV GCLOUD_VERSION=467.0.0
 RUN curl -sfL -o /tmp/gc.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-linux-x86_64.tar.gz && \
@@ -108,7 +114,7 @@ RUN wget -nv https://github.com/NobodyXu/su-exec/archive/refs/tags/v${SU_EXEC_VE
 # Workarounds for proxy and bazel
 RUN useradd user && chmod 777 /home/user
 ENV USER=user HOME=/home/user
-RUN alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+RUN alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
 
 # Mimic Ubuntu path for this file, required by Envoy tests
 RUN ln -s /etc/ssl/certs/ca-bundle.crt /etc/ssl/certs/ca-certificates.crt
