@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # hadolint ignore=DL3006
-FROM quay.io/centos/centos:stream9
+FROM quay.io/rockylinux/rockylinux:9.2
 
 ARG TARGETARCH
 
@@ -67,7 +67,7 @@ RUN dnf -y upgrade --refresh && \
         make pkgconf-pkg-config \
         python3.11 python3.11-devel python3.11-pip python3.11-setuptools \
         wget jq rsync \
-        compat-openssl11 openssl-3.0.7 openssl-devel-3.0.7 \
+        perl-IPC-Cmd perl-FindBin \
         libstdc++-static \
         libxcrypt-compat-0:4.4.18-3.el9 \
         libatomic \
@@ -90,7 +90,6 @@ ENV CRANE_VERSION=v0.16.1
 ENV GCLOUD_VERSION=449.0.0
 ENV GO_BINDATA_VERSION=v3.1.2
 ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
-ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
 ENV GOIMPORTS_VERSION=v0.14.0
 ENV GOLANG_PROTOBUF_VERSION=v1.31.0
 ENV GOLANG_GRPC_PROTOBUF_VERSION=v1.3.0
@@ -203,7 +202,6 @@ RUN go install -ldflags="-s -w" google.golang.org/protobuf/cmd/protoc-gen-go@${G
     go install -ldflags="-s -w" github.com/istio/go-junit-report@${GO_JUNIT_REPORT_VERSION} && \
     go install -ldflags="-s -w" sigs.k8s.io/bom/cmd/bom@${BOM_VERSION} && \
     go install -ldflags="-s -w" sigs.k8s.io/kind@${KIND_VERSION} && \
-    go install -ldflags="-s -w" github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION} && \
     go install -ldflags="-s -w" github.com/imsky/junit-merger/src/junit-merger@${JUNIT_MERGER_VERSION} && \
     go install -ldflags="-s -w" golang.org/x/perf/cmd/benchstat@${BENCHSTAT_VERSION} && \
     go install -ldflags="-s -w" github.com/google/go-containerregistry/cmd/crane@${CRANE_VERSION} && \
@@ -437,6 +435,9 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip==${PIP_INSTALL_VERSION} 
 ENV FPM_VERSION=v1.15.1
 ENV MDL_VERSION=0.12.0
 
+# Mimic Ubuntu path for this file, required by Envoy tests
+RUN ln -s /etc/ssl/certs/ca-bundle.crt /etc/ssl/certs/ca-certificates.crt
+
 # MDL
 RUN gem install --no-wrappers --no-document mdl -v ${MDL_VERSION}
 
@@ -464,6 +465,16 @@ RUN curl --proto '=https' -v --tlsv1.2 -sSf https://sh.rustup.rs | \
     sh -s -- -y -v --default-toolchain ${RUST_VERSION} --profile minimal --component rustfmt clippy &&\
     /home/.cargo/bin/rustup default ${RUST_VERSION} &&\
     mv /home/.cargo/bin/* /usr/bin
+
+# OpenSSL 3.0.x
+ENV OPENSSL_VERSION=3.0.15
+ENV OPENSSL_ROOT_DIR=/opt/openssl
+RUN curl -sfL https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz | tar xz -C /tmp && \
+    cd /tmp/openssl-${OPENSSL_VERSION} && \
+    ./Configure --prefix=${OPENSSL_ROOT_DIR} --openssldir=${OPENSSL_ROOT_DIR}/conf && \
+    make -j4 && make install_sw && \
+    echo "${OPENSSL_ROOT_DIR}/lib64" > /etc/ld.so.conf.d/openssl.conf && ldconfig && \
+    cd /tmp && rm -rf /tmp/openssl-${OPENSSL_VERSION}
 
 # su-exec is used in place of complex sudo setup operations
 RUN chmod u+sx /usr/bin/su-exec
