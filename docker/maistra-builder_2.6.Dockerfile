@@ -474,7 +474,9 @@ RUN curl -sfL https://github.com/openssl/openssl/releases/download/openssl-${OPE
     ./Configure --prefix=${OPENSSL_ROOT_DIR} --openssldir=${OPENSSL_ROOT_DIR}/conf && \
     make -j4 && make install_sw && \
     echo "${OPENSSL_ROOT_DIR}/lib64" > /etc/ld.so.conf.d/openssl.conf && ldconfig && \
-    cd /tmp && rm -rf /tmp/openssl-${OPENSSL_VERSION}
+    cd /tmp && rm -rf /tmp/openssl-${OPENSSL_VERSION} && \
+    rm /usr/bin/openssl || true && \
+    ln -s /opt/openssl/bin/openssl /usr/bin/openssl
 
 # su-exec is used in place of complex sudo setup operations
 RUN chmod u+sx /usr/bin/su-exec
