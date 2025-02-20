@@ -472,7 +472,8 @@ ENV OPENSSL_ROOT_DIR=/opt/openssl
 RUN curl -sfL https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz | tar xz -C /tmp && \
     cd /tmp/openssl-${OPENSSL_VERSION} && \
     ./Configure --prefix=${OPENSSL_ROOT_DIR} --openssldir=${OPENSSL_ROOT_DIR}/conf && \
-    make -j4 && make install_sw && \
+    make uninstall && make clean && make -j4 && make install_sw && \
+    mkdir -p /opt/openssl/conf && cp /tmp/openssl-${OPENSSL_VERSION}/apps/openssl.cnf /opt/openssl/conf/openssl.cnf && \
     echo "${OPENSSL_ROOT_DIR}/lib64" > /etc/ld.so.conf.d/openssl.conf && ldconfig && \
     cd /tmp && rm -rf /tmp/openssl-${OPENSSL_VERSION} && \
     rm /usr/bin/openssl || true && \
