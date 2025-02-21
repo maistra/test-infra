@@ -473,6 +473,7 @@ RUN curl -sfL https://github.com/openssl/openssl/releases/download/openssl-${OPE
     cd /tmp/openssl-${OPENSSL_VERSION} && \
     ./Configure --prefix=${OPENSSL_ROOT_DIR} --openssldir=${OPENSSL_ROOT_DIR}/conf && \
     make -j4 && make install_sw && \
+    mkdir -p ${OPENSSL_ROOT_DIR}/conf && cp /tmp/openssl-${OPENSSL_VERSION}/apps/openssl.cnf ${OPENSSL_ROOT_DIR}/conf/openssl.cnf && \
     echo "${OPENSSL_ROOT_DIR}/lib64" > /etc/ld.so.conf.d/openssl.conf && ldconfig && \
     cd /tmp && rm -rf /tmp/openssl-${OPENSSL_VERSION} && \
     rm /usr/bin/openssl || true && \
