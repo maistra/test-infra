@@ -1,10 +1,11 @@
 FROM quay.io/rockylinux/rockylinux:9.4
 
-ENV GOLANG_VERSION=1.23.4
+ENV GOLANG_VERSION=1.23.6
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GO111MODULE=on
 ENV GOSUMDB=sum.golang.org
 ENV GOCACHE=/gocache
+ENV GOBIN=/usr/local/bin
 
 WORKDIR /root
 
@@ -12,6 +13,7 @@ ENV DOCKER_VERSION=3:27.3.1
 ENV DOCKER_CLI_VERSION=1:27.3.1
 ENV CONTAINERD_VERSION=1.7.22
 ENV DOCKER_BUILDX_VERSION=0.17.1
+ENV K8S_TEST_INFRA_VERSION=4f5d74517ae8ec387568f8c766f4b0ba1f454129
 
 # Install all dependencies available in RPM repos
 # hadolint ignore=DL3008, DL3009
@@ -81,6 +83,9 @@ RUN set -eux; \
     echo "${LLVM_DIRECTORY}/lib" | tee /etc/ld.so.conf.d/llvm.conf && \
     ldconfig && \
     rm -rf ${LLVM_ARTIFACT}.tar.xz /tmp/${LLVM_ARCHIVE}
+
+# Go tools
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION}
 
 # OpenSSL 3.0.x
 ENV OPENSSL_VERSION=3.0.15
