@@ -62,7 +62,7 @@ ENV CRANE_VERSION=v0.14.0
 ENV GCLOUD_VERSION=425.0.0
 ENV GO_BINDATA_VERSION=v3.1.2
 ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
-ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
+# ENV GOCOVMERGE_VERSION=b5bfa59ec0adc420475f97f89b58045c721d761c
 ENV GOIMPORTS_VERSION=v0.1.0
 ENV GOLANG_PROTOBUF_VERSION=v1.30.0
 ENV GOLANG_GRPC_PROTOBUF_VERSION=v1.2.0
@@ -91,7 +91,7 @@ ENV SHELLCHECK_VERSION=v0.9.0
 ENV SU_EXEC_VERSION=0.2
 ENV TRIVY_VERSION=0.43.1
 ENV YQ_VERSION=4.33.2
-ENV GOLANG_VERSION=1.22.12
+ENV GOLANG_VERSION=1.20.14
 ENV GO111MODULE=on
 ENV GOBIN=/usr/local/bin
 ENV GOCACHE=/gocache
@@ -119,6 +119,22 @@ RUN set -eux; \
     mv /tmp/go /usr/lib/golang; \
     ln -s /usr/lib/golang/bin/go /usr/local/bin/go; \
     rm -rf /usr/lib/golang/doc /usr/lib/golang/test /usr/lib/golang/bin/godoc
+
+# Install newer golang in a separated path - required for Envoy/Proxy builds
+# hadolint ignore=DL3008
+ENV GOLANG_VERSION_PROXY=1.22.12
+RUN set -eux; \
+    \
+    case $(uname -m) in \
+        x86_64) GOLANG_GZ=go${GOLANG_VERSION_PROXY}.linux-amd64.tar.gz;; \
+        aarch64) GOLANG_GZ=go${GOLANG_VERSION_PROXY}.linux-arm64.tar.gz;; \
+        *) echo "unsupported architecture"; exit 1 ;; \
+    esac; \
+    \
+    wget -q -O "/tmp/${GOLANG_GZ}" "https://go.dev/dl/${GOLANG_GZ}"; \
+    tar -xzvf "/tmp/${GOLANG_GZ}" -C /tmp; \
+    mv /tmp/go /usr/lib/golang-1.22; \
+    rm -rf /usr/lib/golang-1.22/doc /usr/lib/golang-1.22/test /usr/lib/golang-1.22/bin/godoc
 
 # Install protoc
 RUN set -eux; \
@@ -150,7 +166,7 @@ RUN go install -ldflags="-s -w" github.com/grpc-ecosystem/grpc-gateway/protoc-ge
 RUN go install -ldflags="-s -w" github.com/istio/go-junit-report@${GO_JUNIT_REPORT_VERSION}
 RUN go install -ldflags="-s -w" sigs.k8s.io/bom/cmd/bom@${BOM_VERSION}
 RUN go install -ldflags="-s -w" sigs.k8s.io/kind@${KIND_VERSION}
-RUN go install -ldflags="-s -w" github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION}
+# RUN go install -ldflags="-s -w" github.com/wadey/gocovmerge@${GOCOVMERGE_VERSION}
 RUN go install -ldflags="-s -w" github.com/imsky/junit-merger/src/junit-merger@${JUNIT_MERGER_VERSION}
 RUN go install -ldflags="-s -w" golang.org/x/perf/cmd/benchstat@${BENCHSTAT_VERSION}
 RUN go install -ldflags="-s -w" github.com/google/go-containerregistry/cmd/crane@${CRANE_VERSION}
