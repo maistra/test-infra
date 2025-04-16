@@ -15,6 +15,11 @@ ENV CONTAINERD_VERSION=1.7.22
 ENV DOCKER_BUILDX_VERSION=0.17.1
 ENV K8S_TEST_INFRA_VERSION=4f5d74517ae8ec387568f8c766f4b0ba1f454129
 
+# install rust 1.85 needed for ztunnel
+ARG RUST_VERSION=1.85.1
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain ${RUST_VERSION} && \
+    export PATH=/root/.cargo/bin:$PATH
+
 # Install all dependencies available in RPM repos
 # hadolint ignore=DL3008, DL3009
 RUN dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
