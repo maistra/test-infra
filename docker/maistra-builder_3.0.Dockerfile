@@ -18,7 +18,7 @@ ENV K8S_TEST_INFRA_VERSION=4f5d74517ae8ec387568f8c766f4b0ba1f454129
 # install rust 1.85 needed for ztunnel
 ARG RUST_VERSION=1.85.1
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain ${RUST_VERSION} && \
-    mv /root/.rustup/toolchains/${RUST_VERSION}-x86_64-unknown-linux-gnu/bin/* /usr/bin/
+    mv /root/.rustup/toolchains/${RUST_VERSION}-*-unknown-linux-gnu/bin/* /usr/bin/
 
 # Install all dependencies available in RPM repos
 # hadolint ignore=DL3008, DL3009
