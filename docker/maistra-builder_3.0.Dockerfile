@@ -15,7 +15,7 @@ ENV CONTAINERD_VERSION=1.7.22
 ENV DOCKER_BUILDX_VERSION=0.17.1
 ENV K8S_TEST_INFRA_VERSION=4f5d74517ae8ec387568f8c766f4b0ba1f454129
 
-# Install rust 1.85 needed for ztunnel
+# Install rust 1.85 needed by ztunnel
 ARG RUST_VERSION=1.85.1
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain ${RUST_VERSION} && \
     mv /root/.rustup/toolchains/${RUST_VERSION}-*-unknown-linux-gnu/bin/* /usr/bin/
