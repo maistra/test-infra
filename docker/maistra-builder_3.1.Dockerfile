@@ -1,6 +1,6 @@
-FROM quay.io/rockylinux/rockylinux:9.4
+FROM quay.io/fedora/fedora:41
 
-ENV GOLANG_VERSION=1.24.3
+ENV GOLANG_VERSION=1.24.5
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GO111MODULE=on
 ENV GOSUMDB=sum.golang.org
@@ -22,23 +22,20 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain ${RUST_VERS
 
 # Install all dependencies available in RPM repos
 # hadolint ignore=DL3008, DL3009
-RUN dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
-        dnf-plugins-core && \
-    dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
-    dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && \
-    dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
+RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-core && \
+    dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo && \
+    dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo && \
+    dnf -y install --setopt=install_weak_deps=False --allowerasing \
         gh \
-        docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_CLI_VERSION}" containerd.io-"${CONTAINERD_VERSION}" docker-buildx-plugin-"${DOCKER_BUILDX_VERSION}" \
+        docker-ce docker-ce-cli containerd.io docker-buildx-plugin \
         ca-certificates curl gnupg2 \
         openssh libtool libtool-ltdl glibc \
         make pkgconf-pkg-config \
-        python3.12 python3.12-devel python3.12-pip python3.12-setuptools \
+        python3.12 python3.12-devel python3-pip python3-setuptools \
         wget jq rsync \
         perl-IPC-Cmd perl-FindBin \
-        gcc libstdc++-static \
-        libxcrypt-compat-0:4.4.18-3.el9 \
-        libatomic \
-        iptables-nft libcurl-devel \
+        clang18-devel llvm18-devel lld18 libatomic libstdc++-static \
+        libcurl-devel \
         git less rpm rpm-build gettext file \
         iproute ipset rsync net-tools \
         ninja-build \
@@ -47,6 +44,16 @@ RUN dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --alloweras
         java-11-openjdk-devel \
         ruby ruby-devel rubygem-json && \
     dnf clean all -y
+
+# Configure LLVM/CLang 18 links
+RUN ln -s /usr/bin/clang-18 /usr/bin/clang && \
+    ln -s /usr/bin/clang++-18 /usr/bin/clang++ && \
+    ln -s /usr/bin/llvm-ar-18 /usr/bin/llvm-ar && \
+    ln -s /usr/bin/llvm-nm-18 /usr/bin/llvm-nm && \
+    ln -s /usr/bin/llvm-ranlib-18 /usr/bin/llvm-ranlib && \
+    ln -s /usr/bin/llvm-strip-18 /usr/bin/llvm-strip && \
+    ln -s /usr/bin/lld-18 /usr/bin/lld && \
+    ln -s /usr/bin/lld-link-18 /usr/bin/lld-link
 
 # Install golang from go.dev/dl
 # hadolint ignore=DL3008
@@ -64,42 +71,16 @@ RUN set -eux; \
     ln -s /usr/lib/golang/bin/go /usr/local/bin/go && \
     rm -rf "/tmp/${GOLANG_GZ}" /usr/lib/golang/doc /usr/lib/golang/test /usr/lib/golang/api /usr/lib/golang/bin/godoc /usr/lib/golang/bin/gofmt
 
-# Clang+LLVM versions
-ENV LLVM_VERSION=14.0.6
-ENV LLVM_BASE_URL=https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}
-ENV LLVM_DIRECTORY=/usr/lib/llvm
-
-RUN set -eux; \
-    \
-    case $(uname -m) in \
-        x86_64) \
-               LLVM_ARCHIVE=clang+llvm-${LLVM_VERSION}-x86_64-linux-gnu-rhel-8.4 \
-               LLVM_ARTIFACT=clang+llvm-${LLVM_VERSION}-x86_64-linux-gnu-rhel-8.4;; \
-        aarch64)  \
-               LLVM_ARCHIVE=clang+llvm-${LLVM_VERSION}-aarch64-linux-gnu \
-               LLVM_ARTIFACT=clang+llvm-${LLVM_VERSION}-aarch64-linux-gnu;; \
-        *) echo "unsupported architecture"; exit 1 ;; \
-    esac; \
-    \
-    wget -nv ${LLVM_BASE_URL}/${LLVM_ARTIFACT}.tar.xz && \
-    tar -xJf ${LLVM_ARTIFACT}.tar.xz -C /tmp && \
-    mkdir -p ${LLVM_DIRECTORY} && \
-    mv /tmp/${LLVM_ARCHIVE}/* ${LLVM_DIRECTORY}/ && \
-    echo "${LLVM_DIRECTORY}/lib" | tee /etc/ld.so.conf.d/llvm.conf && \
-    ldconfig && \
-    rm -rf ${LLVM_ARTIFACT}.tar.xz /tmp/${LLVM_ARCHIVE}
-
 # Go tools
 RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION}
 
 # OpenSSL 3.0.x
-ENV OPENSSL_VERSION=3.0.16
+ENV OPENSSL_VERSION=3.0.17
 ENV OPENSSL_ROOT_DIR=/opt/openssl
 RUN curl -sfL https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz | tar xz -C /tmp && \
     cd /tmp/openssl-${OPENSSL_VERSION} && \
     ./Configure --prefix=${OPENSSL_ROOT_DIR} --openssldir=${OPENSSL_ROOT_DIR}/conf && \
     make -j4 && make install_sw && \
-    echo "${OPENSSL_ROOT_DIR}/lib64" > /etc/ld.so.conf.d/openssl.conf && ldconfig && \
     cd /tmp && rm -rf /tmp/openssl-${OPENSSL_VERSION}
 
 # Google cloud tools
@@ -125,9 +106,6 @@ RUN wget -nv https://github.com/NobodyXu/su-exec/archive/refs/tags/v${SU_EXEC_VE
 RUN useradd user && chmod 777 /home/user
 ENV USER=user HOME=/home/user
 RUN alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
-
-# Mimic Ubuntu path for this file, required by Envoy tests
-RUN ln -s /etc/ssl/certs/ca-bundle.crt /etc/ssl/certs/ca-certificates.crt
 
 # mountpoints are mandatory for any host mounts.
 # mountpoints in /config are special.
