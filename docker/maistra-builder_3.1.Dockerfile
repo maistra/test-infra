@@ -80,7 +80,7 @@ ENV OPENSSL_ROOT_DIR=/opt/openssl
 RUN curl -sfL https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz | tar xz -C /tmp && \
     cd /tmp/openssl-${OPENSSL_VERSION} && \
     ./Configure --prefix=${OPENSSL_ROOT_DIR} --openssldir=${OPENSSL_ROOT_DIR}/conf && \
-    make -j build_sw && make install_sw && \
+    make -j4 build_sw && make install_sw && \
     cd /tmp && rm -rf /tmp/openssl-${OPENSSL_VERSION}
 
 # Google cloud tools

@@ -23,7 +23,7 @@ PLATFORMS ?= linux/arm64,linux/amd64
 TARGET_OS ?= linux
 
 # BUILDX_BUILD_ARGS are the additional --build-arg flags passed to the docker buildx build command.
-BUILDX_BUILD_ARGS = --build-arg TARGETOS=$(TARGET_OS)
+BUILDX_BUILD_ARGS = --build-arg TARGETOS=$(TARGET_OS) --build-arg BUILDKIT_PARALLEL_LIMIT=1 --progress=plain
 
 # Build a specific maistra image. Example of usage: make maistra-builder_2.3
 # Only build single arch image by using the build command
