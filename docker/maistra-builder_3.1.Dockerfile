@@ -85,12 +85,28 @@ RUN curl -sfL https://github.com/openssl/openssl/releases/download/openssl-${OPE
 
 # Google cloud tools
 ENV GCLOUD_VERSION=496.0.0
-RUN curl -sfL -o /tmp/gc.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-linux-x86_64.tar.gz && \
+RUN set -eux; \
+    \
+    case $(uname -m) in \
+        x86_64) PLATFORM=x86_64;; \
+        aarch64) PLATFORM=arm;; \
+        *) echo "unsupported architecture"; exit 1 ;; \
+    esac; \
+    \
+    curl -sfL -o /tmp/gc.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-linux-${PLATFORM}.tar.gz && \
     tar -xzf /tmp/gc.tar.gz -C /usr/local && rm -f /tmp/gc.tar.gz
 
 # Bazel
-ENV BAZEL_VERSION=7.6.0
-RUN curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-x86_64 && \
+ENV BAZEL_VERSION=7.6.1
+RUN set -eux; \
+    \
+    case $(uname -m) in \
+        x86_64) PLATFORM=x86_64;; \
+        aarch64) PLATFORM=arm;; \
+        *) echo "unsupported architecture"; exit 1 ;; \
+    esac; \
+    \
+    curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-${PLATFORM} && \
     chmod +x /usr/bin/bazel
 
 # Install su-exec which is a tool that operates like sudo without the overhead
