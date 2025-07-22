@@ -102,7 +102,7 @@ RUN set -eux; \
     \
     case $(uname -m) in \
         x86_64) PLATFORM=x86_64;; \
-        aarch64) PLATFORM=arm;; \
+        aarch64) PLATFORM=arm64;; \
         *) echo "unsupported architecture"; exit 1 ;; \
     esac; \
     \
