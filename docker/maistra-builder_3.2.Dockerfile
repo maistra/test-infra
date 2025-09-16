@@ -29,6 +29,7 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         wget jq rsync \
         perl-IPC-Cmd perl-FindBin \
         clang18-devel llvm18-devel lld18 libatomic libstdc++-static \
+        libcxx-devel libcxxabi-devel libcxx-static libcxxabi-static \
         libcurl-devel \
         git less rpm rpm-build gettext file \
         iproute ipset rsync net-tools \
