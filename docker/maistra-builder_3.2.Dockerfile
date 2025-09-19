@@ -24,7 +24,7 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         docker-ce docker-ce-cli containerd.io docker-buildx-plugin \
         ca-certificates curl gnupg2 \
         openssh libtool libtool-ltdl glibc \
-        make pkgconf-pkg-config \
+        make pkgconf-pkg-config binutils-gold \
         python3.12 python3.12-devel python3-pip python3-setuptools \
         wget jq rsync \
         perl-IPC-Cmd perl-FindBin \
