@@ -9,11 +9,6 @@ ENV GOBIN=/usr/local/bin
 
 WORKDIR /root
 
-# Install rust needed by ztunnel
-ARG RUST_VERSION=1.87.0
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain ${RUST_VERSION} && \
-    mv /root/.rustup/toolchains/${RUST_VERSION}-*-unknown-linux-gnu/bin/* /usr/bin/
-
 # Install all dependencies available in RPM repos
 # hadolint ignore=DL3008, DL3009
 RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-core && \
@@ -37,7 +32,8 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         sudo autoconf automake cmake unzip wget xz procps \
         libbpf-devel \
         java-11-openjdk-devel \
-        ruby ruby-devel rubygem-json && \
+        ruby ruby-devel rubygem-json \
+        cargo rust && \
     dnf clean all -y
 
 # Configure LLVM/CLang 18 links
