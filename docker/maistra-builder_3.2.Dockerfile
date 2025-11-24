@@ -33,7 +33,7 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         libbpf-devel \
         java-11-openjdk-devel \
         ruby ruby-devel rubygem-json \
-        cargo rust && \
+        cargo rust protobuf-compiler && \
     dnf clean all -y
 
 # Configure LLVM/CLang 18 links
