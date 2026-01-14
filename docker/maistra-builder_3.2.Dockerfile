@@ -89,7 +89,7 @@ RUN set -eux; \
     tar -xzf /tmp/gc.tar.gz -C /usr/local && rm -f /tmp/gc.tar.gz
 
 # Bazel
-ENV BAZEL_VERSION=7.6.1
+ENV BAZEL_VERSION=7.7.1
 RUN set -eux; \
     \
     case $(uname -m) in \
