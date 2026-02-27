@@ -1,4 +1,4 @@
-FROM quay.io/fedora/fedora:41
+FROM quay.io/fedora/fedora:43
 
 ENV GOLANG_VERSION=1.24.11
 ENV GOPROXY="https://proxy.golang.org,direct"
@@ -31,9 +31,10 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         ninja-build \
         sudo autoconf automake cmake unzip wget xz procps \
         libbpf-devel \
-        java-11-openjdk-devel \
+        java-21-openjdk-devel \
         ruby ruby-devel rubygem-json \
-        cargo rust protobuf-compiler && \
+        cargo rust protobuf-compiler \
+        openssl-3.5* openssl-devel-3.5* && \
     dnf clean all -y
 
 # Configure LLVM/CLang 18 links
@@ -65,15 +66,6 @@ RUN set -eux; \
 # Go tools
 ENV K8S_TEST_INFRA_VERSION=1f0e63447a32a07c0a6cc1ae3b95172438b373c8
 RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION}
-
-# OpenSSL 3.0.x
-ENV OPENSSL_VERSION=3.0.17
-ENV OPENSSL_ROOT_DIR=/opt/openssl
-RUN curl -sfL https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz | tar xz -C /tmp && \
-    cd /tmp/openssl-${OPENSSL_VERSION} && \
-    ./Configure --prefix=${OPENSSL_ROOT_DIR} --openssldir=${OPENSSL_ROOT_DIR}/conf && \
-    make -j4 build_sw && make install_sw && \
-    cd /tmp && rm -rf /tmp/openssl-${OPENSSL_VERSION}
 
 # Google cloud tools
 ENV GCLOUD_VERSION=496.0.0
