@@ -107,8 +107,8 @@ RUN useradd user && chmod 777 /home/user
 ENV USER=user HOME=/home/user
 RUN alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
 
-# mountpoints are mandatory for any host mounts.
-# mountpoints in /config are special.
+# Mountpoints are mandatory for any host mounts.
+# Mountpoints in /config are special.
 RUN mkdir -p /go && \
     mkdir -p /gocache && \
     mkdir -p /gobin && \
