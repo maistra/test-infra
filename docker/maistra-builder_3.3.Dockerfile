@@ -120,7 +120,7 @@ RUN mkdir -p /go && \
     mkdir -p /home/.helm && \
     mkdir -p /home/.gsutil
 
-# TODO must sort out how to use uid mapping in docker so these don't need to be 777
+# TODO: must sort out how to use uid mapping in docker so these don't need to be 777
 # They are created as root 755.  As a result they are not writeable, which fails in
 # the developer environment as a volume or bind mount inherits the permissions of
 # the directory mounted rather then overridding with the permission of the volume file.
