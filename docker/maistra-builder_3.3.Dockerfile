@@ -66,6 +66,7 @@ RUN set -eux; \
 # Go tools
 ENV K8S_TEST_INFRA_VERSION=1f0e63447a32a07c0a6cc1ae3b95172438b373c8
 RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION}
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" golang.org/x/tools/cmd/goimports@v0.28.0
 
 # Google cloud tools
 ENV GCLOUD_VERSION=496.0.0
