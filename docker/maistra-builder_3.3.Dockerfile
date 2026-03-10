@@ -16,6 +16,7 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
     dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo && \
     dnf -y install --setopt=install_weak_deps=False --allowerasing \
         gh \
+        util-linux-script \
         docker-ce docker-ce-cli containerd.io docker-buildx-plugin \
         ca-certificates curl gnupg2 \
         openssh libtool libtool-ltdl glibc \
@@ -65,8 +66,10 @@ RUN set -eux; \
 
 # Go tools
 ENV K8S_TEST_INFRA_VERSION=1f0e63447a32a07c0a6cc1ae3b95172438b373c8
+ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
 RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION}
 RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" golang.org/x/tools/cmd/goimports@v0.28.0
+RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" github.com/istio/go-junit-report@${GO_JUNIT_REPORT_VERSION}
 
 # Google cloud tools
 ENV GCLOUD_VERSION=496.0.0
