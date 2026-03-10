@@ -65,6 +65,7 @@ RUN set -eux; \
     rm -rf "/tmp/${GOLANG_GZ}" /usr/lib/golang/doc /usr/lib/golang/test /usr/lib/golang/api /usr/lib/golang/bin/godoc /usr/lib/golang/bin/gofmt
 
 # Go tools
+# go-junit-report is used by Istio unit tests
 ENV K8S_TEST_INFRA_VERSION=1f0e63447a32a07c0a6cc1ae3b95172438b373c8
 ENV GO_JUNIT_REPORT_VERSION=df0ed838addb0fa189c4d76ad4657f6007a5811c
 RUN CGO_ENABLED=0 go install -ldflags="-extldflags -static -s -w" k8s.io/test-infra/robots/pr-creator@${K8S_TEST_INFRA_VERSION}
