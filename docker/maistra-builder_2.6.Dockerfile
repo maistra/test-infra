@@ -52,6 +52,7 @@ ENV DOCKER_BUILDX_VERSION=0.11.2-1.el9
 # required for ebpf build: clang,llvm
 # required for building proxy: compat-openssl11, libtool, libstdc++-static, libxcrypt-compat libatomic
 # required for centos dnf config-manager: dnf-plugins-core
+# required for building python from source: gcc, make, zlib-devel, bzip2-devel, libffi-devel, ncurses-devel, sqlite-devel, readline-devel, tk-devel, gdbm-devel, xz-devel, uuid-devel
 # hadolint ignore=DL3008, DL3009
 RUN dnf -y upgrade --refresh && \
     dnf --enablerepo=crb -y install --setopt=install_weak_deps=False --allowerasing \
@@ -62,10 +63,11 @@ RUN dnf -y upgrade --refresh && \
         gh \
         docker-ce-"${DOCKER_VERSION}" docker-ce-cli-"${DOCKER_CLI_VERSION}" containerd.io-"${CONTAINERD_VERSION}" docker-buildx-plugin-"${DOCKER_BUILDX_VERSION}" \
         ca-certificates curl gnupg2 \
-        gcc \
+        gcc gcc-c++ \
         openssh libtool libtool-ltdl glibc \
         make pkgconf-pkg-config \
         python3.11 python3.11-devel python3.11-pip python3.11-setuptools \
+        zlib-devel bzip2-devel libffi-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel xz-devel uuid-devel \
         wget jq rsync \
         perl-IPC-Cmd perl-FindBin \
         libstdc++-static \
@@ -122,7 +124,7 @@ ENV TRIVY_VERSION=0.45.1
 ENV YQ_VERSION=4.35.2
 
 # Go support
-ENV GOLANG_VERSION=1.21.11
+ENV GOLANG_VERSION=1.24.13
 ENV GO111MODULE=on
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GOSUMDB=sum.golang.org
@@ -337,21 +339,14 @@ RUN set -eux; \
     && mv /tmp/oras-install/oras ${OUTDIR}/usr/bin/ \
     && rm -rf oras_${ORAS_VERSION}_*.tar.gz /tmp/oras-install/
 
-# Trivy container scanner
+# Trivy container scanner - build from source
 RUN set -eux; \
-    \
-    case $(uname -m) in \
-    x86_64) \
-    TRVIY_DEB_NAME="trivy_${TRIVY_VERSION}_Linux-64bit.rpm"; \
-    ;; \
-    aarch64) \
-    TRVIY_DEB_NAME="trivy_${TRIVY_VERSION}_Linux-ARM64.rpm"; \
-    ;; \
-    *) echo "unsupported architecture"; exit 1 ;; \
-    esac; \
-    wget -nv -O "/tmp/${TRVIY_DEB_NAME}" "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/${TRVIY_DEB_NAME}"; \
-    rpm -i "/tmp/${TRVIY_DEB_NAME}"; \
-    rm "/tmp/${TRVIY_DEB_NAME}";
+    wget -nv -O "/tmp/trivy-${TRIVY_VERSION}.tar.gz" "https://github.com/aquasecurity/trivy/archive/refs/tags/v${TRIVY_VERSION}.tar.gz"; \
+    tar -xzf "/tmp/trivy-${TRIVY_VERSION}.tar.gz" -C /tmp; \
+    cd /tmp/trivy-${TRIVY_VERSION}; \
+    go build -ldflags="-s -w" -o ${OUTDIR}/usr/bin/trivy ./cmd/trivy; \
+    chmod 555 ${OUTDIR}/usr/bin/trivy; \
+    cd /tmp && rm -rf /tmp/trivy-${TRIVY_VERSION}*
 
 # Install kubectx and kubens
 ADD https://github.com/ahmetb/kubectx/releases/download/v${KUBECTX_VERSION}/kubectx /tmp
@@ -462,7 +457,7 @@ ENV RUSTUP_HOME=/home/.rustup
 ENV PATH=/rust/bin:$PATH
 # hadolint ignore=DL4006
 RUN curl --proto '=https' -v --tlsv1.2 -sSf https://sh.rustup.rs | \
-    sh -s -- -y -v --default-toolchain ${RUST_VERSION} --profile minimal --component rustfmt clippy &&\
+    sh -s -- -y -v --default-toolchain ${RUST_VERSION} --profile minimal --component rustfmt  &&\
     /home/.cargo/bin/rustup default ${RUST_VERSION} &&\
     mv /home/.cargo/bin/* /usr/bin
 
@@ -478,6 +473,21 @@ RUN curl -sfL https://github.com/openssl/openssl/releases/download/openssl-${OPE
     cd /tmp && rm -rf /tmp/openssl-${OPENSSL_VERSION} && \
     rm /usr/bin/openssl || true && \
     ln -s /opt/openssl/bin/openssl /usr/bin/openssl
+
+# Rebuild Python 3.11 crypto extension modules with OpenSSL 3.0.15
+# This is necessary because the RPM-installed Python was compiled against system OpenSSL,
+# but we need the crypto modules (_hashlib, _ssl, etc.) to use OpenSSL 3.0.15
+ENV PYTHON_VERSION=3.11.10
+RUN curl -sfL https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz | tar xJ -C /tmp && \
+    cd /tmp/Python-${PYTHON_VERSION} && \
+    ./configure --with-openssl=${OPENSSL_ROOT_DIR} \
+        --with-openssl-rpath=auto \
+        CFLAGS="-I${OPENSSL_ROOT_DIR}/include" \
+        LDFLAGS="-L${OPENSSL_ROOT_DIR}/lib64 -Wl,-rpath,${OPENSSL_ROOT_DIR}/lib64" && \
+    make -j$(nproc) sharedmods && \
+    cp build/lib.linux-*/_{hashlib,ssl,sha256,sha512,sha1,md5,blake2}.*.so /usr/lib64/python3.11/lib-dynload/ && \
+    ldconfig && \
+    cd /tmp && rm -rf /tmp/Python-${PYTHON_VERSION}
 
 # su-exec is used in place of complex sudo setup operations
 RUN chmod u+sx /usr/bin/su-exec
@@ -536,3 +546,4 @@ RUN chmod +x /usr/local/bin/entrypoint
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
+
