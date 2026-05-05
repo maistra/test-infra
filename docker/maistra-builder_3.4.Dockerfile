@@ -85,7 +85,7 @@ RUN mkdir -p /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu && \
     ln -sf /lib64/libgcc_s.so.1 /lib/x86_64-linux-gnu/libgcc_s.so.1 && \
     ln -sf /lib64/libstdc++.so.6 /lib/x86_64-linux-gnu/libstdc++.so.6
 
-# Install golang from go.dev/dl
+# Install golang from go.dev
 # hadolint ignore=DL3008
 RUN set -eux; \
     \
