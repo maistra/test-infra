@@ -135,6 +135,118 @@ RUN set -eux; \
     curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-${PLATFORM} && \
     chmod +x /usr/bin/bazel
 
+# LLVM Toolchain - Download the exact distribution that toolchains_llvm expects
+# This avoids vendoring 9.6GB in the proxy repository
+ENV LLVM_VERSION=18.1.8
+RUN set -eux; \
+    \
+    case $(uname -m) in \
+        x86_64) \
+            LLVM_DIST="clang+llvm-${LLVM_VERSION}-x86_64-linux-gnu-ubuntu-18.04.tar.xz"; \
+            LLVM_SHA256="54ec30358afcc9fb8aa74307db3046f5187f9fb89fb37064cdde906e062ebf36";; \
+        aarch64) \
+            LLVM_DIST="clang+llvm-${LLVM_VERSION}-aarch64-linux-gnu.tar.xz"; \
+            LLVM_SHA256="5724be2708c857e55ddbd9c709b8fffcef870c2dc77f35ebda6c9c71c9726ec1";; \
+        *) echo "unsupported architecture"; exit 1 ;; \
+    esac; \
+    \
+    curl -fsSL -o /tmp/llvm.tar.xz "https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/${LLVM_DIST}" && \
+    echo "${LLVM_SHA256}  /tmp/llvm.tar.xz" | sha256sum -c - && \
+    mkdir -p /opt/llvm-toolchain && \
+    tar -xf /tmp/llvm.tar.xz -C /opt/llvm-toolchain --strip-components=1 && \
+    rm -f /tmp/llvm.tar.xz
+
+# Create Bazel repository wrapper files for LLVM toolchain
+# Create a REPO.bazel file that tells Bazel this is an absolute path repository
+RUN echo 'workspace(name = "llvm_toolchain_llvm")' > /opt/llvm-toolchain/WORKSPACE && \
+    echo 'repo(default_visibility = ["//visibility:public"])' > /opt/llvm-toolchain/REPO.bazel && \
+    cat > /opt/llvm-toolchain/BUILD.bazel << 'EOF'
+# Bazel repository wrapper for pre-installed LLVM toolchain
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "all_files",
+    srcs = glob(["**/*"], exclude=["**/*.html", "**/*.pdf"]),
+)
+
+filegroup(
+    name = "bin",
+    srcs = glob(["bin/**"]),
+)
+
+filegroup(
+    name = "include",
+    srcs = glob(["include/**", "lib/clang/18/include/**"]),
+)
+
+filegroup(
+    name = "lib",
+    srcs = glob(["lib/**"]),
+)
+
+# Legacy lib location (required by llvm_toolchain)
+filegroup(
+    name = "lib_legacy",
+    srcs = glob(["lib/**"]),
+)
+
+filegroup(
+    name = "compiler_components",
+    srcs = glob(["bin/**", "lib/**", "include/**"]),
+)
+
+# Individual tool targets (with llvm- prefix)
+filegroup(name = "clang", srcs = ["bin/clang"])
+filegroup(name = "lld", srcs = ["bin/ld.lld"])
+filegroup(name = "llvm-ar", srcs = ["bin/llvm-ar"])
+filegroup(name = "llvm-nm", srcs = ["bin/llvm-nm"])
+filegroup(name = "llvm-objcopy", srcs = ["bin/llvm-objcopy"])
+filegroup(name = "llvm-objdump", srcs = ["bin/llvm-objdump"])
+filegroup(name = "llvm-strip", srcs = ["bin/llvm-strip"])
+filegroup(name = "llvm-dwp", srcs = ["bin/llvm-dwp"])
+filegroup(name = "llvm-profdata", srcs = ["bin/llvm-profdata"])
+filegroup(name = "llvm-cov", srcs = ["bin/llvm-cov"])
+
+# Tool targets without llvm- prefix (aliases expected by llvm_toolchain)
+filegroup(name = "as", srcs = ["bin/clang"])
+filegroup(name = "ar", srcs = ["bin/llvm-ar"])
+filegroup(name = "nm", srcs = ["bin/llvm-nm"])
+filegroup(name = "objcopy", srcs = ["bin/llvm-objcopy"])
+filegroup(name = "objdump", srcs = ["bin/llvm-objdump"])
+filegroup(name = "strip", srcs = ["bin/llvm-strip"])
+filegroup(name = "dwp", srcs = ["bin/llvm-dwp"])
+filegroup(name = "profdata", srcs = ["bin/llvm-profdata"])
+filegroup(name = "cov", srcs = ["bin/llvm-cov"])
+
+# Linker targets
+filegroup(name = "ld", srcs = ["bin/ld.lld"])
+filegroup(name = "ld.lld", srcs = ["bin/ld.lld"])
+
+# Config site (may be needed)
+filegroup(name = "extra_config_site", srcs = [])
+EOF
+
+RUN ls -lah /opt/llvm-toolchain/
+
+# Create sysroot stub (points to system root, avoids vendoring 760MB)
+RUN mkdir -p /opt/sysroot && \
+    echo 'workspace(name = "sysroot_linux_amd64")' > /opt/sysroot/WORKSPACE && \
+    cat > /opt/sysroot/BUILD.bazel << 'EOF'
+# Bazel repository wrapper for system sysroot
+# This uses the container's system root instead of vendoring a separate sysroot
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "sysroot",
+    srcs = [],
+)
+
+filegroup(
+    name = "all_files",
+    srcs = [],
+)
+EOF
+
 # Install su-exec which is a tool that operates like sudo without the overhead
 ENV SU_EXEC_VERSION=0.3.1
 RUN wget -nv https://github.com/NobodyXu/su-exec/archive/refs/tags/v${SU_EXEC_VERSION}.tar.gz && \
