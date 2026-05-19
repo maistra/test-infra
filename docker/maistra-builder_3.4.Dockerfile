@@ -47,6 +47,11 @@ RUN ln -s /usr/bin/clang-18 /usr/bin/clang && \
     ln -s /usr/bin/llvm-nm-18 /usr/bin/llvm-nm && \
     ln -s /usr/bin/llvm-ranlib-18 /usr/bin/llvm-ranlib && \
     ln -s /usr/bin/llvm-strip-18 /usr/bin/llvm-strip && \
+    ln -s /usr/bin/llvm-objcopy-18 /usr/bin/llvm-objcopy && \
+    ln -s /usr/bin/llvm-objdump-18 /usr/bin/llvm-objdump && \
+    ln -s /usr/bin/llvm-dwp-18 /usr/bin/llvm-dwp && \
+    ln -s /usr/bin/llvm-profdata-18 /usr/bin/llvm-profdata && \
+    ln -s /usr/bin/llvm-cov-18 /usr/bin/llvm-cov && \
     ln -s /usr/bin/lld-18 /usr/bin/lld && \
     ln -s /usr/bin/lld-18 /usr/bin/ld.lld && \
     ln -s /usr/bin/lld-link-18 /usr/bin/lld-link
@@ -134,6 +139,34 @@ RUN set -eux; \
     \
     curl -o /usr/bin/bazel -Ls https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-${PLATFORM} && \
     chmod +x /usr/bin/bazel
+
+# Download libc++ headers compatible with Clang 18
+# Fedora 43's libcxx-devel provides libc++ that requires Clang 19+
+# We extract compatible headers from LLVM 18.1.8 distribution (just headers, ~5MB)
+ENV LLVM_VERSION=18.1.8
+RUN set -eux; \
+    \
+    case $(uname -m) in \
+        x86_64) \
+            LLVM_DIST="clang+llvm-${LLVM_VERSION}-x86_64-linux-gnu-ubuntu-18.04.tar.xz"; \
+            LLVM_SHA256="54ec30358afcc9fb8aa74307db3046f5187f9fb89fb37064cdde906e062ebf36";; \
+        aarch64) \
+            LLVM_DIST="clang+llvm-${LLVM_VERSION}-aarch64-linux-gnu.tar.xz"; \
+            LLVM_SHA256="5724be2708c857e55ddbd9c709b8fffcef870c2dc77f35ebda6c9c71c9726ec1";; \
+        *) echo "unsupported architecture"; exit 1 ;; \
+    esac; \
+    \
+    curl -fsSL -o /tmp/llvm.tar.xz "https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/${LLVM_DIST}" && \
+    echo "${LLVM_SHA256}  /tmp/llvm.tar.xz" | sha256sum -c - && \
+    mkdir -p /tmp/llvm && \
+    tar -xf /tmp/llvm.tar.xz -C /tmp/llvm --strip-components=1 && \
+    mkdir -p /opt/llvm18-libcxx && \
+    cp -r /tmp/llvm/include/c++ /opt/llvm18-libcxx/ && \
+    cp -r /tmp/llvm/include/x86_64-unknown-linux-gnu/c++/v1/* /opt/llvm18-libcxx/c++/v1/ && \
+    rm -rf /usr/include/c++ && \
+    ln -s /opt/llvm18-libcxx/c++ /usr/include/c++ && \
+    rm -rf /tmp/llvm /tmp/llvm.tar.xz && \
+    echo "Installed Clang 18-compatible libc++ headers to /usr/include/c++/v1/"
 
 # Install su-exec which is a tool that operates like sudo without the overhead
 ENV SU_EXEC_VERSION=0.3.1
