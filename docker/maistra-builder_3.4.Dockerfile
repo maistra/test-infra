@@ -25,7 +25,7 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         python3.12 python3.12-devel python3-pip python3-setuptools \
         wget jq rsync \
         perl-IPC-Cmd perl-FindBin \
-        clang18-devel llvm18-devel lld18 libatomic libstdc++-static \
+        clang-devel llvm-devel lld libatomic libstdc++-static \
         libcxx-devel libcxxabi-devel libcxx-static libcxxabi-static \
         libcurl-devel \
         git less rpm rpm-build gettext file \
@@ -39,17 +39,6 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         openssl-3.5* openssl-devel-3.5* \
         ncurses-compat-libs && \
     dnf clean all -y
-
-# Configure LLVM/CLang 18 links
-RUN ln -s /usr/bin/clang-18 /usr/bin/clang && \
-    ln -s /usr/bin/clang++-18 /usr/bin/clang++ && \
-    ln -s /usr/bin/llvm-ar-18 /usr/bin/llvm-ar && \
-    ln -s /usr/bin/llvm-nm-18 /usr/bin/llvm-nm && \
-    ln -s /usr/bin/llvm-ranlib-18 /usr/bin/llvm-ranlib && \
-    ln -s /usr/bin/llvm-strip-18 /usr/bin/llvm-strip && \
-    ln -s /usr/bin/lld-18 /usr/bin/lld && \
-    ln -s /usr/bin/lld-18 /usr/bin/ld.lld && \
-    ln -s /usr/bin/lld-link-18 /usr/bin/lld-link
 
 # Create symlinks for Ubuntu/Debian paths (needed by vendored LLVM toolchain)
 # The vendored toolchain expects Ubuntu-style library paths
