@@ -25,7 +25,7 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         python3.12 python3.12-devel python3-pip python3-setuptools \
         wget jq rsync \
         perl-IPC-Cmd perl-FindBin \
-        clang-devel llvm-devel lld libatomic libstdc++-static \
+        clang-devel llvm-devel lld clang-tools-extra libatomic libstdc++-static \
         libcxx-devel libcxxabi-devel libcxx-static libcxxabi-static \
         libcurl-devel \
         git less rpm rpm-build gettext file \
