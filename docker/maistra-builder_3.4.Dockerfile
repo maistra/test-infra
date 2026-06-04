@@ -36,7 +36,7 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         java-21-openjdk-devel \
         ruby ruby-devel rubygem-json \
         cargo rust protobuf-compiler \
-        openssl-3.5* openssl-devel-3.5* \
+        openssl-3.5* openssl-devel-3.5* openssl-devel-engine-3.5* \
         ncurses-compat-libs && \
     dnf clean all -y
 
