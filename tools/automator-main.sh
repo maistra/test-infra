@@ -320,9 +320,9 @@ merge() {
     if [ "$issue_exists" -eq 0 ]; then
       # shellcheck disable=SC2086
       gh issue create -b "Automatic merge of upstream ($merge_branch) into $org/$repo ($branch branch) failed. ${merge_failure_notify:-}" -t "Automatic merge of upstream failed" ${merge_failure_label:-} -R "$org/$repo"
-      print_error "Conflicts detected, manual merge is required. An issue in $org/$repo has been created." 0
+      print_error "Conflicts detected, manual merge is required. An issue in $org/$repo has been created." 1
     else
-      print_error "Conflicts detected, manual merge is required. An issue in $org/$repo already exists." 0
+      print_error "Conflicts detected, manual merge is required. An issue in $org/$repo already exists." 1
     fi
   else
     if [[ "$(git show --shortstat)" =~ $title ]]; then
@@ -404,16 +404,17 @@ main() {
 
   pushd "$tmp_dir" || print_error_and_exit "invalid dir: $tmp_dir"
 
+  local code
   set +e
   for repo in $repos; do
     work
-    local code="$?"
+    code="$?"
     [ "$code" -ne 0 ] && exit_code="$code"
   done
   set -e
 
   popd || print_error_and_exit "invalid dir: $tmp_dir"
+  return "${exit_code:-0}"
 }
 
 main "$@"
-exit "${exit_code:-0}"
