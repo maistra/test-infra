@@ -1,4 +1,4 @@
-FROM quay.io/fedora/fedora:43
+FROM registry.access.redhat.com/ubi9/ubi:9.8
 
 ENV GOLANG_VERSION=1.26.4
 ENV GOPROXY="https://proxy.golang.org,direct"
@@ -12,11 +12,10 @@ WORKDIR /root
 # Install all dependencies available in RPM repos
 # hadolint ignore=DL3008, DL3009
 RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-core && \
-    dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo && \
-    dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo && \
+    dnf config-manager addrepo --add-repo https://cli.github.com/packages/rpm/gh-cli.repo && \
+    dnf config-manager addrepo --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
     dnf -y install --setopt=install_weak_deps=False --allowerasing \
         gh \
-        util-linux-script \
         docker-ce docker-ce-cli containerd.io docker-buildx-plugin \
         ca-certificates curl gnupg2 \
         openssh libtool libtool-ltdl glibc glibc-devel glibc-static \
@@ -26,19 +25,20 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         wget jq rsync \
         perl-IPC-Cmd perl-FindBin \
         clang-devel llvm-devel lld clang-tools-extra libatomic libstdc++-static \
-        libcxx-devel libcxxabi-devel libcxx-static libcxxabi-static \
+        gcc-toolset-15-libstdc++-devel gcc-toolset-15-libatomic-devel \
         libcurl-devel \
         git less rpm rpm-build gettext file \
         iproute ipset rsync net-tools \
         ninja-build \
         sudo autoconf automake cmake unzip wget xz procps \
-        libbpf-devel \
         java-25-openjdk-devel \
         ruby ruby-devel rubygem-json \
-        cargo rust protobuf-compiler \
-        openssl-3.5* openssl-devel-3.5* openssl-devel-engine-3.5* \
-        ncurses-compat-libs && \
+        openssl-3.5* openssl-devel-3.5* && \
     dnf clean all -y
+
+# link gcc toolset 15 to standard path so bazel can find it
+RUN ln -s /opt/rh/gcc-toolset-15/root/usr/include/c++/15 /usr/include/c++/15
+RUN ln -s /opt/rh/gcc-toolset-15/root/usr/lib/gcc/$(uname -m)-redhat-linux/15 /usr/lib/gcc/$(uname -m)-redhat-linux/15
 
 # Install golang from go.dev
 # hadolint ignore=DL3008
