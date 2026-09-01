@@ -37,6 +37,12 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         rust cargo && \
     dnf clean all -y
 
+# install protobuf-compiler for ztunnel build
+RUN dnf install -y \
+    https://mirror.stream.centos.org/9-stream/CRB/x86_64/os/Packages/protobuf-compiler-3.14.0-13.el9.x86_64.rpm \
+    https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/protobuf-3.14.0-13.el9.x86_64.rpm && \
+    dnf clean all
+
 # link gcc toolset 15 to standard path so bazel can find it
 RUN ln -s /opt/rh/gcc-toolset-15/root/usr/include/c++/15 /usr/include/c++/15
 RUN ln -s /opt/rh/gcc-toolset-15/root/usr/lib/gcc/$(uname -m)-redhat-linux/15 /usr/lib/gcc/$(uname -m)-redhat-linux/15
