@@ -33,7 +33,8 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
         sudo autoconf automake cmake unzip wget xz procps \
         java-25-openjdk-devel \
         ruby ruby-devel rubygem-json \
-        openssl-3.5* openssl-devel-3.5* && \
+        openssl-3.5* openssl-devel-3.5* \
+        rust cargo && \
     dnf clean all -y
 
 # link gcc toolset 15 to standard path so bazel can find it
