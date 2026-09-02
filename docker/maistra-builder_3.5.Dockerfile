@@ -38,9 +38,10 @@ RUN dnf -y install --setopt=install_weak_deps=False --allowerasing dnf-plugins-c
     dnf clean all -y
 
 # install protobuf-compiler for ztunnel build
-RUN dnf install -y \
-    https://mirror.stream.centos.org/9-stream/CRB/x86_64/os/Packages/protobuf-compiler-3.14.0-13.el9.x86_64.rpm \
-    https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/protobuf-3.14.0-13.el9.x86_64.rpm && \
+RUN ARCH=$(uname -m) && \
+    dnf install -y \
+    https://mirror.stream.centos.org/9-stream/CRB/${ARCH}/os/Packages/protobuf-compiler-3.14.0-13.el9.${ARCH}.rpm \
+    https://mirror.stream.centos.org/9-stream/AppStream/${ARCH}/os/Packages/protobuf-3.14.0-13.el9.${ARCH}.rpm && \
     dnf clean all
 
 # link gcc toolset 15 to standard path so bazel can find it
