@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/ubi9/ubi:9.8
 
-ENV GOLANG_VERSION=1.26.4
+ENV GOLANG_VERSION=1.26.8
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GO111MODULE=on
 ENV GOSUMDB=sum.golang.org
@@ -87,7 +87,7 @@ RUN set -eux; \
     tar -xzf /tmp/gc.tar.gz -C /usr/local && rm -f /tmp/gc.tar.gz
 
 # Bazel
-ENV BAZEL_VERSION=8.7.0
+ENV BAZEL_VERSION=8.8.0
 RUN set -eux; \
     \
     case $(uname -m) in \
