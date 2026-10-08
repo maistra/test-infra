@@ -1,0 +1,229 @@
+name: Build containers
+
+# This workflow builds maistra-builder container images for PRs.
+# It is NOT triggered directly by PR events. Instead, ci-auth.yaml checks
+# org membership and dispatches this workflow with the PR details.
+# This indirection prevents untrusted fork code from running with repo secrets.
+#
+# Flow: PR opened -> ci-auth checks membership -> dispatches this workflow
+#       -> detect which versions changed -> build each on Testing Farm
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number"
+        required: true
+        type: string
+      head_sha:
+        description: "PR head SHA to build"
+        required: true
+        type: string
+      base_ref:
+        description: "PR base branch"
+        required: true
+        type: string
+      source_repo:
+        description: "PR head repo clone URL (github.com HTTPS only)"
+        required: true
+        type: string
+
+# Only one build per PR at a time. If a new push arrives, cancel the old build.
+concurrency:
+  group: build-pr-${{ inputs.pr_number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  statuses: write       # to report build status on the PR commit
+  pull-requests: read   # to fetch PR metadata for input validation
+
+jobs:
+  # Validate that the dispatch inputs are legitimate and detect
+  # which builder versions need rebuilding based on changed files.
+  detect-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.detect.outputs.versions }}
+      needs_build: ${{ steps.detect.outputs.needs_build }}
+    steps:
+      # validate all inputs before using them. Since this workflow
+      # is triggered via workflow_dispatch, anyone with write access could
+      # call it with arbitrary values. We verify:
+      # - pr_number is a positive integer
+      # - head_sha is a valid 40-char hex SHA that belongs to the PR
+      # - base_ref has no path traversal (..)
+      # - source_repo matches the PR's actual head repo URL
+      - name: Validate inputs
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          INPUT_PR_NUMBER: ${{ inputs.pr_number }}
+          INPUT_HEAD_SHA: ${{ inputs.head_sha }}
+          INPUT_BASE_REF: ${{ inputs.base_ref }}
+          INPUT_SOURCE_REPO: ${{ inputs.source_repo }}
+        with:
+          script: |
+            const prNumber = parseInt(process.env.INPUT_PR_NUMBER);
+            const headSha = process.env.INPUT_HEAD_SHA;
+            const baseRef = process.env.INPUT_BASE_REF;
+            const sourceRepo = process.env.INPUT_SOURCE_REPO;
+
+            // Format validation
+            if (isNaN(prNumber) || prNumber <= 0) {
+              core.setFailed(`Invalid pr_number: ${process.env.INPUT_PR_NUMBER}`);
+              return;
+            }
+            if (!/^[0-9a-f]{40}$/.test(headSha)) {
+              core.setFailed(`Invalid head_sha format: ${headSha}`);
+              return;
+            }
+            if (!/^[a-zA-Z0-9_.\-\/]+$/.test(baseRef) || baseRef.includes('..')) {
+              core.setFailed(`Invalid base_ref format: ${baseRef}`);
+              return;
+            }
+            if (!/^https:\/\/github\.com\/[a-zA-Z0-9_.\-]+\/[a-zA-Z0-9_.\-]+\.git$/.test(sourceRepo)) {
+              core.setFailed(`Invalid source_repo: ${sourceRepo}`);
+              return;
+            }
+
+            // Cross-check: verify the SHA actually belongs to this PR.
+            // The PR may have been updated since ci-auth dispatched us,
+            // so we accept any ancestor of the current HEAD.
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+
+            if (pr.head.sha !== headSha) {
+              const compare = await github.rest.repos.compareCommits({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                base: headSha,
+                head: pr.head.sha
+              });
+              if (!['ahead', 'identical'].includes(compare.data.status)) {
+                core.setFailed(`head_sha ${headSha} does not belong to PR #${prNumber}`);
+                return;
+              }
+              core.warning(`Building ancestor commit ${headSha} (PR HEAD is now ${pr.head.sha})`);
+            }
+
+            // Cross-check: verify source_repo matches the PR's fork URL.
+            // pr.head.repo is null when the fork has been deleted.
+            if (!pr.head.repo) {
+              const baseCloneUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}.git`;
+              if (sourceRepo !== baseCloneUrl) {
+                core.setFailed(`PR fork deleted and source_repo ${sourceRepo} is not the base repo`);
+                return;
+              }
+            } else if (sourceRepo !== pr.head.repo.clone_url) {
+              core.setFailed(`source_repo ${sourceRepo} does not match PR head repo ${pr.head.repo.clone_url}`);
+              return;
+            }
+
+            core.info(`Inputs validated: PR #${prNumber}, SHA ${headSha}`);
+      
+      - name: Checkout repo (needed to load detect-versions.js)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      # Runs detect-versions.js in 'pr' mode: lists files changed in the PR
+      # and determines which builder versions are affected.
+      # See detect-versions.js for full documentation of outputs.
+      - name: Detect changed versions
+        id: detect
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          INPUT_PR_NUMBER: ${{ inputs.pr_number }}
+        with:
+          script: |
+            const detect = require('./.github/scripts/detect-versions.js');
+            await detect({
+              github, context, core,
+              mode: 'pr',
+              prNumber: parseInt(process.env.INPUT_PR_NUMBER)
+            });
+
+      # Report detection result to the PR as commit statuses.
+      # - If no build needed: single "success" status so reviewers see it was checked.
+      # - If builds needed: one "pending" status per version so ALL versions appear
+      #   on the PR immediately, even those waiting in the max-parallel queue.
+      #   TF will overwrite these with its own status (same context) when it starts
+      #   and again when it finishes (success/failure).
+      - name: Report build status to PR
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          INPUT_HEAD_SHA: ${{ inputs.head_sha }}
+          NEEDS_BUILD: ${{ steps.detect.outputs.needs_build }}
+          VERSIONS: ${{ steps.detect.outputs.versions }}
+        with:
+          script: |
+            const sha = process.env.INPUT_HEAD_SHA;
+            const needsBuild = process.env.NEEDS_BUILD === 'true';
+
+            if (!needsBuild) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha,
+                state: 'success',
+                context: 'build containers',
+                description: 'No build-relevant files changed, skipped'
+              });
+              return;
+            }
+
+            // Post a pending status for each version using the same context
+            // that the TF action will use, so TF overwrites ours when it starts.
+            const versions = JSON.parse(process.env.VERSIONS);
+            for (const version of versions) {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha,
+                state: 'pending',
+                context: `Testing Farm - build maistra-builder:${version}`,
+                description: 'Queued, waiting for build slot...'
+              });
+            }
+
+  # Build each affected version on a Testing Farm bare metal machine.
+  # Runs one TF request per version in parallel (up to max-parallel).
+  # Each TF run executes plans/build-container.fmf which installs Docker,
+  # clones the PR branch, and runs `make build-containers-<version>`.
+  build:
+    needs: detect-versions
+    if: needs.detect-versions.outputs.needs_build == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        version: ${{ fromJSON(needs.detect-versions.outputs.versions) }}
+    name: "build maistra-builder:${{ matrix.version }}"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      
+      - name: Build on Testing Farm
+        uses: sclorg/testing-farm-as-github-action@230555baceb860aa468d216f1822974836b965d1 # v4
+        with:
+          api_key: ${{ secrets.TESTING_FARM_API_TOKEN }}
+          api_url: https://api.testing-farm.io/v0.1
+          # TF clones plans/ from the base branch (security: untrusted PR code
+          # cannot modify the build scripts). The PR code is cloned separately
+          # inside the TMT script using SOURCE_REPO and SOURCE_REF.
+          git_url: https://github.com/${{ github.repository }}.git
+          git_ref: ${{ inputs.base_ref }}
+          tmt_plan_regex: ^/plans/build-container$
+          compose: CentOS-Stream-10
+          arch: x86_64
+          #TODO: initial estimates, not validated. Measure and adjust
+          tmt_hardware: '{"memory": ">= 16 GB", "disk": [{"size": ">= 100 GB"}], "cpu": {"processors": ">= 32"}}'
+          variables: "BUILDER_VERSION=${{ matrix.version }};SOURCE_REPO=${{ inputs.source_repo }};SOURCE_REF=${{ inputs.head_sha }}"
+          timeout: 300
+          # Report build status directly on the PR commit
+          update_pull_request_status: true
+          pull_request_status_name: "build maistra-builder:${{ matrix.version }}"
+          commit_sha: ${{ inputs.head_sha }}
+          pr_number: ${{ inputs.pr_number }}
+

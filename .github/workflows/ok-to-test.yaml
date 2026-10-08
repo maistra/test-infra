@@ -1,0 +1,56 @@
+---
+name: Handle ok-to-test label
+
+# When a maintainer adds the 'ok-to-test' label to a PR from a non-member,
+# this workflow dispatches build-containers to start the CI build.
+# This is the manual approval path for external contributors.
+# See ci-auth.yaml for the automatic path (org members).
+on:
+  pull_request_target:
+    types: [labeled]
+    branches:
+      - main
+
+concurrency:
+  group: ok-to-test-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  handle-ok-to-test:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'ok-to-test'
+    permissions:
+      pull-requests: write   # to remove the needs-ok-to-test label
+      actions: write          # to dispatch build-containers workflow
+    steps:
+      # Dispatch build-containers with the PR details, same as ci-auth does
+      # for org members automatically.
+      - name: Dispatch build
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build-containers.yaml',
+              ref: context.payload.repository.default_branch,
+              inputs: {
+                pr_number: String(context.payload.pull_request.number),
+                head_sha: context.payload.pull_request.head.sha,
+                base_ref: context.payload.pull_request.base.ref,
+                source_repo: context.payload.pull_request.head.repo?.clone_url
+                  ?? `https://github.com/${context.repo.owner}/${context.repo.repo}.git`
+              }
+            });
+
+      # Clean up: remove the 'needs-ok-to-test' label now that CI has been approved
+      - name: Remove needs-ok-to-test
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              name: 'needs-ok-to-test'
+            }).catch(() => {});
