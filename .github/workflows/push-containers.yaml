@@ -1,0 +1,110 @@
+name: Push containers
+
+# This workflow builds and pushes maistra-builder images to quay.io after
+# a PR is merged to main. It also supports manual dispatch for ad-hoc pushes.
+#
+# Uses the same Makefile targets as Prow:
+#   - Single-arch (2.3, 2.4): make maistra-builder_VERSION.push
+#   - Multi-arch (2.5+):      make maistra-builder_VERSION.push_multi
+#
+# Multi-arch builds cross-compile ARM via QEMU/buildx on a single x86_64
+# machine, producing a multi-arch OCI manifest in a single atomic push.
+# This matches exactly what Prow does in its postsubmit jobs.
+#
+# Flow:
+#   PR merged to main -> GHA detects changed files -> detect which versions
+#   are affected -> for each version, build & push on TF bare metal x86_64
+on:
+  push:
+    branches: [main]
+    # Only trigger when build-relevant files change.
+    # This matches the paths used by detect-versions.js.
+    paths:
+      - "docker/maistra-builder_*.Dockerfile"
+      - "docker/scripts/**"
+      - "Makefile"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Builder version to push (e.g. 3.5, main). Leave empty to auto-detect from last push"
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: push-containers
+  cancel-in-progress: false
+
+jobs:
+  # Job 1: Figure out which versions need pushing.
+  # Two possible scenarios:
+  #   - Manual dispatch with version: push exactly that version
+  #   - Push to main: auto-detect from changed files
+  detect-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      needs_push: ${{ steps.detect.outputs.needs_build }}
+      matrix_all: ${{ steps.detect.outputs.matrix_all }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Detect versions to push
+        id: detect
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        with:
+          script: |
+            const detect = require('./.github/scripts/detect-versions.js');
+            const manualVersion = (process.env.INPUT_VERSION || '').trim();
+            if (manualVersion) {
+              await detect({github, context, core, mode: 'manual', version: manualVersion});
+            } else if (context.eventName === 'push') {
+              await detect({github, context, core, mode: 'push'});
+            } else {
+              core.setFailed('workflow_dispatch requires a version input when not triggered by push');
+            }
+
+  # Job 2: Build and push each affected version on TF bare metal.
+  # Runs one TF request per version in parallel (up to max-parallel).
+  # Each TF run executes plans/push-container.fmf which:
+  #   1. Installs Docker CE and QEMU binfmt (for cross-compilation)
+  #   2. Logs in to quay.io
+  #   3. Runs make maistra-builder_VERSION.push (single-arch) or
+  #      make maistra-builder_VERSION.push_multi (multi-arch with buildx)
+  #
+  # All builds run on x86_64 machines only. ARM images are cross-compiled
+  # via QEMU, matching Prow's behavior.
+  push:
+    needs: detect-versions
+    if: needs.detect-versions.outputs.needs_push == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include: ${{ fromJSON(needs.detect-versions.outputs.matrix_all) }}
+    name: "push maistra-builder:${{ matrix.version }}"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Push via Testing Farm
+        uses: sclorg/testing-farm-as-github-action@230555baceb860aa468d216f1822974836b965d1 # v4
+        with:
+          api_key: ${{ secrets.TESTING_FARM_API_TOKEN }}
+          api_url: https://api.testing-farm.io/v0.1
+          git_url: https://github.com/${{ github.repository }}.git
+          git_ref: ${{ github.sha }}
+          tmt_plan_regex: ^/plans/push-container$
+          compose: CentOS-Stream-10
+          arch: x86_64
+          # TODO: initial estimates, not empirically validated
+          tmt_hardware: '{"memory": ">= 16 GB", "disk": [{"size": ">= 100 GB"}], "cpu": {"processors": ">= 32"}}'
+          # TAG_SUFFIX comes from repo variable. In the test repo it is
+          # "-staging", in production it is empty (not configured).
+          # The Makefile appends TAG_SUFFIX to the image tag.
+          variables: "BUILDER_VERSION=${{ matrix.version }};PUSH_MODE=${{ matrix.push_mode }};TAG_SUFFIX=${{ vars.TAG_SUFFIX || '' }}"
+          secrets: "QUAY_USER=maistra-dev+prow;QUAY_PASS=${{ secrets.QUAY_PASSWORD }}"
+          timeout: 300

@@ -1,0 +1,25 @@
+---
+summary: Build maistra-builder container image (pre-submit validation)
+
+prepare:
+  - name: Install Docker CE
+    how: shell
+    script: |
+      modprobe iptable_nat
+      dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin git make
+      systemctl start docker
+      systemctl enable docker
+      docker info
+
+discover:
+  how: shell
+  tests:
+    - name: /build-container
+      test: bash build-container.sh
+      path: /plans
+      duration: 5h
+
+execute:
+  how: tmt
+

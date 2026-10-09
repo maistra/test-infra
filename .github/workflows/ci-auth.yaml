@@ -1,0 +1,127 @@
+---
+name: CI Authorization
+
+# Security gate: checks if the PR author is a member of the maistra org.
+#
+# - Org members: CI runs automatically (dispatches build-containers).
+# - Non-members: PR gets labeled 'needs-ok-to-test'. A maintainer must
+#   add the 'ok-to-test' label to approve CI (handled by ok-to-test.yaml).
+#
+# Uses pull_request_target (not pull_request) so it runs with base branch
+# permissions, preventing untrusted fork code from accessing secrets.
+# The actual build is dispatched as a separate workflow_dispatch to
+# build-containers.yaml.
+on:
+    pull_request_target:
+        types: [opened, synchronize, reopened]
+        branches:
+            - main
+
+# Only one auth check per PR at a time.
+concurrency:
+    group: ci-auth-pr-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
+jobs:
+    authorize:
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write  # to add/remove labels
+            actions: write         # to dispatch build-containers workflow
+        steps:
+            # Generate a token from the GitHub App that has org:members read
+            # permission. We can't use GITHUB_TOKEN for org membership checks.
+            - name: Generate Github App token
+              id: app-token
+              uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
+              with:
+                  client-id: ${{ vars.MAISTRA_ORG_MEM_GH_APP_CLIENT_ID }}
+                  private-key: ${{ secrets.MAISTRA_ORG_MEM_GH_APP_PRIVATE_KEY }}
+                  owner: ${{ github.repository_owner }}
+
+            # Main logic: check org membership and either dispatch build
+            # or label the PR for manual approval.
+            - name: Check authorization and manage CI
+              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+              env:
+                  APP_TOKEN: ${{ steps.app-token.outputs.token }}
+              with:
+                  script: |
+                      const prNumber = context.payload.pull_request.number;
+                      const sender = context.payload.sender.login;
+                      const org = context.repo.owner;
+
+                      // Helper: dispatch build-containers workflow with the PR details
+                      const dispatchBuild = async () => {
+                          await github.rest.actions.createWorkflowDispatch({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              workflow_id: 'build-containers.yaml',
+                              ref: context.payload.repository.default_branch,
+                              inputs: {
+                                  pr_number: String(prNumber),
+                                  head_sha: context.payload.pull_request.head.sha,
+                                  base_ref: context.payload.pull_request.base.ref,
+                                  source_repo: context.payload.pull_request.head.repo?.clone_url
+                                    ?? `https://github.com/${context.repo.owner}/${context.repo.repo}.git`
+                              }
+                          });
+                      };
+
+                      // Check org membership using the GitHub App token
+                      // (GITHUB_TOKEN doesn't have org:members scope)
+                      const appOctokit = getOctokit(process.env.APP_TOKEN);
+                      let isMember = false;
+                      try {
+                          const res = await appOctokit.request('GET /orgs/{org}/members/{username}', {
+                             org: org,
+                             username: sender,
+                          });
+                          isMember = (res.status === 204);
+                      // Fail-closed: any API error (rate-limit, 500, network) treats the
+                      // user as non-member. Safe but may temporarily block legitimate
+                      // members. A new push or PR reopen will re-trigger this check.
+                      } catch (e) {
+                          core.warning(`Org membership check failed: ${e.message}`);
+                          isMember = false;
+                      }
+
+                      // Check if ok-to-test label is present (for non-members
+                      // who were previously approved, we need to remove it on new pushes)
+                      const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                      });
+                      const hasOkToTest = labels.some(l => l.name === 'ok-to-test');
+
+                      // Org member: remove needs-ok-to-test (if present) and dispatch build
+                      if (isMember) {
+                          core.info(`Sender ${sender} is org member, dispatching build`);
+                          await github.rest.issues.removeLabel({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              issue_number: prNumber,
+                              name: 'needs-ok-to-test'
+                          }).catch( () => {});
+                          await dispatchBuild();
+                      // Non-member: add needs-ok-to-test label and remove any existing
+                      // ok-to-test label (force re-approval on each new push)
+                      } else {
+                          core.info(`Sender ${sender} is not org member`);
+                          await github.rest.issues.addLabels({
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              issue_number: prNumber,
+                              labels: ['needs-ok-to-test']
+                          }).catch( () => {});
+                          
+                          if (hasOkToTest) {
+                              await github.rest.issues.removeLabel({
+                                  owner: context.repo.owner,
+                                  repo: context.repo.repo,
+                                  issue_number: prNumber,
+                                  name: 'ok-to-test'
+                              }).catch( () => {});
+                          }
+                      }
