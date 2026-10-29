@@ -27,7 +27,7 @@ cleanup() {
 }
 
 get_opts() {
-  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-strategy:,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
+  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-failure-pr,merge-strategy:,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
     eval set -- "$opt"
   else
     print_error_and_exit "unable to parse options"
@@ -113,6 +113,10 @@ get_opts() {
       merge_failure_label="$2"
       shift 2
       ;;
+    --merge-failure-pr)
+      merge_failure_pr=true
+      shift
+      ;;
     --merge-strategy)
       merge_strategy="$2"
       shift 2
@@ -181,6 +185,16 @@ validate_opts() {
 
   if [ "${merge_strategy}" != "merge" ] && [ "${merge_strategy}" != "rebase" ]; then
     print_error_and_exit "merge-strategy option must be 'merge' or 'rebase'"
+  fi
+
+  if [ -z "${merge_failure_pr:-}" ]; then
+    merge_failure_pr=false
+  fi
+
+  # A rebase stops on the first conflicting commit, so there is no single tree to
+  # publish for review. Conflict PRs are only meaningful for the merge strategy.
+  if $merge_failure_pr && [ "${merge_strategy}" != "merge" ]; then
+    print_error_and_exit "merge-failure-pr option requires merge-strategy 'merge'"
   fi
 
   if [ -n "${merge_failure_notify:-}" ]; then
@@ -291,6 +305,44 @@ commit() {
   add_labels
 }
 
+# create_merge_failure_pr commits the conflicted merge, markers and all, and opens a draft
+# PR against the target branch so the conflicts can be resolved in review rather than
+# reproduced by hand. It pushes to a branch of its own so a later clean merge, which reuses
+# fork_name, never collides with an open conflict PR, and it applies only
+# merge_failure_label, keeping the PR away from any auto-merge labels.
+create_merge_failure_pr() {
+  local conflict_branch="$fork_name-conflicts"
+  local conflict_title="$title (manual conflict resolution required)"
+  local conflicts
+  conflicts="$(git diff --name-only --diff-filter=U | sed 's/^/- /')"
+
+  git add --all
+  git -c "user.name=$user" -c "user.email=$email" commit --message "$conflict_title" --author="$user <$email>"
+  git push --force "https://$user:$token@github.com/$user/$repo.git" "HEAD:$conflict_branch"
+
+  local pr_exists
+  pr_exists=$(gh pr list --repo "$org/$repo" --base "$branch" --head "$conflict_branch" --state open | wc -l)
+  if [ "$pr_exists" -eq 0 ]; then
+    local conflict_body
+    conflict_body="$(
+      cat <<EOF
+Automatic merge of upstream ($merge_branch) into $org/$repo ($branch branch) failed.
+
+This branch holds the merge commit with its conflict markers left in place, in:
+
+$conflicts
+
+Resolve every conflict and mark this PR ready for review once it is clean. Do not merge it as is. ${merge_failure_notify:-}
+EOF
+    )"
+    # shellcheck disable=SC2086
+    gh pr create --draft -R "$org/$repo" -B "$branch" -H "$user:$conflict_branch" -t "$conflict_title" -b "$conflict_body" ${merge_failure_label:-}
+    print_error "Conflicts detected, manual merge is required. A draft PR in $org/$repo has been created." 1
+  else
+    print_error "Conflicts detected, manual merge is required. A draft PR in $org/$repo already exists and has been updated." 1
+  fi
+}
+
 merge() {
   local src_branch="${AUTOMATOR_SRC_BRANCH:-none}"
   fork_name="$src_branch-$branch-$modifier-$(hash "$title")"
@@ -315,14 +367,20 @@ merge() {
 
   if [ "$code" -ne 0 ]; then
     export GITHUB_TOKEN="$token"
-    local issue_exists
-    issue_exists=$(gh issue list -S "Automatic merge of $merge_branch into $branch failed." -R "$org/$repo" | wc -l)
-    if [ "$issue_exists" -eq 0 ]; then
-      # shellcheck disable=SC2086
-      gh issue create -b "Automatic merge of upstream ($merge_branch) into $org/$repo ($branch branch) failed. ${merge_failure_notify:-}" -t "Automatic merge of upstream failed" ${merge_failure_label:-} -R "$org/$repo"
-      print_error "Conflicts detected, manual merge is required. An issue in $org/$repo has been created." 1
+    # Only conflicts leave a tree worth reviewing. Anything else, a bad ref or a failed
+    # fetch, still reports through an issue.
+    if $merge_failure_pr && [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+      create_merge_failure_pr
     else
-      print_error "Conflicts detected, manual merge is required. An issue in $org/$repo already exists." 1
+      local issue_exists
+      issue_exists=$(gh issue list -S "Automatic merge of $merge_branch into $branch failed." -R "$org/$repo" | wc -l)
+      if [ "$issue_exists" -eq 0 ]; then
+        # shellcheck disable=SC2086
+        gh issue create -b "Automatic merge of upstream ($merge_branch) into $org/$repo ($branch branch) failed. ${merge_failure_notify:-}" -t "Automatic merge of upstream failed" ${merge_failure_label:-} -R "$org/$repo"
+        print_error "Conflicts detected, manual merge is required. An issue in $org/$repo has been created." 1
+      else
+        print_error "Conflicts detected, manual merge is required. An issue in $org/$repo already exists." 1
+      fi
     fi
   else
     if [[ "$(git show --shortstat)" =~ $title ]]; then
