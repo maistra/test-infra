@@ -1,0 +1,35 @@
+name: Lint
+
+# Runs shellcheck on all .sh files in the repo for every PR.
+on:
+  pull_request:
+    branches: [main]
+
+# Only one lint run per PR at a time.
+concurrency:
+  group: lint-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install shellcheck
+        env:
+          # Must match the version in maistra-builder:2.4 (Prow build_root).
+          # v0.10.0 fails with SC2317 false positives on trap-registered functions
+          # in docker/scripts/entrypoint.sh and prow-entrypoint-main.sh.
+          SHELLCHECK_VERSION: "0.8.0"
+        run: |
+          wget -qO- "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" | tar -xJf -
+          sudo cp "shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/
+          shellcheck --version
+
+      - name: Run lint
+        run: make lint
