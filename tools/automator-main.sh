@@ -27,7 +27,7 @@ cleanup() {
 }
 
 get_opts() {
-  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-failure-pr,merge-strategy:,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
+  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-failure-pr,merge-strategy:,post-merge-hook:,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
     eval set -- "$opt"
   else
     print_error_and_exit "unable to parse options"
@@ -119,6 +119,10 @@ get_opts() {
       ;;
     --merge-strategy)
       merge_strategy="$2"
+      shift 2
+      ;;
+    --post-merge-hook)
+      post_merge_hook="$(realpath "$2")"
       shift 2
       ;;
     --verbose)
@@ -231,6 +235,15 @@ validate_opts() {
 
   if [ ! -f "${script_path:-}" ] && ! $merge; then
     print_error_and_exit "either script-path, cmd, or merge-repository and merge-branch are required"
+  fi
+
+  if [ -n "${post_merge_hook:-}" ]; then
+    if ! $merge; then
+      print_error_and_exit "post-merge-hook option requires merge-repository and merge-branch"
+    fi
+    if [ ! -f "$post_merge_hook" ]; then
+      print_error_and_exit "post-merge-hook does not exist: $post_merge_hook"
+    fi
   fi
 
   if [ -z "${modifier:-}" ]; then
@@ -383,6 +396,10 @@ merge() {
       fi
     fi
   else
+    # Validate even an up-to-date merge, and never publish if the hook fails.
+    if [ -n "${post_merge_hook:-}" ]; then
+      bash "${shell_args[@]}" "$post_merge_hook" "${script_args[@]}"
+    fi
     if [[ "$(git show --shortstat)" =~ $title ]]; then
       git show --shortstat
       git push --force "https://$user:$token@github.com/$user/$repo.git" "HEAD:$fork_name"
