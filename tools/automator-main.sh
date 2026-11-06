@@ -27,7 +27,7 @@ cleanup() {
 }
 
 get_opts() {
-  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-failure-pr,merge-strategy:,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
+  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-failure-pr,merge-strategy:,merge-at-tag-boundaries,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
     eval set -- "$opt"
   else
     print_error_and_exit "unable to parse options"
@@ -121,6 +121,10 @@ get_opts() {
       merge_strategy="$2"
       shift 2
       ;;
+    --merge-at-tag-boundaries)
+      merge_at_tag_boundaries=true
+      shift
+      ;;
     --verbose)
       shell_args+=("-x")
       shift
@@ -195,6 +199,13 @@ validate_opts() {
   # publish for review. Conflict PRs are only meaningful for the merge strategy.
   if $merge_failure_pr && [ "${merge_strategy}" != "merge" ]; then
     print_error_and_exit "merge-failure-pr option requires merge-strategy 'merge'"
+  fi
+
+  merge_at_tag_boundaries="${merge_at_tag_boundaries:-false}"
+  if $merge_at_tag_boundaries; then
+    if ! $merge || [ "$merge_strategy" != merge ] || $fetch_tags; then
+      print_error_and_exit "merge-at-tag-boundaries requires merge-repository, merge-branch, merge-strategy 'merge', and cannot use fetch-tags"
+    fi
   fi
 
   if [ -n "${merge_failure_notify:-}" ]; then
@@ -328,6 +339,8 @@ create_merge_failure_pr() {
       cat <<EOF
 Automatic merge of upstream ($merge_branch) into $org/$repo ($branch branch) failed.
 
+${merge_failure_context:-}
+
 This branch holds the merge commit with its conflict markers left in place, in:
 
 $conflicts
@@ -339,8 +352,65 @@ EOF
     gh pr create --draft -R "$org/$repo" -B "$branch" -H "$user:$conflict_branch" -t "$conflict_title" -b "$conflict_body" ${merge_failure_label:-}
     print_error "Conflicts detected, manual merge is required. A draft PR in $org/$repo has been created." 1
   else
+    if [ -n "${merge_failure_context:-}" ]; then
+      gh pr comment "$conflict_branch" --repo "$org/$repo" --body "$merge_failure_context"
+    fi
     print_error "Conflicts detected, manual merge is required. A draft PR in $org/$repo already exists and has been updated." 1
   fi
+}
+
+# Merge a single boundary, retaining the failed target for issue/conflict-PR reporting.
+merge_tag_target() {
+  local target="$1" description="$2" code
+  echo "Merging $description"
+  # Fast-forward where possible; only create a merge commit for divergent history.
+  if git -c "user.name=$user" -c "user.email=$email" merge --ff -m "$title" --log "$target"; then
+    return 0
+  else
+    code=$?
+    merge_failure_context="Merge failed at $description. Resolve this target before merging later upstream changes."
+    echo "$merge_failure_context" >&2
+    return "$code"
+  fi
+}
+
+merge_tag_boundaries() {
+  local upstream_ref="upstream/$merge_branch"
+  local refs ref tag commit history previous="" tip
+  local -A tags_by_commit=()
+  local -a boundaries=()
+
+  refs="$(git for-each-ref --format='%(refname)' refs/automator/upstream-tags/)" || return
+  while IFS= read -r ref; do
+    [ -n "$ref" ] || continue
+    tag="${ref#refs/automator/upstream-tags/}"
+    # Tags on trees or blobs cannot define commit boundaries.
+    commit="$(git rev-parse "${ref}^{commit}" 2>/dev/null)" || continue
+    tags_by_commit["$commit"]="$tag"
+  done <<< "$refs"
+
+  # Only tagged commits reachable from upstream but not midstream are boundaries.
+  # Topological order handles duplicate tags and dates that do not match ancestry.
+  # Validate the entire plan before changing HEAD.
+  history="$(git rev-list --topo-order --reverse "$upstream_ref" --not HEAD)" || return
+  while IFS= read -r commit; do
+    [ -n "$commit" ] || continue
+    [ -n "${tags_by_commit[$commit]:-}" ] || continue
+    if [ -n "$previous" ] && ! git merge-base --is-ancestor "$previous" "$commit"; then
+      echo "Cannot merge divergent tag boundaries: ${tags_by_commit[$previous]} ($previous) and ${tags_by_commit[$commit]} ($commit)" >&2
+      return 1
+    fi
+    boundaries+=("$commit")
+    previous="$commit"
+  done <<< "$history"
+
+  for commit in "${boundaries[@]}"; do
+    # Stop explicitly on failure: merge() disables errexit while capturing status.
+    merge_tag_target "$commit" "tag boundary ${tags_by_commit[$commit]} ($commit)" || return
+  done
+
+  tip="$(git rev-parse "$upstream_ref")" || return
+  merge_tag_target "$upstream_ref" "branch tip $upstream_ref ($tip)"
 }
 
 merge() {
@@ -351,13 +421,25 @@ merge() {
     git remote add -f upstream "$merge_repository"
     merge_branch="$(git describe --tags --abbrev=0 "upstream/$merge_branch")"
     echo "Using tag $merge_branch"
+  elif $merge_at_tag_boundaries; then
+    git remote add --no-tags -f -t "$merge_branch" upstream "$merge_repository"
+    echo "Using branch $merge_branch with upstream tag boundaries"
   else
     git remote add -f -t "$merge_branch" upstream "$merge_repository"
     echo "Using branch $merge_branch"
   fi
 
+  local initial_merge_head merge_failure_context=""
+  initial_merge_head="$(git rev-parse HEAD)"
+  if $merge_at_tag_boundaries; then
+    # Keep upstream tags separate from downstream tags with the same names.
+    git fetch --no-tags upstream '+refs/tags/*:refs/automator/upstream-tags/*'
+  fi
+
   set +e # git return a non-zero exit code on merge failure, which fails the script
-  if [ "${merge_strategy}" == "merge" ]; then
+  if $merge_at_tag_boundaries; then
+    merge_tag_boundaries
+  elif [ "${merge_strategy}" == "merge" ]; then
     git -c "user.name=$user" -c "user.email=$email" merge --no-ff -m "$title" --log upstream/"$merge_branch"
   else
     git -c "user.name=$user" -c "user.email=$email" rebase upstream/"$merge_branch"
@@ -372,18 +454,22 @@ merge() {
     if $merge_failure_pr && [ -n "$(git diff --name-only --diff-filter=U)" ]; then
       create_merge_failure_pr
     else
-      local issue_exists
-      issue_exists=$(gh issue list -S "Automatic merge of $merge_branch into $branch failed." -R "$org/$repo" | wc -l)
-      if [ "$issue_exists" -eq 0 ]; then
+      local issue_number
+      issue_number=$(gh issue list -S "Automatic merge of $merge_branch into $branch failed." -R "$org/$repo" --json number --jq '.[0].number // empty')
+      if [ -z "$issue_number" ]; then
         # shellcheck disable=SC2086
-        gh issue create -b "Automatic merge of upstream ($merge_branch) into $org/$repo ($branch branch) failed. ${merge_failure_notify:-}" -t "Automatic merge of upstream failed" ${merge_failure_label:-} -R "$org/$repo"
+        gh issue create -b "Automatic merge of upstream ($merge_branch) into $org/$repo ($branch branch) failed. ${merge_failure_context:-} ${merge_failure_notify:-}" -t "Automatic merge of upstream failed" ${merge_failure_label:-} -R "$org/$repo"
         print_error "Conflicts detected, manual merge is required. An issue in $org/$repo has been created." 1
       else
+        if [ -n "$merge_failure_context" ]; then
+          gh issue comment "$issue_number" --repo "$org/$repo" --body "$merge_failure_context"
+        fi
         print_error "Conflicts detected, manual merge is required. An issue in $org/$repo already exists." 1
       fi
     fi
   else
-    if [[ "$(git show --shortstat)" =~ $title ]]; then
+    # Fast-forwards retain the upstream commit message, not the automator title.
+    if [ "$(git rev-parse HEAD)" != "$initial_merge_head" ]; then
       git show --shortstat
       git push --force "https://$user:$token@github.com/$user/$repo.git" "HEAD:$fork_name"
       pull_request="$(create_pr)"
