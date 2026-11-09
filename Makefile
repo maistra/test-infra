@@ -2,7 +2,7 @@ HUB ?= quay.io/maistra-dev
 CONTAINER_CLI ?= docker
 
 BUILD_IMAGE = maistra-builder
-BUILD_IMAGE_VERSIONS = $(BUILD_IMAGE)_main $(BUILD_IMAGE)_3.5 $(BUILD_IMAGE)_3.4 $(BUILD_IMAGE)_3.3 $(BUILD_IMAGE)_3.2 $(BUILD_IMAGE)_3.1 $(BUILD_IMAGE)_3.0 $(BUILD_IMAGE)_2.6
+BUILD_IMAGE_VERSIONS = $(BUILD_IMAGE)_main $(BUILD_IMAGE)_3.6 $(BUILD_IMAGE)_3.5 $(BUILD_IMAGE)_3.4 $(BUILD_IMAGE)_3.3 $(BUILD_IMAGE)_3.2 $(BUILD_IMAGE)_3.1 $(BUILD_IMAGE)_3.0 $(BUILD_IMAGE)_2.6
 
 ${BUILD_IMAGE}: $(BUILD_IMAGE_VERSIONS)
 
@@ -25,15 +25,15 @@ TARGET_OS ?= linux
 # BUILDX_BUILD_ARGS are the additional --build-arg flags passed to the docker buildx build command.
 BUILDX_BUILD_ARGS = --build-arg TARGETOS=$(TARGET_OS) --build-arg BUILDKIT_PARALLEL_LIMIT=1 --progress=plain
 
-# Build a specific maistra image. Example of usage: make maistra-builder_2.3
-# Only build single arch image by using the build command
+# Build a specific maistra image for the local platform.
+# Example of usage: make maistra-builder_2.6
 ${BUILD_IMAGE}_%:
 	@echo "Building single-platform image with $(CONTAINER_CLI)" && \
 	$(CONTAINER_CLI) build -t ${HUB}/${BUILD_IMAGE}:$* -f docker/$@.Dockerfile docker
 
-# Build a maistra version for the platforms described in the PLATFORMS var. 
-# Example of usage: make maistra-builder_2.5_multi
-# This target is supported on >= 2.5 versions
+# Build a maistra image for the platforms described in PLATFORMS.
+# Example of usage: make maistra-builder_2.6_multi
+# All supported versions can be built for multiple platforms.
 ${BUILD_IMAGE}_%_multi:
 	@if [ "$(CONTAINER_CLI)" = "podman" ]; then \
 		echo "Building multi-platform image with podman" && \
@@ -51,13 +51,15 @@ ${BUILD_IMAGE}_%_multi:
 ${BUILD_IMAGE}.push: ${BUILD_IMAGE}
 	@$(CONTAINER_CLI) push --all-tags ${HUB}/${BUILD_IMAGE}
 
-# Build and push a specific single arch maistra image. Example of usage: make maistra-builder_2.3.push
+# Build and push a specific maistra image for the local platform.
+# Example of usage: make maistra-builder_2.6.push
 ${BUILD_IMAGE}_%.push:
 	@echo "Building and pushing single-platform image" && \
 	$(MAKE) ${BUILD_IMAGE}_$* && \
 	$(CONTAINER_CLI) push ${HUB}/${BUILD_IMAGE}:$*
 
-# Build and push multi image. Example of usage: make maistra-builder_2.5.push_multi
+# Build and push a maistra image for all platforms described in PLATFORMS.
+# Example of usage: make maistra-builder_2.6.push_multi
 ${BUILD_IMAGE}_%.push_multi:
 	@echo "Building and pushing multi-platform image" && \
 	if [ "$(CONTAINER_CLI)" = "podman" ]; then \
