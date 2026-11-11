@@ -43,14 +43,14 @@ const VERSION_REGEX = /^docker\/maistra-builder_(.+)\.Dockerfile$/;
 // Given a list of changed files returns which versions need rebuilding.
 //
 // Returns null if no build-relevant files changed -> nothing to do.
-// Returns ALL_VERSIONS if ANY shared file changed, because shared files affect all versions.
+// If any shared file changed, include ALL_VERSIONS plus versions whose Dockerfiles
+// changed, so new versions are built even before they are registered on main.
 // Return only specific versions whose Dockerfiles changed otherwise.
 function extractVersions(files) {
     const filenames = files.map(f => f.filename);
 
-    // Check if any shared file changed. If so, rebuild everything
+    // Check if any shared file changed.
     const hasSharedChange = filenames.some(name => SHARED_PATHS.some(re => re.test(name)));
-    if (hasSharedChange) return ALL_VERSIONS;
 
     // Check if any version-specific Dockerfile changed.
     // Extract the version string from each matching Dockerfile path
@@ -60,6 +60,9 @@ function extractVersions(files) {
             return m ? m[1] : null;
         })
         .filter(v => v !== null);
+
+    // Shared changes rebuild known versions as well as newly added Dockerfiles.
+    if (hasSharedChange) return [...new Set([...ALL_VERSIONS, ...versions])];
     
     // No build-relevant files changed at all
     if (versions.length === 0) return null;
