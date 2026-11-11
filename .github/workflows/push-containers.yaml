@@ -3,9 +3,7 @@ name: Push containers
 # This workflow builds and pushes maistra-builder images to quay.io after
 # a PR is merged to main. It also supports manual dispatch for ad-hoc pushes.
 #
-# Uses the same Makefile targets as Prow:
-#   - Single-arch (2.3, 2.4): make maistra-builder_VERSION.push
-#   - Multi-arch (2.5+):      make maistra-builder_VERSION.push_multi
+# Uses make maistra-builder_VERSION.push_multi for every supported version.
 #
 # Multi-arch builds cross-compile ARM via QEMU/buildx on a single x86_64
 # machine, producing a multi-arch OCI manifest in a single atomic push.
@@ -26,8 +24,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Builder version to push (e.g. 3.5, main). Leave empty to auto-detect from last push"
-        required: false
+        description: "Builder version to push (e.g. 3.5, main)"
+        required: true
 
 permissions:
   contents: read
@@ -45,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       needs_push: ${{ steps.detect.outputs.needs_build }}
-      matrix_all: ${{ steps.detect.outputs.matrix_all }}
+      versions: ${{ steps.detect.outputs.versions }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -72,8 +70,7 @@ jobs:
   # Each TF run executes plans/push-container.fmf which:
   #   1. Installs Docker CE and QEMU binfmt (for cross-compilation)
   #   2. Logs in to quay.io
-  #   3. Runs make maistra-builder_VERSION.push (single-arch) or
-  #      make maistra-builder_VERSION.push_multi (multi-arch with buildx)
+  #   3. Runs make maistra-builder_VERSION.push_multi (multi-arch with buildx)
   #
   # All builds run on x86_64 machines only. ARM images are cross-compiled
   # via QEMU, matching Prow's behavior.
@@ -85,7 +82,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        include: ${{ fromJSON(needs.detect-versions.outputs.matrix_all) }}
+        version: ${{ fromJSON(needs.detect-versions.outputs.versions) }}
     name: "push maistra-builder:${{ matrix.version }}"
     steps:
       - name: Checkout repo
@@ -105,6 +102,6 @@ jobs:
           # TAG_SUFFIX comes from repo variable. In the test repo it is
           # "-staging", in production it is empty (not configured).
           # The Makefile appends TAG_SUFFIX to the image tag.
-          variables: "BUILDER_VERSION=${{ matrix.version }};PUSH_MODE=${{ matrix.push_mode }};TAG_SUFFIX=${{ vars.TAG_SUFFIX || '' }}"
+          variables: "BUILDER_VERSION=${{ matrix.version }};TAG_SUFFIX=${{ vars.TAG_SUFFIX || '' }}"
           secrets: "QUAY_USER=maistra-dev+prow;QUAY_PASS=${{ secrets.QUAY_PASSWORD }}"
           timeout: 300
