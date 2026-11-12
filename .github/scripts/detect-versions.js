@@ -26,7 +26,7 @@
 
 // Supported maistra-builder versions, matching BUILD_IMAGE_VERSIONS in Makefile.
 // Each one corresponds to a Dockerfile: `docker/maistra-builder_<version>.Dockerfile`
-const ALL_VERSIONS = ['2.6', '3.0', '3.1', '3.2', '3.3', '3.4', '3.5', 'main'];
+const ALL_VERSIONS = ['2.6', '3.0', '3.1', '3.2', '3.3', '3.4', '3.5', '3.6', 'main'];
 
 // File path patterns that affect ALL versions.
 // Makefile defines how every image is built.
