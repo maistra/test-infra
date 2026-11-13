@@ -27,7 +27,7 @@ cleanup() {
 }
 
 get_opts() {
-  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-failure-notify:,merge-failure-label:,merge-failure-pr,merge-strategy:,merge-at-tag-boundaries,post-merge-hook:,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
+  if opt="$(getopt -o '' -l branch:,org:,repo:,title:,match-title:,body:,labels:,user:,email:,modifier:,script-path:,cmd:,token-path:,token:,merge-repository:,merge-branch:,merge-tag:,merge-failure-notify:,merge-failure-label:,merge-failure-pr,merge-strategy:,merge-at-tag-boundaries,post-merge-hook:,git-exclude:,strict,dry-run,verbose,fetch-tags -n "$(basename "$0")" -- "$@")"; then
     eval set -- "$opt"
   else
     print_error_and_exit "unable to parse options"
@@ -103,6 +103,10 @@ get_opts() {
       ;;
     --merge-branch)
       merge_branch="$2"
+      shift 2
+      ;;
+    --merge-tag)
+      merge_tag="$2"
       shift 2
       ;;
     --merge-failure-notify)
@@ -183,9 +187,20 @@ validate_opts() {
     branch="$(current_branch)"
   fi
 
-  if [ -n "${merge_repository:-}" ] && [ -n "${merge_branch:-}" ]; then
+  if [ -n "${merge_branch:-}" ] && [ -n "${merge_tag:-}" ]; then
+    print_error_and_exit "merge-branch and merge-tag are mutually exclusive"
+  fi
+
+  if [ -n "${merge_repository:-}" ] && [ -n "${merge_branch:-}${merge_tag:-}" ]; then
     merge=true
   fi
+
+  if [ -n "${merge_tag:-}" ] && ${fetch_tags}; then
+    print_error_and_exit "merge-tag cannot use fetch-tags"
+  fi
+
+  # Name the merged upstream ref in failure reports.
+  merge_source="${merge_tag:+tag }${merge_tag:-${merge_branch:-}}"
 
   if [ -z "${merge_strategy:-}" ]; then
     merge_strategy="merge"
@@ -207,8 +222,8 @@ validate_opts() {
 
   merge_at_tag_boundaries="${merge_at_tag_boundaries:-false}"
   if $merge_at_tag_boundaries; then
-    if ! $merge || [ "$merge_strategy" != merge ] || $fetch_tags; then
-      print_error_and_exit "merge-at-tag-boundaries requires merge-repository, merge-branch, merge-strategy 'merge', and cannot use fetch-tags"
+    if ! $merge || [ -n "${merge_tag:-}" ] || [ "$merge_strategy" != merge ] || $fetch_tags; then
+      print_error_and_exit "merge-at-tag-boundaries requires merge-repository, merge-branch, merge-strategy 'merge', and cannot use merge-tag or fetch-tags"
     fi
   fi
 
@@ -245,12 +260,12 @@ validate_opts() {
   fi
 
   if [ ! -f "${script_path:-}" ] && ! $merge; then
-    print_error_and_exit "either script-path, cmd, or merge-repository and merge-branch are required"
+    print_error_and_exit "either script-path, cmd, or merge-repository and merge-branch or merge-tag are required"
   fi
 
   if [ -n "${post_merge_hook:-}" ]; then
     if ! $merge; then
-      print_error_and_exit "post-merge-hook option requires merge-repository and merge-branch"
+      print_error_and_exit "post-merge-hook option requires merge-repository and merge-branch or merge-tag"
     fi
     if [ ! -f "$post_merge_hook" ]; then
       print_error_and_exit "post-merge-hook does not exist: $post_merge_hook"
@@ -350,7 +365,7 @@ create_merge_failure_pr() {
     local conflict_body
     conflict_body="$(
       cat <<EOF
-Automatic merge of upstream ($merge_branch) into $org/$repo ($branch branch) failed.
+Automatic merge of upstream ($merge_source) into $org/$repo ($branch branch) failed.
 
 ${merge_failure_context:-}
 
@@ -376,8 +391,8 @@ EOF
 merge_tag_target() {
   local target="$1" description="$2" code
   echo "Merging $description"
-  # Fast-forward where possible; only create a merge commit for divergent history.
-  if git -c "user.name=$user" -c "user.email=$email" merge --ff -m "$title" --log "$target"; then
+  # Preserve a first-parent boundary even when a fast-forward would be possible.
+  if git -c "user.name=$user" -c "user.email=$email" merge --no-ff -m "$title" -m "Upstream $description" --log "$target"; then
     return 0
   else
     code=$?
@@ -387,40 +402,96 @@ merge_tag_target() {
   fi
 }
 
+fail_tag_boundary() {
+  local tag="$1" commit="$2" reason="$3" fetch_command switch_command merge_command
+  printf -v fetch_command 'git fetch --no-tags %q %q' "$merge_repository" "refs/tags/$tag"
+  printf -v switch_command 'git switch %q' "$branch"
+  printf -v merge_command 'git merge --no-ff -m %q --log %q' "$title" "$commit"
+  printf -v merge_failure_context '%s\n\nTo merge the original tag manually, review and run these commands in a clean downstream checkout:\n\n```bash\n%s\n%s\n%s\n```' \
+    "$reason" "$fetch_command" "$switch_command" "$merge_command"
+  echo "$merge_failure_context" >&2
+  return 1
+}
+
+# Resolve a release tag to its boundary commit on the upstream release branch. Write
+# the result into the named caller variable so failures retain merge_failure_context.
+get_tag_boundary() {
+  local tag="$1" result_var="$2" upstream_ref="upstream/$merge_branch"
+  local series="${merge_branch#release[-/]}"
+  local commit matching_tags base
+
+  commit="$(git rev-parse "refs/automator/upstream-tags/${tag}^{commit}")" || return
+  # One name per line, e.g. "1.31.4"; multiple names for this commit are invalid.
+  matching_tags="$(git for-each-ref --points-at "$commit" --format='%(refname:strip=3)' \
+    "refs/automator/upstream-tags/${series}.*")" || return
+  if [[ "$matching_tags" == *$'\n'* ]]; then
+    fail_tag_boundary "$tag" "$commit" \
+      "Multiple release-series tags point to boundary commit $commit: $matching_tags"
+    return 1
+  fi
+
+  # Security releases are tagged on a side branch cut from the release branch, and
+  # their commits are cherry-picked back with new SHAs. The newest commit the tag
+  # shares with the release branch is that branch point, so stop there: midstream
+  # then holds every downstream change up to the point where the z-stream branch
+  # will be cut. For tags on the release branch, the merge-base is the tag itself.
+  if ! base="$(git merge-base "$commit" "$upstream_ref")"; then
+    fail_tag_boundary "$tag" "$commit" "Tag $tag ($commit) has no common history with $upstream_ref."
+    return 1
+  fi
+  if [ "$base" != "$commit" ]; then
+    echo "Resolved security tag $tag ($commit) to its branch point $base on $upstream_ref" >&2
+  fi
+  printf -v "$result_var" '%s' "$base"
+}
+
 merge_tag_boundaries() {
   local upstream_ref="upstream/$merge_branch"
-  local refs ref tag commit history previous="" tip
-  local -A tags_by_commit=()
-  local -a boundaries=()
+  local series current_tag refs ref tag boundary tip
+  local seen_current_tag=false
 
-  refs="$(git for-each-ref --format='%(refname)' refs/automator/upstream-tags/)" || return
+  if [[ "$merge_branch" =~ ^release[-/](v?[0-9]+\.[0-9]+)$ ]]; then
+    series="${BASH_REMATCH[1]}"
+  else
+    echo "merge-at-tag-boundaries requires a release-X.Y or release/vX.Y branch, got: $merge_branch" >&2
+    return 1
+  fi
+
+  # Start at the newest exact tag already in midstream. Older releases are
+  # superseded; security tags are recognized through get_tag_boundary below.
+  current_tag="$(git -c versionsort.suffix=- for-each-ref --merged=HEAD --count=1 \
+    --sort=-version:refname --format='%(refname:strip=3)' "refs/automator/upstream-tags/${series}.*")" || return
+  if [ -z "$current_tag" ]; then
+    seen_current_tag=true
+  fi
+
+  # Discover all tag refs in the release series, one per line. For series=1.31:
+  #   refs/automator/upstream-tags/1.31.0
+  #   refs/automator/upstream-tags/1.31.1
+  #   ...
+  #   refs/automator/upstream-tags/1.31.4
+  # Version order handles .9/.10 and places prereleases before final releases.
+  refs="$(git -c versionsort.suffix=- for-each-ref --sort=version:refname \
+    --format='%(refname)' "refs/automator/upstream-tags/${series}.*")" || return
   while IFS= read -r ref; do
     [ -n "$ref" ] || continue
     tag="${ref#refs/automator/upstream-tags/}"
-    # Tags on trees or blobs cannot define commit boundaries.
-    commit="$(git rev-parse "${ref}^{commit}" 2>/dev/null)" || continue
-    tags_by_commit["$commit"]="$tag"
-  done <<< "$refs"
-
-  # Only tagged commits reachable from upstream but not midstream are boundaries.
-  # Topological order handles duplicate tags and dates that do not match ancestry.
-  # Validate the entire plan before changing HEAD.
-  history="$(git rev-list --topo-order --reverse "$upstream_ref" --not HEAD)" || return
-  while IFS= read -r commit; do
-    [ -n "$commit" ] || continue
-    [ -n "${tags_by_commit[$commit]:-}" ] || continue
-    if [ -n "$previous" ] && ! git merge-base --is-ancestor "$previous" "$commit"; then
-      echo "Cannot merge divergent tag boundaries: ${tags_by_commit[$previous]} ($previous) and ${tags_by_commit[$commit]} ($commit)" >&2
-      return 1
+    if ! $seen_current_tag; then
+      if [ "$tag" = "$current_tag" ]; then
+        seen_current_tag=true
+      fi
+      continue
     fi
-    boundaries+=("$commit")
-    previous="$commit"
-  done <<< "$history"
-
-  for commit in "${boundaries[@]}"; do
-    # Stop explicitly on failure: merge() disables errexit while capturing status.
-    merge_tag_target "$commit" "tag boundary ${tags_by_commit[$commit]} ($commit)" || return
-  done
+    get_tag_boundary "$tag" boundary || return
+    if git merge-base --is-ancestor "$boundary" HEAD; then
+      current_tag="$tag"
+      echo "Current tag boundary $current_tag ($boundary) is already integrated downstream"
+      continue
+    fi
+    # Publish at the first new boundary, not at later tags or the branch tip.
+    merge_tag_target "$boundary" "tag boundary $tag (upstream commit $boundary)"
+    return $?
+  done <<< "$refs"
 
   tip="$(git rev-parse "$upstream_ref")" || return
   merge_tag_target "$upstream_ref" "branch tip $upstream_ref ($tip)"
@@ -430,10 +501,18 @@ merge() {
   local src_branch="${AUTOMATOR_SRC_BRANCH:-none}"
   fork_name="$src_branch-$branch-$modifier-$(hash "$title")"
 
+  local merge_target
   if $fetch_tags; then
     git remote add -f upstream "$merge_repository"
     merge_branch="$(git describe --tags --abbrev=0 "upstream/$merge_branch")"
+    merge_source="$merge_branch"
     echo "Using tag $merge_branch"
+  elif [ -n "${merge_tag:-}" ]; then
+    git remote add --no-tags upstream "$merge_repository"
+    # Keep the upstream tag separate from a downstream tag with the same name.
+    merge_target="refs/automator/upstream-tags/$merge_tag"
+    git fetch --no-tags upstream "+refs/tags/$merge_tag:$merge_target"
+    echo "Using tag $merge_tag"
   elif $merge_at_tag_boundaries; then
     git remote add --no-tags -f -t "$merge_branch" upstream "$merge_repository"
     echo "Using branch $merge_branch with upstream tag boundaries"
@@ -441,6 +520,8 @@ merge() {
     git remote add -f -t "$merge_branch" upstream "$merge_repository"
     echo "Using branch $merge_branch"
   fi
+
+  merge_target="${merge_target:-upstream/$merge_branch}"
 
   local initial_merge_head merge_failure_context=""
   initial_merge_head="$(git rev-parse HEAD)"
@@ -453,9 +534,9 @@ merge() {
   if $merge_at_tag_boundaries; then
     merge_tag_boundaries
   elif [ "${merge_strategy}" == "merge" ]; then
-    git -c "user.name=$user" -c "user.email=$email" merge --no-ff -m "$title" --log upstream/"$merge_branch"
+    git -c "user.name=$user" -c "user.email=$email" merge --no-ff -m "$title" --log "$merge_target"
   else
-    git -c "user.name=$user" -c "user.email=$email" rebase upstream/"$merge_branch"
+    git -c "user.name=$user" -c "user.email=$email" rebase "$merge_target"
   fi
   local code=$?
   set -e
@@ -468,16 +549,16 @@ merge() {
       create_merge_failure_pr
     else
       local issue_number
-      issue_number=$(gh issue list -S "Automatic merge of $merge_branch into $branch failed." -R "$org/$repo" --json number --jq '.[0].number // empty')
+      issue_number=$(gh issue list -S "Automatic merge of $merge_source into $branch failed." -R "$org/$repo" --json number --jq '.[0].number // empty')
       if [ -z "$issue_number" ]; then
         # shellcheck disable=SC2086
-        gh issue create -b "Automatic merge of upstream ($merge_branch) into $org/$repo ($branch branch) failed. ${merge_failure_context:-} ${merge_failure_notify:-}" -t "Automatic merge of upstream failed" ${merge_failure_label:-} -R "$org/$repo"
-        print_error "Conflicts detected, manual merge is required. An issue in $org/$repo has been created." 1
+        gh issue create -b "Automatic merge of upstream ($merge_source) into $org/$repo ($branch branch) failed. ${merge_failure_context:-} ${merge_failure_notify:-}" -t "Automatic merge of upstream failed" ${merge_failure_label:-} -R "$org/$repo"
+        print_error "Automatic merge failed, manual intervention is required. An issue in $org/$repo has been created." 1
       else
         if [ -n "$merge_failure_context" ]; then
           gh issue comment "$issue_number" --repo "$org/$repo" --body "$merge_failure_context"
         fi
-        print_error "Conflicts detected, manual merge is required. An issue in $org/$repo already exists." 1
+        print_error "Automatic merge failed, manual intervention is required. An issue in $org/$repo already exists." 1
       fi
     fi
   else
@@ -485,7 +566,6 @@ merge() {
     if [ -n "${post_merge_hook:-}" ]; then
       bash "${shell_args[@]}" "$post_merge_hook" "${script_args[@]}"
     fi
-    # Fast-forwards retain the upstream commit message, not the automator title.
     if [ "$(git rev-parse HEAD)" != "$initial_merge_head" ]; then
       git show --shortstat
       git push --force "https://$user:$token@github.com/$user/$repo.git" "HEAD:$fork_name"
