@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi9/ubi:9.9
+FROM registry.access.redhat.com/ubi9/ubi
 
 ENV GOLANG_VERSION=1.27.4
 ENV GOPROXY="https://proxy.golang.org,direct"
