@@ -1,6 +1,6 @@
-FROM registry.access.redhat.com/ubi9/ubi:9.8
+FROM registry.access.redhat.com/ubi9/ubi:9.9
 
-ENV GOLANG_VERSION=1.26.10
+ENV GOLANG_VERSION=1.27.4
 ENV GOPROXY="https://proxy.golang.org,direct"
 ENV GO111MODULE=on
 ENV GOSUMDB=sum.golang.org
